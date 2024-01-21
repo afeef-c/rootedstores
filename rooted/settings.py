@@ -86,6 +86,7 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
+        
     }
 }
 
@@ -145,3 +146,9 @@ from django.contrib.messages import constants as messages
 MESSAGE_TAGS = {
     messages.ERROR: 'danger',
 }
+
+ACCOUNT_SID='AC0722d83bf85ed2310a99c6a179b132b1'
+AUTH_TOKEN='f80222ff17ae15daef5fe556849d96a9'
+COUNTRY_CODE='+91'
+TWILIO_WHATSAPP_NUMBER='whatsapp:+14155238886.'
+TWILIO_PHONE_NUMBER='+91 8281016629'

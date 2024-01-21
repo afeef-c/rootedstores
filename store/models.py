@@ -24,5 +24,12 @@ class Product(models.Model):
     def __str__(self) -> str:
         return self.product_name
     
+class ProductImages(models.Model):
+    images = models.ImageField(upload_to="product-images", default="product.jpg")
+    product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
+    date = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name_plural = "Product images"
 
     
