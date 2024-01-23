@@ -34,10 +34,16 @@
 	<div class="container">
 		<div class="row align-items-center">
 			<div class="col-lg-2 col-md-3 col-6">
+				
 				<a href="{% url 'home' %}" class="brand-wrap">
-					<img class="logo" src="{% static './images/logo.png' %}">
+					<div class="row">
+						<img class="logo" src="{% static './images/root_logo.png' %}">
+						<h2>Rooted</h2>
+					</div>
+						
 				</a> <!-- brand-wrap.// -->
 			</div>
+
 			<div class="col-lg col-sm col-md col-6 flex-grow-0">
 				<div class="dropdown category-wrap d-inline-block float-right">
 					<button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">

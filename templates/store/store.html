@@ -41,7 +41,7 @@
                                 </div> <!-- card-body.// -->
                             </div>
                         </article> <!-- filter-group  .// -->
-                        <article class="filter-group">
+                        <!--<article class="filter-group">
                             <header class="card-header">
                                 <a href="#" data-toggle="collapse" data-target="#collapse_4" aria-expanded="true" class="">
                                     <i class="icon-control fa fa-chevron-down"></i>
@@ -69,9 +69,11 @@
                                     <input type="checkbox">
                                     <span class="btn btn-light"> XXL </span>
                                 </label>
-                            </div><!-- card-body.// -->
                             </div>
-                        </article> <!-- filter-group .// -->
+                            
+                            </div>
+                        </article> -->
+                        <!--filter-group .//-->
                         
                         <article class="filter-group">
                             <header class="card-header">
@@ -88,25 +90,25 @@
                                     <label>Min</label>
                                     <!-- <input class="form-control" placeholder="$0" type="number"> -->
                                         <select class="mr-2 form-control">
-                                            <option value="0">$0</option>
-                                            <option value="50">$50</option>
-                                            <option value="100">$100</option>
-                                            <option value="150">$150</option>
-                                            <option value="200">$200</option>
-                                            <option value="500">$500</option>
-                                            <option value="1000">$1000</option>
+                                            <option value="0">₹ 0</option>
+                                            <option value="50">₹ 50</option>
+                                            <option value="100">₹ 100</option>
+                                            <option value="150">₹ 150</option>
+                                            <option value="200">₹ 200</option>
+                                            <option value="500">₹ 500</option>
+                                            <option value="1000">₹ 1000</option>
                                         </select>
                                     </div>
                                     <div class="form-group text-right col-md-6">
                                     <label>Max</label>
                                         <select class="mr-2 form-control">
-                                            <option value="50">$50</option>
-                                            <option value="100">$100</option>
-                                            <option value="150">$150</option>
-                                            <option value="200">$200</option>
-                                            <option value="500">$500</option>
-                                            <option value="1000">$1000</option>
-                                            <option value="2000">$2000+</option>
+                                            <option value="50">₹ 50</option>
+                                            <option value="100">₹ 100</option>
+                                            <option value="150">₹ 150</option>
+                                            <option value="200">₹ 200</option>
+                                            <option value="500">₹ 500</option>
+                                            <option value="1000">₹ 1000</option>
+                                            <option value="2000">₹ 2000+</option>
                                         </select>
                                     </div>
                                     </div> <!-- form-row.// -->
@@ -142,7 +144,7 @@
                                         <a href="{{p.get_url}}" class="title"> {{p.product_name}} </a>
                                         <div class="price-wrap mt-2">
                                             <span class="price">₹ {{p.price}}</span>
-                                            <del class="price-old">$1980</del>
+                                            <del class="price-old">₹ 300</del>
                                         </div> <!-- price-wrap.// -->
                                     </div>
                                     <a href="{{ p.get_url }}" class="btn btn-block btn-primary">View Details </a>

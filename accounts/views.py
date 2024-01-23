@@ -40,7 +40,8 @@ def register(request):
 
             # Check if 'methodOtp' exists in request.POST
             
-            MessageHandler(request.POST['phone_number'],otp).send_otp_via_whatsapp()
+            MessageHandler(request.POST['phone_number'],otp).send_otp_via_message()
+            #MessageHandler(request.POST['phone_number'],otp).send_otp_via_whatsapp()
             #if request.POST['methodOtp']=="methodOtpWhatsapp":
             #    messagehandler=MessageHandler(request.POST['phone_number'],otp).send_otp_via_whatsapp()
             #else:
