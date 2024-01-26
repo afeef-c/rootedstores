@@ -2,191 +2,697 @@
 {% load static %}
 
 
+
 {% block content %}
 
+	<!--=======  breadcrumb area =======-->
 
-<!-- ========================= SECTION PAGETOP ========================= -->
-    <section class="section-pagetop bg">
-        <div class="container">
-            <h2 class="title-page">Our Store</h2>
-        </div> <!-- container //  -->
-    </section>
-<!-- ========================= SECTION INTRO END// ========================= -->
+	<div class="breadcrumb-area breadcrumb-bg-2 pt-50 pb-70">
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-12">
+					<h1 class="breadcrumb-title">Store</h1>
 
-<!-- ========================= SECTION CONTENT ========================= -->
-    <section class="section-content padding-y">
-        <div class="container">
+					<!--=======  breadcrumb list  =======-->
 
-            <div class="row">
-                <aside class="col-md-3"> 
-                    
-                    <div class="card">
-                        <article class="filter-group">
-                            <header class="card-header">
-                                <a href="#" data-toggle="collapse" data-target="#collapse_1" aria-expanded="true" class="">
-                                    <i class="icon-control fa fa-chevron-down"></i>
-                                    <h6 class="title">Categories</h6>
-                                </a>
-                            </header>
-                            <div class="filter-content collapse show" id="collapse_1" style="">
-                                <div class="card-body">
-                                    
-                                    <ul class="list-menu">
-                                        <li><a href="{% url 'store'%}"> All products </a></li>
-                                        {% for cat in links %}
-                                        <li><a href="{{cat.get_url}}"> {{cat.cat_name}} </a></li>
-                                        {% endfor %}
-                                    </ul>
+					<ul class="breadcrumb-list">
+						<li class="breadcrumb-list__item"><a href="{% url 'home' %}">HOME</a></li>
+						<li class="breadcrumb-list__item breadcrumb-list__item--active">PRODUCTS</li>
+					</ul>
 
-                                </div> <!-- card-body.// -->
-                            </div>
-                        </article> <!-- filter-group  .// -->
-                        <!--<article class="filter-group">
-                            <header class="card-header">
-                                <a href="#" data-toggle="collapse" data-target="#collapse_4" aria-expanded="true" class="">
-                                    <i class="icon-control fa fa-chevron-down"></i>
-                                    <h6 class="title">Sizes </h6>
-                                </a>
-                            </header>
-                            <div class="filter-content collapse show" id="collapse_4" style="">
-                                <div class="card-body">
-                                <label class="checkbox-btn">
-                                    <input type="checkbox">
-                                    <span class="btn btn-light"> XS </span>
-                                </label>
+					<!--=======  End of breadcrumb list  =======-->
 
-                                <label class="checkbox-btn">
-                                    <input type="checkbox">
-                                    <span class="btn btn-light"> SM </span>
-                                </label>
+				</div>
+			</div>
+		</div>
+	</div>
 
-                                <label class="checkbox-btn">
-                                    <input type="checkbox">
-                                    <span class="btn btn-light"> LG </span>
-                                </label>
+	<!--=======  End of breadcrumb area =======-->
 
-                                <label class="checkbox-btn">
-                                    <input type="checkbox">
-                                    <span class="btn btn-light"> XXL </span>
-                                </label>
-                            </div>
-                            
-                            </div>
-                        </article> -->
-                        <!--filter-group .//-->
-                        
-                        <article class="filter-group">
-                            <header class="card-header">
-                                <a href="#" data-toggle="collapse" data-target="#collapse_3" aria-expanded="true" class="">
-                                    <i class="icon-control fa fa-chevron-down"></i>
-                                    <h6 class="title">Price range </h6>
-                                </a>
-                            </header>
-                            <div class="filter-content collapse show" id="collapse_3" style="">
-                                <div class="card-body">
-                                    
-                                    <div class="form-row">
-                                    <div class="form-group col-md-6">
-                                    <label>Min</label>
-                                    <!-- <input class="form-control" placeholder="$0" type="number"> -->
-                                        <select class="mr-2 form-control">
-                                            <option value="0">₹ 0</option>
-                                            <option value="50">₹ 50</option>
-                                            <option value="100">₹ 100</option>
-                                            <option value="150">₹ 150</option>
-                                            <option value="200">₹ 200</option>
-                                            <option value="500">₹ 500</option>
-                                            <option value="1000">₹ 1000</option>
-                                        </select>
-                                    </div>
-                                    <div class="form-group text-right col-md-6">
-                                    <label>Max</label>
-                                        <select class="mr-2 form-control">
-                                            <option value="50">₹ 50</option>
-                                            <option value="100">₹ 100</option>
-                                            <option value="150">₹ 150</option>
-                                            <option value="200">₹ 200</option>
-                                            <option value="500">₹ 500</option>
-                                            <option value="1000">₹ 1000</option>
-                                            <option value="2000">₹ 2000+</option>
-                                        </select>
-                                    </div>
-                                    </div> <!-- form-row.// -->
-                                    <button class="btn btn-block btn-primary">Apply</button>
-                                </div><!-- card-body.// -->
-                            </div>
-                        </article> <!-- filter-group .// -->
-                        
-                    </div> <!-- card.// -->
+	<!--=============================================
+    =            shop page content         =
+    =============================================-->
 
-                </aside> <!-- col.// -->
+	<div class="shop-page-wrapper">
 
-                <main class="col-md-9">
+		<!--=======  shop page header  =======-->
 
-                    <header class="border-bottom mb-4 pb-3">
-                            <div class="form-inline">
-                                <span class="mr-md-auto"> <strong>{{ products.count }}</strong> items found </span>
-                                
-                            </div>
-                    </header><!-- sect-heading -->
+		<div class="shop-page-header">
+			<div class="container wide">
+				<div class="row align-items-center">
 
-                    <div class="row">
-                        {% for p in products %}
-                        <div class="col-md-4">
-                            <figure class="card card-product-grid">
-                                <div class="img-wrap"> 
-                                    
-                                    <img src="{{ p.images.url }}">
-                                    
-                                </div> <!-- img-wrap.// -->
-                                <figcaption class="info-wrap">
-                                    <div class="fix-height">
-                                        <a href="{{p.get_url}}" class="title"> {{p.product_name}} </a>
-                                        <div class="price-wrap mt-2">
-                                            <span class="price">₹ {{p.price}}</span>
-                                            <del class="price-old">₹ 300</del>
-                                        </div> <!-- price-wrap.// -->
-                                    </div>
-                                    <a href="{{ p.get_url }}" class="btn btn-block btn-primary">View Details </a>
-                                </figcaption>
-                            </figure>
-                        </div> <!-- col.// -->
-                        {% endfor %}
+					<div class="col-12 col-lg-7 col-md-10 d-none d-md-block">
+						<!--=======  fitler titles  =======-->
+						<div class="filter-title filter-title--type-two">
+							<ul class="product-filter-menu">
+								<li class="active" data-filter="*">All</li>
+								<li data-filter=".hot">hot products</li>
+								<li data-filter=".new">new products</li>
+								<li data-filter=".sale">sale products</li>
+							</ul>
+						</div>
+						<!--=======  End of fitler titles  =======-->
+					</div>
 
-                    </div> <!-- row end.// -->
+					<div class="col-12 col-lg-5 col-md-2">
+						<!--=======  filter icons  =======-->
+
+						<div class="filter-icons">
+							<!--=======  filter dropdown  =======-->
+
+							<div class="single-icon filter-dropdown">
+								<select class="nice-select">
+									<option value="0">Default sorting</option>
+									<option value="1">Sort ny popularity</option>
+									<option value="0">Sort by average rating</option>
+									<option value="0">Sort by latest</option>
+									<option value="0">Sort by price: low to high</option>
+									<option value="0">Sort by price: high to low</option>
+								</select>
+							</div>
+
+							<!--=======  End of filter dropdown  =======-->
+
+							<!--=======  grid icons  =======-->
+
+							<div class="single-icon grid-icons">
+								<a data-target="five-column" class="active" href="javascript:void(0)"><i
+										class="ti-layout-grid4-alt"></i></a>
+								<a data-target="four-column" href="javascript:void(0)"><i class="ti-layout-grid3-alt"></i></a>
+								<a data-target="three-column" href="javascript:void(0)"><i class="ti-layout-grid2-alt"></i></a>
+								<a data-target="list" href="javascript:void(0)"><i class="ti-view-list"></i></a>
+							</div>
+
+							<!--=======  End of grid icons  =======-->
+
+							<!--=======  advance filter icon  =======-->
+
+							<div class="single-icon advance-filter-icon">
+								<a href="javascript:void(0)" id="advance-filter-active-btn"><i class="ion-android-funnel"></i>
+									Filters</a>
+							</div>
+							
+							<!--=======  End of advance filter icon  =======-->
+						</div>
+
+						<!--=======  End of filter icons  =======-->
+					</div>
+
+				</div>
+			</div>
+		</div>
+
+		<!--=======  End of shop page header  =======-->
+
+		<!--=============================================
+        =            shop advance filter area         =
+        =============================================-->
+
+		<div class="shop-advance-filter-area" id="shop-advance-filter-area">
+			<div class="shop-advance-filter-wrapper pt-50">
+				<div class="container">
+					<div class="row">
+						<div class="col-lg-2 col-md-4 col-sm-6 mb-50">
+							<!--=======  single advance filte  =======-->
+
+							<div class="single-filter-widget">
+								<h2 class="single-filter-widget--title">Sort by</h2>
+								<ul class="single-filter-widget--list">
+									<li><a href="#">Default</a></li>
+									<li><a href="#">Popularity</a></li>
+									<li><a href="#">Average rating</a></li>
+									<li><a href="#">Newness</a></li>
+									<li><a href="#">Price: low to high</a></li>
+									<li><a href="#">Price: high to low</a></li>
+								</ul>
+							</div>
+
+							<!--=======  End of single advance filte  =======-->
+						</div>
+
+						<div class="col-lg-2 col-md-4 col-sm-6 mb-50">
+							<!--=======  single advance filte  =======-->
+
+							<div class="single-filter-widget">
+								<h2 class="single-filter-widget--title">Categories</h2>
+								<ul class="single-filter-widget--list single-filter-widget--list--category">
+									<li class="has-children">
+										<a href="shop-left-sidebar.html">Cosmetic </a> <span class="quantity">5</span>
+										<ul>
+											<li><a href="shop-left-sidebar.html">For body</a></li>
+											<li><a href="shop-left-sidebar.html">Make up</a></li>
+											<li><a href="shop-left-sidebar.html">New</a></li>
+											<li><a href="shop-left-sidebar.html">Perfumes</a></li>
+										</ul>
+									</li>
+									<li class="has-children">
+										<a href="shop-left-sidebar.html">Furniture </a> <span class="quantity">23</span>
+										<ul>
+											<li><a href="shop-left-sidebar.html">Sofas</a></li>
+											<li><a href="shop-left-sidebar.html">Armchairs</a></li>
+											<li><a href="shop-left-sidebar.html">Desk Chairs</a></li>
+											<li><a href="shop-left-sidebar.html">Dining Chairs</a></li>
+										</ul>
+									</li>
+									<li><a href="shop-left-sidebar.html">Watches </a> <span class="quantity">12</span></li>
+								</ul>
+							</div>
+
+							<!--=======  End of single advance filte  =======-->
+						</div>
+
+						<div class="col-lg-2 col-md-4 col-sm-6 mb-50">
+							<!--=======  single advance filte  =======-->
+
+							<div class="single-filter-widget">
+								<h2 class="single-filter-widget--title">Price filter</h2>
+								<ul class="single-filter-widget--list">
+									<li><a href="#">All</a></li>
+									<li><a href="#">$0.00 - $70.00</a></li>
+									<li><a href="#">$70.00 - $140.00</a></li>
+									<li><a href="#">$140.00 - $210.00</a></li>
+									<li><a href="#">$210.00 - $280.00</a></li>
+									<li><a href="#">$280.00 - $350.00</a></li>
+								</ul>
+							</div>
+
+							<!--=======  End of single advance filte  =======-->
+						</div>
+
+						<div class="col-lg-2 col-md-4 col-sm-6 mb-50">
+							<!--=======  single advance filte  =======-->
+
+							<div class="single-filter-widget">
+								<h2 class="single-filter-widget--title">Color</h2>
+								<ul class="single-filter-widget--list single-filter-widget--list--color">
+									<li><a class="active" href="#" data-tippy="Black" data-tippy-inertia="true"
+											data-tippy-animation="shift-away" data-tippy-delay="50" data-tippy-arrow="true"
+											data-tippy-theme="sharpborder"><span class="color-picker black"></span></a></li>
+									<li><a href="#" data-tippy="Blue" data-tippy-inertia="true" data-tippy-animation="shift-away"
+											data-tippy-delay="50" data-tippy-arrow="true" data-tippy-theme="sharpborder"><span
+												class="color-picker blue"></span></a></li>
+									<li><a href="#" data-tippy="Brown" data-tippy-inertia="true" data-tippy-animation="shift-away"
+											data-tippy-delay="50" data-tippy-arrow="true" data-tippy-theme="sharpborder"><span
+												class="color-picker brown"></span></a></li>
+									<li><a href="#" data-tippy="Gold" data-tippy-inertia="true" data-tippy-animation="shift-away"
+											data-tippy-delay="50" data-tippy-arrow="true" data-tippy-theme="sharpborder"><span
+												class="color-picker gold"></span></a></li>
+									<li><a href="#" data-tippy="Green Coral" data-tippy-inertia="true" data-tippy-animation="shift-away"
+											data-tippy-delay="50" data-tippy-arrow="true" data-tippy-theme="sharpborder"><span
+												class="color-picker green-coral"></span></a></li>
+									<li><a href="#" data-tippy="Grey" data-tippy-inertia="true" data-tippy-animation="shift-away"
+											data-tippy-delay="50" data-tippy-arrow="true" data-tippy-theme="sharpborder"><span
+												class="color-picker grey"></span></a></li>
+									<li><a href="#" data-tippy="Oak" data-tippy-inertia="true" data-tippy-animation="shift-away"
+											data-tippy-delay="50" data-tippy-arrow="true" data-tippy-theme="sharpborder"><span
+												class="color-picker oak"></span></a></li>
+									<li><a href="#" data-tippy="Pink" data-tippy-inertia="true" data-tippy-animation="shift-away"
+											data-tippy-delay="50" data-tippy-arrow="true" data-tippy-theme="sharpborder"><span
+												class="color-picker pink"></span></a></li>
+									<li><a href="#" data-tippy="Silver" data-tippy-inertia="true" data-tippy-animation="shift-away"
+											data-tippy-delay="50" data-tippy-arrow="true" data-tippy-theme="sharpborder"><span
+												class="color-picker silver"></span></a></li>
+									<li><a href="#" data-tippy="White" data-tippy-inertia="true" data-tippy-animation="shift-away"
+											data-tippy-delay="50" data-tippy-arrow="true" data-tippy-theme="sharpborder"><span
+												class="color-picker white"></span></a></li>
+								</ul>
+							</div>
+
+							<!--=======  End of single advance filte  =======-->
+						</div>
+
+						<div class="col-lg-2 col-md-4 col-sm-6 mb-50">
+							<!--=======  single advance filte  =======-->
+
+							<div class="single-filter-widget">
+								<h2 class="single-filter-widget--title">Size</h2>
+								<ul class="single-filter-widget--list single-filter-widget--list--size">
+									<li><a href="#">L</a> <span class="quantity">5</span></li>
+									<li><a href="#">M</a> <span class="quantity">5</span></li>
+									<li><a href="#">S</a> <span class="quantity">5</span></li>
+									<li><a href="#">XS</a> <span class="quantity">5</span></li>
+								</ul>
+							</div>
+
+							<!--=======  End of single advance filte  =======-->
+						</div>
+
+						<div class="col-lg-2 col-md-4 col-sm-6 mb-50">
+							<!--=======  single advance filte  =======-->
+
+							<div class="single-filter-widget">
+								<h2 class="single-filter-widget--title">Brands</h2>
+								<ul class="single-filter-widget--list single-filter-widget--list--brand">
+									<li><a href="#">Alliop</a> <span class="quantity">(12)</span></li>
+									<li><a href="#">Burberry</a> <span class="quantity">(15)</span></li>
+									<li><a href="#">Catmen</a> <span class="quantity">(13)</span></li>
+									<li><a href="#">Houdini</a> <span class="quantity">(10)</span></li>
+									<li><a href="#">Love</a> <span class="quantity">(70)</span></li>
+									<li><a href="#">Made</a> <span class="quantity">(15)</span></li>
+								</ul>
+							</div>
+
+							<!--=======  End of single advance filte  =======-->
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!--=====  End of shop advance filter area  ======-->
+
+		<!--=============================================
+		=            shop page content         =
+		=============================================-->
+
+		<div class="shop-page-content mt-100 mb-100">
+			<div class="container wide">
+				<div class="row">
+					<div class="col-xl-3 col-lg-3 order-2 order-lg-1">
+						<!--=======  page sidebar  =======-->
+
+						<div class="page-sidebar">
+							<!--=======  single sidebar widget  =======-->
+
+							<div class="single-sidebar-widget mb-40">
+								<!--=======  search widget  =======-->
+
+								<div class="search-widget">
+									<form action="#">
+										<input type="search" placeholder="Search products ...">
+										<button type="button"><i class="ion-android-search"></i></button>
+									</form>
+								</div>
+
+								<!--=======  End of search widget  =======-->
+							</div>
 
 
-                    <nav class="mt-4" aria-label="Page navigation sample">
-                        {% if products.has_other_pages %}
-                            <ul class="pagination">
-                                {% if product.has_previous %}
-                                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">Previous</a></li>
-                                {% else %}
-                                    <li class="page-item disabled"><a class="page-link" href="#">Previous</a></li>
-                                {% endif %}
+							<!--=======  End of single sidebarwidget  =======-->
 
-                                {% for i in products.paginator.page_range %}
-                                    {% if products.number == i %}    
-                                        <li class="page-item active"><a class="page-link" href="#"> {{i}} </a></li>
-                                    {% else %}
-                                        <li class="page-item"><a class="page-link" href="?page={{i}}"> {{i}} </a></li>
-                                    {% endif %}        
-                                {% endfor %}
-                                {% if product.has_next %}
-                                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Next</a></li>
-                                {% else %}
-                                    <li class="page-item disabled"><a class="page-link" href="#">Next</a></li>
-                                {% endif %}
-                            </ul>
-                        {% endif %}
-                    </nav>
+							<!--=======  single sidebar widget  =======-->
 
-                </main> <!-- col.// -->
+							<div class="single-sidebar-widget mb-40">
+								<h2 class="single-sidebar-widget--title">Categories</h2>
+								<ul class="single-sidebar-widget--list single-sidebar-widget--list--category">
+									<li class="has-children">
+										<a href="shop-left-sidebar.html">Cosmetic </a> <span class="quantity">5</span>
+										<ul>
+											<li><a href="shop-left-sidebar.html">For body</a></li>
+											<li><a href="shop-left-sidebar.html">Make up</a></li>
+											<li><a href="shop-left-sidebar.html">New</a></li>
+											<li><a href="shop-left-sidebar.html">Perfumes</a></li>
+										</ul>
+									</li>
+									<li class="has-children">
+										<a href="shop-left-sidebar.html">Furniture </a> <span class="quantity">23</span>
+										<ul>
+											<li><a href="shop-left-sidebar.html">Sofas</a></li>
+											<li><a href="shop-left-sidebar.html">Armchairs</a></li>
+											<li><a href="shop-left-sidebar.html">Desk Chairs</a></li>
+											<li><a href="shop-left-sidebar.html">Dining Chairs</a></li>
+										</ul>
+									</li>
+									<li><a href="shop-left-sidebar.html">Watches </a> <span class="quantity">12</span></li>
+									<li><a href="shop-left-sidebar.html">Bags </a> <span class="quantity">22</span></li>
+									<li><a href="shop-left-sidebar.html">Uncategorized </a> <span class="quantity">14</span></li>
+								</ul>
+							</div>
 
-            </div>
+							<!--=======  End of single sidebar widget  =======-->
 
-        </div> <!-- container .//  -->
-    </section>
-<!-- ========================= SECTION CONTENT END// ========================= -->
+							<!--=======  single sidebar widget  =======-->
 
-{% endblock content %}
+							<div class="single-sidebar-widget mb-40">
+								<h2 class="single-sidebar-widget--title">Filters</h2>
+								<div class="sidebar-price">
+									<div id="price-range"></div>
+									<div class="output-wrapper mt-20">
+										<input type="text" id="price-amount" class="price-amount" readonly>
+										<a class="price-range-button" href="#"><i class="ion-android-funnel"></i> Filter</a>
+									</div>
+								</div>
+							</div>
+
+							<!--=======  End of single sidebar widget  =======-->
+
+							<!--=======  single sidebar widget  =======-->
+
+							<div class="single-sidebar-widget mb-40">
+								<h2 class="single-sidebar-widget--title">Popular products</h2>
+
+								<!--=======  widget product wrapper  =======-->
+
+								<div class="widget-product-wrapper">
+									<!--=======  single widget product  =======-->
+									<div class="single-widget-product-wrapper">
+										<div class="single-widget-product">
+											<!--=======  image  =======-->
+
+											<div class="single-widget-product__image">
+												<a href="shop-product-basic.html">
+													<img src="{% static 'assets/images/products/product-furniture-2-100x100.jpg' %}" class="img-fluid" alt="">
+												</a>
+											</div>
+
+											<!--=======  End of image  =======-->
+
+											<!--=======  content  =======-->
+
+											<div class="single-widget-product__content">
+
+												<div class="single-widget-product__content__top">
+													<h3 class="product-title"><a href="shop-product-basic.html">Wooden Table</a></h3>
+													<div class="price">
+														<span class="main-price discounted">$270.00</span>
+														<span class="discounted-price">$220.00</span>
+													</div>
+													<div class="rating">
+														<i class="ion-android-star"></i>
+														<i class="ion-android-star"></i>
+														<i class="ion-android-star-outline"></i>
+														<i class="ion-android-star-outline"></i>
+														<i class="ion-android-star-outline"></i>
+													</div>
+												</div>
+
+											</div>
+
+											<!--=======  End of content  =======-->
+										</div>
+									</div>
+
+									<!--=======  End of single widget product  =======-->
+
+									<!--=======  single widget product  =======-->
+									<div class="single-widget-product-wrapper">
+										<div class="single-widget-product">
+											<!--=======  image  =======-->
+
+											<div class="single-widget-product__image">
+												<a href="shop-product-basic.html">
+													<img src="{% static 'assets/images/products/product-furniture-11-100x100.jpg' %}" class="img-fluid" alt="">
+												</a>
+											</div>
+
+											<!--=======  End of image  =======-->
+
+											<!--=======  content  =======-->
+
+											<div class="single-widget-product__content">
+
+												<div class="single-widget-product__content__top">
+													<h3 class="product-title"><a href="shop-product-basic.html">Sofa with cushion</a></h3>
+													<div class="price">
+														<span class="main-price discounted">$660.00</span>
+														<span class="discounted-price">$600.00</span>
+													</div>
+													<div class="rating">
+														<i class="ion-android-star"></i>
+														<i class="ion-android-star"></i>
+														<i class="ion-android-star"></i>
+														<i class="ion-android-star"></i>
+														<i class="ion-android-star"></i>
+													</div>
+												</div>
+
+
+
+											</div>
+
+											<!--=======  End of content  =======-->
+										</div>
+									</div>
+
+									<!--=======  End of single widget product  =======-->
+
+									<!--=======  single widget product  =======-->
+									<div class="single-widget-product-wrapper">
+										<div class="single-widget-product">
+											<!--=======  image  =======-->
+
+											<div class="single-widget-product__image">
+												<a href="shop-product-basic.html">
+													<img src="{% static 'assets/images/products/soccer-4-100x100.jpg' %}" class="img-fluid" alt="">
+												</a>
+											</div>
+
+											<!--=======  End of image  =======-->
+
+											<!--=======  content  =======-->
+
+											<div class="single-widget-product__content">
+
+												<div class="single-widget-product__content__top">
+													<h3 class="product-title"><a href="shop-product-basic.html">High waist trousers</a></h3>
+													<div class="price">
+														<span class="main-price discounted">$36.00</span>
+														<span class="discounted-price">$33.00</span>
+													</div>
+													<div class="rating">
+														<i class="ion-android-star"></i>
+														<i class="ion-android-star"></i>
+														<i class="ion-android-star"></i>
+														<i class="ion-android-star"></i>
+														<i class="ion-android-star-outline"></i>
+													</div>
+												</div>
+
+
+											</div>
+
+											<!--=======  End of content  =======-->
+										</div>
+									</div>
+									<!--=======  End of single widget product  =======-->
+								</div>
+
+								<!--=======  End of widget product wrapper  =======-->
+							</div>
+
+							<!--=======  End of single sidebar widget  =======-->
+
+							<!--=======  single sidebar widget  =======-->
+
+							<div class="single-sidebar-widget">
+								<h2 class="single-sidebar-widget--title">Tags</h2>
+
+								<div class="tag-container">
+									<a href="#">bags</a>
+									<a href="#">chair</a>
+									<a href="#">clock</a>
+									<a href="#">comestic</a>
+									<a href="#">fashion</a>
+									<a href="#">furniture</a>
+									<a href="#">holder</a>
+									<a href="#">mask</a>
+									<a href="#">men</a>
+									<a href="#">oil</a>
+								</div>
+							</div>
+
+							<!--=======  End of single sidebar widget  =======-->
+						</div>
+
+						<!--=======  End of page sidebar  =======-->
+					</div>
+					<div class="col-xl-9 col-lg-9 order-1 order-lg-2 mb-md-80 mb-sm-80">
+
+						<div class="row product-isotope shop-product-wrap five-column">
+
+							<!--=======  single product  =======-->
+							{% for p in products %}
+							<div class="col-12 col-lg-is-5 col-md-6 col-sm-6 mb-45 hot sale">
+								<div class="single-product">
+									<!--=======  single product image  =======-->
+									
+									<div class="single-product__image">
+										<a class="image-wrap" href="{{p.get_url}}">
+											<img src="{{ p.images.url }}" class="img-fluid" alt="">
+											
+										</a>
+
+										<div class="single-product__floating-badges">
+											<span class="onsale">-10%</span>
+											<span class="hot">hot</span>
+										</div>
+
+										<div class="single-product__floating-icons">
+											<span class="wishlist"><a href="#" data-tippy="Add to wishlist" data-tippy-inertia="true"
+													data-tippy-animation="shift-away" data-tippy-delay="50" data-tippy-arrow="true"
+													data-tippy-theme="sharpborder" data-tippy-placement="left"><i
+														class="ion-android-favorite-outline"></i></a></span>
+
+											<span class="compare"><a href="#" data-tippy="Compare" data-tippy-inertia="true"
+													data-tippy-animation="shift-away" data-tippy-delay="50" data-tippy-arrow="true"
+													data-tippy-theme="sharpborder" data-tippy-placement="left"><i
+														class="ion-ios-shuffle-strong"></i></a></span>
+
+											<span class="quickview"><a class="cd-trigger" href="#qv-1" data-tippy="Quick View"
+													data-tippy-inertia="true" data-tippy-animation="shift-away" data-tippy-delay="50"
+													data-tippy-arrow="true" data-tippy-theme="sharpborder" data-tippy-placement="left"><i
+														class="ion-ios-search-strong"></i></a></span>
+										</div>
+
+
+									</div>
+
+									<!--=======  End of single product image  =======-->
+
+									<!--=======  single product content  =======-->
+
+									<div class="single-product__content">
+										<div class="single-product__variations">
+											<div class="size-container mb-5">
+												<span class="size">L</span>
+												<span class="size">M</span>
+												<span class="size">S</span>
+												<span class="size">XS</span>
+											</div>
+											<div class="color-container">
+												<span class="black"></span>
+												<span class="blue"></span>
+												<span class="yellow"></span>
+											</div>
+											<!-- <a href="#" class="clear-link">clear</a> -->
+										</div>
+										<div class="title">
+											<h3> <a href=""> {{ p.product_name }} </a></h3>
+											<a href="#">Select options</a>
+										</div>
+										<div class="price">
+											<span class="main-price discounted">₹ 460</span>
+											<span class="discounted-price">₹ {{p.price}} </span>
+										</div>
+									</div>
+
+									<!--=======  End of single product content  =======-->
+								</div>
+								<div class="single-product--list">
+									<!--=======  single product image  =======-->
+
+									<div class="single-product__image">
+										<a class="image-wrap" href="{{ p.geturl }}">
+											<img src="{% static 'assets/images/products/cloth-1-1-600x800.jpg' %}" class="img-fluid" alt="">
+											<img src="{% static 'assets/images/products/cloth-1-2-600x800.jpg' %}" class="img-fluid" alt="">
+										</a>
+
+										<div class="single-product__floating-badges">
+											<span class="onsale">-10%</span>
+											<span class="hot">hot</span>
+										</div>
+
+										<div class="single-product__floating-icons">
+											<span class="wishlist"><a href="#" data-tippy="Add to wishlist" data-tippy-inertia="true"
+													data-tippy-animation="shift-away" data-tippy-delay="50" data-tippy-arrow="true"
+													data-tippy-theme="sharpborder" data-tippy-placement="bottom"><i
+														class="ion-android-favorite-outline"></i></a></span>
+
+											<span class="compare"><a href="#" data-tippy="Compare" data-tippy-inertia="true"
+													data-tippy-animation="shift-away" data-tippy-delay="50" data-tippy-arrow="true"
+													data-tippy-theme="sharpborder" data-tippy-placement="bottom"><i
+														class="ion-ios-shuffle-strong"></i></a></span>
+
+											<span class="quickview"><a class="cd-trigger" href="#qv-1" data-tippy="Quick View"
+													data-tippy-inertia="true" data-tippy-animation="shift-away" data-tippy-delay="50"
+													data-tippy-arrow="true" data-tippy-theme="sharpborder" data-tippy-placement="bottom"><i
+														class="ion-ios-search-strong"></i></a></span>
+										</div>
+
+										<div class="single-product__variations">
+											<div class="size-container mb-5">
+												<span class="size">L</span>
+												<span class="size">M</span>
+												<span class="size">S</span>
+												<span class="size">XS</span>
+											</div>
+											<div class="color-container">
+												<span class="black"></span>
+												<span class="blue"></span>
+												<span class="yellow"></span>
+											</div>
+											<!-- <a href="#" class="clear-link">clear</a> -->
+										</div>
+
+									</div>
+
+									<!--=======  End of single product image  =======-->
+
+									<!--=======  single product content  =======-->
+
+									<div class="single-product__content">
+
+										<div class="title">
+											<h3> <a href="shop-product-basic.html">High-waist Trousers</a></h3>
+										</div>
+										<div class="price">
+											<span class="main-price discounted">$160.00</span>
+											<span class="discounted-price">$180.00</span>
+										</div>
+										<p class="short-desc"> Lorem ipsum dolor sit amet consectetur, adipisicing elit. Laudantium
+											consequuntur voluptatem ad molestiae. Expedita nesciunt quam totam, sapiente eveniet consectetur
+											voluptas quas harum impedit quia quibusdam tempora ab facilis. Non assumenda veritatis,
+										</p>
+
+										<a href="#" class="lezada-button lezada-button--medium">ADD TO CART</a>
+
+									</div>
+
+									<!--=======  End of single product content  =======-->
+								</div>
+							</div>
+							{% endfor %}
+							<!--=======  End of single product  =======-->
+
+							
+
+
+
+						</div>
+
+						<div class="row">
+							<div class="col-lg-12 text-center mt-30">
+								<a class="lezada-button lezada-button--medium lezada-button--icon--left" href="#"><i
+										class="ion-android-add"></i> MORE</a>
+
+								<nav class="mt-4" aria-label="Page navigation sample">
+									{% if products.has_other_pages %}
+										<ul class="pagination ">
+											{% if product.has_previous %}
+												<li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">&laquo;</a></li>
+											{% else %}
+												<li class="page-item disabled"><a class="page-link" href="#">&laquo;</a></li>
+											{% endif %}
+
+											{% for i in products.paginator.page_range %}
+												{% if products.number == i %}    
+													<li class="page-item active"><a class="page-link" href="#"> {{i}} </a></li>
+												{% else %}
+													<li class="page-item"><a class="page-link" href="?page={{i}}"> {{i}} </a></li>
+												{% endif %}        
+											{% endfor %}
+											{% if product.has_next %}
+												<li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">&raquo;</a></li>
+											{% else %}
+												<li class="page-item disabled"><a class="page-link" href="#">&raquo;</a></li>
+											{% endif %}
+										</ul>
+									{% endif %}
+								</nav>
+							</div>
+						</div>
+						
+
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!--=====  End of shop page content  ======-->
+	</div>
+
+	<!--=====  End of shop page content  ======-->
+
+
+
+{% endblock %}

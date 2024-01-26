@@ -1,0 +1,40 @@
+
+{% extends 'customadmin/admin_base.html' %}
+{% load static %}
+
+{% block title %}
+Delete User 
+{% endblock title %}
+
+{% block custom_css %}
+{% endblock custom_css %}
+
+{% block page_title %}
+Delete User 
+{% endblock page_title %}
+
+{% block page_content %}
+    <div class="row">
+        <div class="col-12 col-md-12 col-lg-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Delete Users </h4>
+                </div>
+                <div class="card-body">
+                    <form action="" method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <p>Are you sure you want to delete {{user.username}} account?</p>
+                        <button type="submit">Yes, delete my account</button>
+                    </form>
+                    <p><a href="{% url 'users_list' %}">Cancel</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+{% endblock page_content %}
+
+{% block custom_js %}
+
+{% endblock custom_js %}

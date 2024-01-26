@@ -1,0 +1,57 @@
+{% extends 'customadmin/admin_base.html' %}
+{% load static %}
+
+
+<h2>Catergory lists</h2>
+
+{% block title %}
+Category Create
+{% endblock title %}
+
+{% block custom_css %}
+{% endblock custom_css %}
+
+{% block page_title %}
+Category Create
+{% endblock page_title %}
+
+{% block page_content %}
+<div class="r">
+    <div class="col-12 col-md-12 col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                <h4>Categories</h4>
+            </div>
+            <div class="card-body">
+                <form action="" method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {% for field in form %}
+                    <div class="form-group">
+                        <label> {{ field.label }} </label>
+                        <input type="{{field.field.widget.input_type}}" name="{{field.name}}" id="{{field.name}}" class="form-control">
+                        {% if field.errors %}
+                        <div class="alert alert-danger" style="margin: 10px; padding:0px">
+                            {{field.errors}}
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}                
+                    <button class="btn btn-primary btn-block" type="submit">SAVE CATEGORY</button>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock page_content %}
+
+{% block custom_js %}
+<script>
+    document.getElementById("cat_name").onkeyup = function() {
+        document.getElementById('slug').value = document.getElementById("cat_name").value.toLowerCase().replace(" ", '_');
+    }
+</script>
+
+{% endblock custom_js %}

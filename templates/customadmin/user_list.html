@@ -1,0 +1,103 @@
+{% extends 'customadmin/admin_base.html' %}
+{% load static %}
+
+
+<h2>Users Lists</h2>
+
+{% block title %}
+Users List
+{% endblock title %}
+
+{% block custom_css %}
+{% endblock custom_css %}
+
+{% block page_title %}
+Users List
+{% endblock page_title %}
+
+{% block page_content %}
+<div class="row">    
+
+    <div class="card">
+        <div class="card-header">
+            <h4>Users List</h4>
+        <div class="card-header-form">
+            <form>
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="Search">
+                <div class="input-group-btn">
+                <button class="btn btn-primary"><i class="fas fa-search"></i></button>
+                </div>
+            </div>
+            </form>
+        </div>
+        </div>
+        
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                <tbody>
+                <tr>
+                    <th>
+                    <div class="custom-checkbox custom-control">
+                        <input type="checkbox" data-checkboxes="mygroup" data-checkbox-role="dad" class="custom-control-input" id="checkbox-all">
+                        <label for="checkbox-all" class="custom-control-label">&nbsp;</label>
+                    </div>
+                    </th>
+                    <th>User Name</th>
+                    <th>User type</th>
+                    <th>Profile Pic</th>
+                    <th>date_joined</th>
+                    <th>Phone</th>
+                    <th>Update</th>
+                    <th>Delete</th>
+                </tr>
+                {% for user in users %}
+                <tr>
+                    <td class="p-0 text-center">
+                        <div class="custom-checkbox custom-control">
+                            <input type="checkbox" data-checkboxes="mygroup" class="custom-control-input" id="checkbox-1">
+                            <label for="checkbox-1" class="custom-control-label">&nbsp;</label>
+                        </div>
+                    </td>
+                    <td> {{user.username}} </td>
+                    <td class="align-middle">
+                        {% if user.is_admin %}<span class="badge badge-success">Admin</span>{% endif %}
+                        {% if user.is_staff %} <span class="badge badge-secondary">Staff</span>{% endif %}
+                        {% if user.is_active%} <span class="badge badge-primary">Active</span>{% endif %}
+                        {% if user.is_superadmin %}<span class="badge badge-danger">Super Admin</span>{% endif %}
+                        {% if user.is_merchant%}<span class="badge badge-light">Merchant</span> {% endif %}
+                        {% if not user.is_admin and not user.is_staff and not user.is_active and not user.is_merchant and not user.is_superadmin %}<span class="badge badge-warning">Just register</span>{% endif %}
+                        
+                    </td>
+                    <td>
+                        {% if user.profile_pic %}
+                        <!--<img alt="profil" src="{% static user.profile_pic %}" class="rounded-circle" width="35" data-toggle="tooltip" title="" data-original-title="Wildan Ahdian">-->
+                        <img alt="profile" src="{% if user.profile_pic %}{{ user.profile_pic.url }}{% else %}{% static 'path/to/default/image.jpg' %}{% endif %}" class="rounded-circle" width="35" data-toggle="tooltip" title="" data-original-title="{{ user.first_name }} {{ user.last_name }}">
+
+                        {% else %}
+                        <img src="{% static 'admin_assets/img/avatar/avatar-1.png' %}" class="rounded-circle" width="35" data-toggle="tooltip" title="" data-original-title="{{ user.first_name }} {{ user.last_name }}">
+                        
+                        {% endif %}
+                    </td>
+
+                    <td> {{user.date_joined|date:"Y-m-d" }} </td>
+                    <td><div class="badge badge-success"> {{user.phone_number}} </div></td>
+                    <td><a href="{% url 'user_update' user.id %}" class="btn btn-warning">Update</a></td>
+                    <td><a href="{% url 'user_delete' user.id %}" class="btn btn-danger">Delete</a></td>
+                </tr>
+                {% endfor %}
+                
+                
+                </tbody></table>
+            </div>
+        </div>
+        
+    </div>
+    
+</div>    
+{% endblock page_content %}
+
+{% block custom_js %}
+
+{% endblock custom_js %}

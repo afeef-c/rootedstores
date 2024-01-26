@@ -1,0 +1,136 @@
+{% extends 'partials/base.html' %}
+{% load static %}
+
+
+
+{% block content %}
+	<!--=======  breadcrumb area =======-->
+
+	<div class="breadcrumb-area breadcrumb-bg-1 pt-50 pb-70 mb-130">
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-12">
+					<h1 class="breadcrumb-title">Customer login</h1>
+
+					<!--=======  breadcrumb list  =======-->
+
+					<ul class="breadcrumb-list">
+						<li class="breadcrumb-list__item"><a href="index-2.html">HOME</a></li>
+						<li class="breadcrumb-list__item breadcrumb-list__item--active">customer login</li>
+					</ul>
+
+					<!--=======  End of breadcrumb list  =======-->
+
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!--=======  End of breadcrumb area =======-->
+	<!--=============================================
+    =            login page content         =
+    =============================================-->
+
+	<div class="login-area mb-130 mb-md-70 mb-sm-70 mb-xs-70 mb-xxs-70">
+		<div class="container">
+			<div class="row">
+				<!-- login page -->
+				<div class="col-lg-6 mb-md-50 mb-sm-50">
+					<div class="lezada-form login-form">
+						<form action="{% url 'login' %}" method="POST">
+							{% csrf_token %}
+							<div class="row">
+								<div class="col-lg-12">
+									<!--=======  login title  =======-->
+
+									<div class="section-title section-title--login text-center mb-50">
+										<h2 class="mb-20">Login</h2>
+										<p>Great to have you back!</p>
+									</div>
+
+									<!--=======  End of login title  =======-->
+								</div>
+								<div class="col-lg-12 mb-60">
+									<input type="email" name="email" placeholder="Username or email address" required>
+								</div>
+								<div class="col-lg-12 mb-60">
+									<input type="password" name="password" placeholder="Password" required>
+								</div>
+								<div class="col-lg-12 text-center mb-30">
+									<button type="submit" name="login" class="lezada-button lezada-button--medium">login</button>
+								</div>
+
+								<div class="col-lg-12">
+									<input type="checkbox"> <span class="remember-text">Remember me</span>
+									<a href="#" class="reset-pass-link">Lost your password?</a>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+
+				<!-- Registration page -->
+				<div class="col-lg-6">
+					<div class="lezada-form login-form--register">
+						<form method="POST" action="{% url 'register' %}" enctype="multipart/form-data">
+							{% csrf_token %}
+							<div class="row">
+								<div class="col-lg-12">
+									<!-- Register title -->
+									<div class="section-title section-title--login text-center mb-50">
+										<h2 class="mb-20">Register</h2>
+										<p>If you don’t have an account, register now!</p>
+									</div>
+									<!-- End of Register title -->
+								</div>
+
+								<!-- Form fields -->
+								<div class="col-lg-12 mb-30">
+									<label for="{{ form.first_name.id_for_label }}">First Name <span class="required">*</span></label>
+									<input type="text" name="{{ form.first_name.name }}" id="{{ form.first_name.id_for_label }}" {% if form.first_name.required %}required{% endif %}>
+								</div>
+
+								<div class="col-lg-12 mb-30">
+									<label for="{{ form.last_name.id_for_label }}">Last Name <span class="required">*</span></label>
+									<input type="text" name="{{ form.last_name.name }}" id="{{ form.last_name.id_for_label }}"  {% if form.last_name.required %}required{% endif %}>
+								</div>
+
+								<div class="col-lg-12 mb-30">
+									<label for="{{ form.phone_number.id_for_label }}">Phone Number <span class="required">*</span></label>
+									<input type="text" name="{{ form.phone_number.name }}" id="{{ form.phone_number.id_for_label }}"  {% if form.phone_number.required %}required{% endif %}>
+								</div>
+
+								<div class="col-lg-12 mb-30">
+									<label for="{{ form.email.id_for_label }}">Email Address <span class="required">*</span></label>
+									<input type="text" name="{{ form.email.name }}" id="{{ form.email.id_for_label }}"  {% if form.email.required %}required{% endif %}>
+								</div>
+
+								<div class="col-lg-12 mb-30">
+									<label for="{{ form.password.id_for_label }}">Password <span class="required">*</span></label>
+									<input type="password" name="{{ form.password.name }}" id="{{ form.password.id_for_label }}" {% if form.password.required %}required{% endif %}>
+								</div>
+
+								<div class="col-lg-12 mb-30">
+									<label for="{{ form.confirm_password.id_for_label }}">Confirm Password <span class="required">*</span></label>
+									<input type="password" name="{{ form.confirm_password.name }}" id="{{ form.confirm_password.id_for_label }}" {% if form.confirm_password.required %}required{% endif %}>
+								</div>
+
+								<div class="col-lg-12 text-center">
+									<button class="lezada-button lezada-button--medium" name="register" type="submit">Register</button>
+								</div>
+							</div>
+							{{form.email.errors}}
+                    		{{form.non_field_errors}}
+						</form>
+
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!--=====  End of login content  ======-->
+
+
+
+{% endblock %}

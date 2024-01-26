@@ -1,12 +1,12 @@
 from django.shortcuts import render
 from store.models import Product
-
+from django.contrib.auth.decorators import login_required
 
 def home(request):
-    products = Product.objects.filter(is_available=True)
-
+    products = Product.objects.all()
+    
     context ={
-        'products':products
+        'products':products,
     }
 
     return render(request, 'home.html', context)

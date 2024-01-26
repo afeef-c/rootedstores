@@ -16,6 +16,11 @@ from .message_handler import MessageHandler  # Import your MessageHandler class
 
 User = get_user_model()  # Use the get_user_model() function to get the User model
 
+
+
+def account(request):
+    return render(request, 'accounts/account.html')
+    
 def register(request):
     if request.method == 'POST':
         form = RegistrationForm(request.POST)
@@ -55,11 +60,12 @@ def register(request):
     else:
         form = RegistrationForm()
 
-    return render(request, 'accounts/register.html', {'form': form})
+    return render(request, 'accounts/account.html', {'form': form})
 
 
 
 def login(request):
+    
     if request.method == 'POST':
         email = request.POST['email']
         password = request.POST['password']
@@ -69,12 +75,12 @@ def login(request):
         if user is not None:
             auth.login(request, user)
             messages.success(request, 'You are logged in')
-            return redirect('dashbord')
+            return redirect('home')
         else:
             messages.error(request, 'Invalid login credentials!!')
             return redirect('login')
 
-    return render(request, 'accounts/login.html')
+    return render(request, 'accounts/account.html')
 
 @login_required(login_url='login')
 def logout(request):

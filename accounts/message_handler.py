@@ -1,6 +1,5 @@
 from django.conf import settings
-from twilio.rest import Client
-
+#from twilio.rest import Client
 
 class MessageHandler:
     phone_number=None

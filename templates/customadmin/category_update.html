@@ -1,0 +1,69 @@
+{% extends 'customadmin/admin_base.html' %}
+{% load static %}
+
+
+<h2>Catergory lists</h2>
+
+{% block title %}
+Category Update
+{% endblock title %}
+
+{% block custom_css %}
+{% endblock custom_css %}
+
+{% block page_title %}
+Category Update
+{% endblock page_title %}
+
+{% block page_content %}
+<div class="r">
+    <div class="col-12 col-md-12 col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                <h4>Categories</h4>
+            </div>
+            <div class="card-body">
+                <form action="" method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {% for field in form %}
+                        <div class="form-group">
+                            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                            {% if field.field.widget.input_type == 'file' %}
+                                <div class="custom-file">
+                                    <input type="{{ field.field.widget.input_type }}" name="{{ field.name }}" id="{{ field.id_for_label }}" class="custom-file-input">
+                                    <label class="custom-file-label" for="{{ field.id_for_label }}">Choose file</label>
+                                </div>
+                            {% else %}
+                                <input type="{{ field.field.widget.input_type }}" name="{{ field.name }}" id="{{ field.id_for_label }}" class="form-control" value="{{ field.value }}">
+                            {% endif %}
+                            {% if field.errors %}
+                                <div class="alert alert-danger" style="margin-top: 5px;">{{ field.errors }}</div>
+                            {% endif %}
+                        </div>
+                        {% if field.field.widget.input_type == 'file' %}
+                            <div class="form-group">
+                                <label for="">Current {{ field.label }} </label><br>
+                                <img src="/media/{{ field.value }}" style="height: 200px;" alt="">
+                            </div>
+                        {% endif %}
+                        
+                    {% endfor %}
+                    <button class="btn btn-primary btn-block mt-3" type="submit">UPDATE CATEGORY</button>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+{% endblock page_content %}
+
+{% block custom_js %}
+<script>
+    document.getElementById("cat_name").onkeyup = function() {
+        document.getElementById('slug').value = document.getElementById("cat_name").value.toLowerCase().replace(" ", '_');
+    }
+</script>
+
+{% endblock custom_js %}
