@@ -181,7 +181,7 @@
 										<!--=======  single product image  =======-->
 										
 										<div class="single-product__image">
-											<a class="image-wrap" href="shop-product-basic.html">
+											<a class="image-wrap" href="{{ p.get_url }}">
 												<img src="{{ p.images.url }}" class="img-fluid w-10" alt="">
 											</a>
 
@@ -194,24 +194,18 @@
 														data-tippy-animation="shift-away" data-tippy-delay="50" data-tippy-arrow="true"
 														data-tippy-theme="sharpborder" data-tippy-placement="left"><i
 															class="ion-android-favorite-outline"></i></a></span>
-												<span class="compare"><a href="#" data-tippy="Compare" data-tippy-inertia="true"
-														data-tippy-animation="shift-away" data-tippy-delay="50" data-tippy-arrow="true"
-														data-tippy-theme="sharpborder" data-tippy-placement="left"><i
-															class="ion-ios-shuffle-strong"></i></a></span>
-												<span class="quickview"><a class="cd-trigger" href="#qv-1" data-tippy="Quick View"
-														data-tippy-inertia="true" data-tippy-animation="shift-away" data-tippy-delay="50"
-														data-tippy-arrow="true" data-tippy-theme="sharpborder" data-tippy-placement="left"><i
-															class="ion-ios-search-strong"></i></a></span>
+												
 											</div>
 										</div>
 										<!--=======  End of single product image  =======-->
 
 										<!--=======  single product content  =======-->
 
-										<div class="single-product__content">
+										<div class="single-product__content" >
 											<div class="title">
-												<h3> <a href="shop-product-basic.html"> {{p.product_name}} </a></h3>
-												<a href="#">Add to cart</a>
+												<h3> <a href="{{ p.geturl }}"> {{p.product_name}} </a></h3>
+												<a href="{% url 'add_cart' p.id %}">Add to cart</a>
+												
 											</div>
 											<div class="price">
 												<span class="main-price discounted">₹ 500 </span>

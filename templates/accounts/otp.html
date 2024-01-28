@@ -49,13 +49,18 @@ h2{
 <body>
     {% block includes %}
     {% include 'partials/alerts.html' %}
-    <form action="{% url 'otp' uid=id %}" method="post">
-        
-        <h2>OTP VERIFICATION:</h2>
+    {% if messages %}
+        {% for message in messages %}
+            <div>{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+    <form action="{% url 'otp_verify' uid=id %}" method="post">
         {% csrf_token %}
-        <label for="otp">OTP:         </label>
+        <h2>OTP VERIFICATION:</h2>
+        
+        <label for="otp">Enter OTP:         </label>
         <input id="otp" type="text" name="otp">
-        <input type="submit" value="login">
+        <button type="submit">Verfy OTP</button>
         </form>
         {% endblock includes %}
 

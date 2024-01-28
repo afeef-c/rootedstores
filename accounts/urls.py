@@ -11,7 +11,7 @@ urlpatterns = [
     #path('dashbord/', views.dashbord , name='dashbord'),
     #path('', views.dashbord , name='dashbord'),
     
-    path('otp/<str:uid>/', views.otpVerify, name='otp'),
+    path('otp/<str:uid>/', views.otp_verify, name='otp_verify'),
 
 ]
 

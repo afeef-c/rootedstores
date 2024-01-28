@@ -38,3 +38,7 @@ class RegistrationForm(forms.ModelForm):
             raise forms.ValidationError(
                 'Password does not match !!'
             )
+    
+
+class OTPVerificationForm(forms.Form):
+    otp = forms.CharField(label='Enter OTP', max_length=6, min_length=6, widget=forms.TextInput(attrs={'autocomplete': 'off'}))

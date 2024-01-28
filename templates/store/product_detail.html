@@ -112,7 +112,7 @@
 												</div>
 												{% for image in p_images %}
 												<div class="single-image">
-													<img src="{{image.images.url}}" class="img-fluid" alt="">
+													<img id="p-img" src="{{image.images.url}}" class="img-fluid" alt="">
 												</div>
 												{% endfor %}
 												<!--=======  End of single image  =======-->
@@ -134,14 +134,6 @@
 								<!--=======  shop product description  =======-->
 
 								<div class="shop-product__description">
-									<!--=======  shop product navigation  =======-->
-
-									<div class="shop-product__navigation">
-										<a href="shop-product-basic.html"><i class="ion-ios-arrow-thin-left"></i></a>
-										<a href="shop-product-basic.html"><i class="ion-ios-arrow-thin-right"></i></a>
-									</div>
-
-									<!--=======  End of shop product navigation  =======-->
 
 									<!--=======  shop product rating  =======-->
 
@@ -172,8 +164,8 @@
 									<!--=======  shop product price  =======-->
 
 									<div class="shop-product__price mb-30">
-										<span class="main-price discounted">₹ 460 </span>
-										<span class="discounted-price">₹ {{single_product.price}}</span>
+										<span> ₹ </span><span class="main-price discounted">{{single_product.old_price}} </span>
+										<span> ₹ </span><span class="discounted-price" id="product-price" >{{single_product.price}}</span>
 									</div>
 
 									<!--=======  End of shop product price  =======-->
@@ -185,67 +177,81 @@
 									</div>
 
 									<!--=======  End of shop product short description  =======-->
-
-									<!--=======  shop product size block  =======-->
-
-									<div class="shop-product__block shop-product__block--size mb-20">
-										<div class="shop-product__block__title">Size: </div>
-										<div class="shop-product__block__value">
-											<div class="shop-product-size-list">
-												<span class="single-size">L</span>
-												<span class="single-size">M</span>
-												<span class="single-size">S</span>
-												<span class="single-size">XS</span>
+									<form method="">
+										<!--action="{% url 'add_cart' single_product.id %}"-->
+										<!--=======  shop product size block  =======-->
+										{% csrf_token %}
+										<div class="shop-product__block shop-product__block--size mb-20">
+											<div class="shop-product__block__title">Size: </div>
+											<div class="shop-product__block__value">
+												<div class="shop-product-size-list">
+													
+													<select class="form-control" name="size" id="size" required>
+														<option value="" disabled selected>Choose size</option>
+														{% for i in single_product.variation_set.sizes %}
+															<option value="{{i.variation_value|lower}}">{{i.variation_value|capfirst}}</option>
+														{% endfor %}
+													</select>
+													
+													<!--<span class="single-size">L</span>
+													<span class="single-size">M</span>
+													<span class="single-size">S</span>
+													<span class="single-size">XS</span>-->
+												</div>
 											</div>
 										</div>
-									</div>
+										
+										<!--=======  End of shop product size block  =======-->
 
-									<!--=======  End of shop product size block  =======-->
+										<!--=======  shop product color block  =======-->
 
-									<!--=======  shop product color block  =======-->
-
-									<div class="shop-product__block shop-product__block--color mb-20">
-										<div class="shop-product__block__title">Color: </div>
-										<div class="shop-product__block__value">
-											<div class="shop-product-color-list">
-
-												<ul class="single-filter-widget--list single-filter-widget--list--color">
-													<li class="mb-0 pt-0 pb-0 mr-10"><a class="active" href="#"><span
-																class="color-picker black"></span></a></li>
-													<li class="mb-0 pt-0 pb-0 mr-10"><a href="#"><span class="color-picker blue"></span></a></li>
-													<li class="mb-0 pt-0 pb-0 mr-10"><a href="#"><span class="color-picker brown"></span></a></li>
-
-												</ul>
+										<div class="shop-product__block shop-product__block--color mb-20">
+											<div class="shop-product__block__title">Color: </div>
+											<div class="shop-product__block__value">
+												<div class="shop-product-color-list">
+													<select class="form-control" name="color" id="color" required>
+														<option value="" disabled selected>Choose color</option>
+														{% for i in single_product.variation_set.colors %}
+															<option value="{{i.variation_value|lower}}">{{i.variation_value|capfirst}}</option>
+														{% endfor %}
+													</select>
+													
+													<!--<ul class="single-filter-widget--list single-filter-widget--list--color">
+														<li class="mb-0 pt-0 pb-0 mr-10"><a class="active" href="#"><span
+																	class="color-picker black"></span></a></li>
+														<li class="mb-0 pt-0 pb-0 mr-10"><a href="#"><span class="color-picker blue"></span></a></li>
+														<li class="mb-0 pt-0 pb-0 mr-10"><a href="#"><span class="color-picker brown"></span></a></li>
+													</ul>-->
+												</div>
 											</div>
 										</div>
-									</div>
 
-									<!--=======  End of shop product color block  =======-->
+										<!--=======  End of shop product color block  =======-->
 
-									<!--=======  shop product quantity block  =======-->
+										<!--=======  shop product quantity block  =======-->
 
-									<div class="shop-product__block shop-product__block--quantity mb-40">
-										<div class="shop-product__block__title">Quantity: </div>
-										<div class="shop-product__block__value">
-											<div class="pro-qty d-inline-block mx-0 pt-0">
-												<input type="text" value="1">
+										<div class="shop-product__block shop-product__block--quantity mb-40">
+											<div class="shop-product__block__title">Quantity: </div>
+											<div class="shop-product__block__value">
+												<div class="pro-qty d-inline-block mx-0 pt-0">
+													<input type="text" value="1" id="productQty">
+												</div>
 											</div>
 										</div>
-									</div>
+										<!--=======  End of shop product quantity block  =======-->
+										
+										<!--=======  shop product buttons  =======-->
+										<div class="shop-product__buttons mb-40">
+											<input type="hidden" class="product-id" value="{{single_product.id}}" id="">
+											<input type="hidden" class="product-title" value="{{single_product.product_name}}" id="">
+											<button type="submit" class="lezada-button lezada-button--medium" id="add-to-cart">add to cart</button>
+											
+										</div>
+										<!--=======  End of shop product buttons  =======-->
+									</form>
+									
 
-									<!--=======  End of shop product quantity block  =======-->
-
-									<!--=======  shop product buttons  =======-->
-
-									<div class="shop-product__buttons mb-40">
-										<a class="lezada-button lezada-button--medium" href="#">add to cart</a>
-										<a class="lezada-compare-button ml-20" href="#" data-tippy="Compare" data-tippy-inertia="true"
-											data-tippy-animation="shift-away" data-tippy-delay="50" data-tippy-placement="left"
-											data-tippy-arrow="true" data-tippy-theme="sharpborder"><i class="ion-ios-shuffle"></i></a>
-									</div>
-
-									<!--=======  End of shop product buttons  =======-->
-
+									
 									<!--=======  shop product brands  =======-->
 
 									<div class="shop-product__brands mb-20">
@@ -559,4 +565,45 @@
 	<!--=====  End of shop page content  ======-->
 
 
-{% endblock %}
+{% endblock content %}
+
+{% block js %}
+
+<script>
+	<!-- add to cart -->
+	$(document).on('click',"#add-to-cart",function(){
+		var _vm	=$(this);
+		var _qty = $('#productQty').val();
+		var _productId = $('.product-id').val();
+		var _productImage = $('#p-img').val();
+		var _productTitle = $('.product-title').val();
+		var _productPrice = $('#product-price').text();
+		
+		
+		// Ajax
+		$.ajax({
+			url:'/cart/add-to-cart',
+			data:{
+				'id':_productId,
+				'image':_productImage,
+				'qty':_qty,
+				'title':_productTitle,
+				'price':_productPrice
+
+			},
+			dataType:'json',
+			beforeSend:function(){
+				_vm.attr('disabled',true);
+			},
+			success:function(res){
+				$("#cart-list").text(res.totalitems)
+				_vm.attr('disabled',false);
+			}
+		})
+		// end
+	})
+
+</script>
+
+
+{% endblock js %}

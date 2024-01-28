@@ -41,7 +41,7 @@
 						<div class="site-main-nav d-none d-lg-block">
 							<nav class="site-nav center-menu">
 								<ul>
-									<li class="menu-item-has-children"><a href="#">Home</a></li>
+									<li class="menu-item-has-children"><a href="{% url 'home' %}">Home</a></li>
 									<li class="menu-item-has-children"><a href="{% url 'store' %}">Store</a></li>
 									
 									<li class="menu-item-has-children "><a href="javascript:void(0)">Blog</a></li>
@@ -92,7 +92,8 @@
 							<div class="single-icon cart">
 								<a href="javascript:void(0)" id="offcanvas-cart-icon">
 									<i class="ion-ios-cart"></i>
-									<span class="count">3</span>
+									
+									<span class="count" id="cart-list"> {{request.session.cartdata|length}} </span>
 								</a>
 							</div>
 							<!--=======  End of single-icon  =======-->
@@ -120,7 +121,7 @@
 						</button>
 						<!--Site Mobile Menu Toggle End-->
 						<ul class="dl-menu dl-menu-toggle">
-							<li class=""><a href="#">Home</a></li>
+							<li class=""><a href="{% url 'home' %}">Home</a></li>
 
 							<li><a href="#">Shop</a></li>
 							<li><a href="#">Blog</a></li>

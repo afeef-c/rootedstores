@@ -5,8 +5,9 @@ from django.contrib.auth.models import AbstractBaseUser,BaseUserManager
 # Create your models here.
 class MyAccountManager(BaseUserManager):
 
-    def create_user(self, first_name,last_name,username,email,otp,password=None):
+    def create_user(self, first_name,last_name,username,email,password=None):
 
+        
         if not email:
             raise ValueError('User must have an email address')
         
@@ -18,20 +19,21 @@ class MyAccountManager(BaseUserManager):
             username=username,
             first_name=first_name,
             last_name=last_name,
-            otp=otp
         )
+        
+        
         user.set_password(password)
         user.save(using=self._db)
         return user
     
-    def create_superuser(self, first_name,last_name,username,email,otp,password):
+    def create_superuser(self, first_name,last_name,username,email,password):
         user = self.create_user(
             email = self.normalize_email(email),
             username=username,
             password=password,
             first_name=first_name,
             last_name=last_name,
-            otp=otp,
+            
         )
 
         user.is_admin=True
@@ -41,16 +43,16 @@ class MyAccountManager(BaseUserManager):
         user.save(using=self._db)
         return user
     
-    def create_merchant_user(self, first_name, last_name, username, email, phone_number, otp, password=None):
+    def create_merchant_user(self, first_name, last_name, username, email, phone_number, password=None):
         user = self.model(
             email=self.normalize_email(email),
             username=username,
             first_name=first_name,
             last_name=last_name,
             phone_number=phone_number,
-            otp=otp,
             is_merchant=True  # Set is_merchant to True for merchant users
         )
+        
         user.set_password(password)
         user.is_active = True 
         user.save(using=self._db)
@@ -63,7 +65,6 @@ class MyAccountManager(BaseUserManager):
             first_name=first_name,
             last_name=last_name,
             phone_number=phone_number,
-            otp=otp,
             is_staff=True,
         )
         # Add specific fields for staff users here
@@ -74,6 +75,7 @@ class MyAccountManager(BaseUserManager):
 
 class Account(AbstractBaseUser):
     
+    uid=models.CharField(default=f'{uuid.uuid4}',max_length=200)
     first_name       = models.CharField(max_length=50)
     last_name       = models.CharField(max_length=50)
     username        = models.CharField(max_length=50, unique=True)
@@ -90,12 +92,11 @@ class Account(AbstractBaseUser):
     is_superadmin    = models.BooleanField(default=False)
     is_merchant = models.BooleanField(default=False)
 
-    otp=models.CharField(max_length=100,null=True,blank=True)
-    uid=models.CharField(default=f'{uuid.uuid4}',max_length=200)
+    
 
 
     USERNAME_FIELD  = 'email'
-    REQUIRED_FIELDS = ['username','phone_number','first_name','last_name']
+    REQUIRED_FIELDS = ['username','first_name','last_name']
 
     objects = MyAccountManager()
 

@@ -2,6 +2,21 @@
 {% extends 'partials/base.html' %}
 {% load static %}
 
+{% block css %}
+<style>
+	.styled-input {
+    text-align: center;
+    border: none;
+    outline: none; /* Remove the focus border */
+    background-color: #f0f0f0; /* Set the background color */
+    padding: 5px; /* Adjust padding as needed */
+    border-radius: 5px; /* Add border-radius for rounded corners */
+    width: 50px; /* Adjust width as needed */
+}
+
+</style>
+{% endblock css %}
+
 {% block content %}
 <!--=======  breadcrumb area =======-->
 
@@ -33,10 +48,21 @@
 	<div class="shopping-cart-area mb-130">
 		<div class="container">
 			<div class="row">
+				{% if not  'cart_data'  %}
+
+					
+					<h2 class="text-center">Your cart is empty</h2>	
+					<br style="display: none;">
+					
+					<div class="text-center">
+						<a href="{% url 'store' %}" class="btn btn-primary">Continue planting!</a>
+					</div>
+				{% else %}
 				<div class="col-lg-12 mb-30">
 					<!--=======  cart table  =======-->
 
 					<div class="cart-table-container">
+						
 						<table class="cart-table">
 							<thead>
 								<tr>
@@ -47,91 +73,48 @@
 									<th class="product-remove">&nbsp;</th>
 								</tr>
 							</thead>
+							
+								<tbody>
+									{% for product_id, item in cart_data.items %}
+									<tr>
+										<td class="product-thumbnail">
+											<a href="shop-product-basic.html">
+												<img src=" {{ item.image }}" class="img-fluid" alt="">
+											</a>
+										</td>
+										<td class="product-name">
+											<a href="{{ item.product.get_url }}"> {{ item.title }} </a>
+											<span class="product-variation">Color: Black</span>
+										</td>
+										<td class="product-price"><span class="price"> {{ item.price }} </span></td>
+										<td class="product-quantity">
+											<div class="d-inline-block mx-0">
+												<a href="#" class="dec qty-btn">-</a>
+												<input type="text" value="{{ item.qty }}" class="styled-input" onfocus="this.removeAttribute('readonly');">
+												<a href="#" class="inc qty-btn">+</a>
+												
+											</div>
+										</td>
+										<td class="total-price">
+									    	<span class="price">₹ {% widthratio item.price 1 item.qty %} </span>
+										</td>
 
-							<tbody>
-								<tr>
-									<td class="product-thumbnail">
-										<a href="shop-product-basic.html">
-											<img src="{% static 'assets/images/products/bag-1-1-600x800.jpg' %}" class="img-fluid" alt="">
-										</a>
-									</td>
-									<td class="product-name">
-										<a href="shop-product-basic.html">Black Fabric Watch</a>
-										<span class="product-variation">Color: Black</span>
-									</td>
+										<!--<td class="total-price"><span class="price">₹ {% widthratio item.price 1 item.qty %} </span></td>-->
+										<td class="product-remove">
 
-									<td class="product-price"><span class="price">$100.00</span></td>
+											<a href="#">
+												<i class="ion-android-close"></i>
+											</a>
+										</td>
+									</tr>
+									{% endfor %}
 
-									<td class="product-quantity">
-										<div class="pro-qty d-inline-block mx-0">
-											<input type="text" value="1">
-										</div>
-									</td>
 
-									<td class="total-price"><span class="price">$100.00</span></td>
-
-									<td class="product-remove">
-										<a href="#">
-											<i class="ion-android-close"></i>
-										</a>
-									</td>
-								</tr>
-								<tr>
-									<td class="product-thumbnail">
-										<a href="shop-product-basic.html">
-											<img src="{% static 'assets/images/products/watch-1-1-600x800.jpg' %}" class="img-fluid" alt="">
-										</a>
-									</td>
-									<td class="product-name">
-										<a href="shop-product-basic.html">Brown watch</a>
-										<span class="product-variation">Color: Brown</span>
-									</td>
-
-									<td class="product-price"><span class="price">$150.00</span></td>
-
-									<td class="product-quantity">
-										<div class="pro-qty d-inline-block mx-0">
-											<input type="text" value="1">
-										</div>
-									</td>
-
-									<td class="total-price"><span class="price">$250.00</span></td>
-
-									<td class="product-remove">
-										<a href="#">
-											<i class="ion-android-close"></i>
-										</a>
-									</td>
-								</tr>
-								<tr>
-									<td class="product-thumbnail">
-										<a href="shop-product-basic.html">
-											<img src="{% static 'assets/images/products/cloth-1-1-600x800.jpg' %}" class="img-fluid" alt="">
-										</a>
-									</td>
-									<td class="product-name">
-										<a href="shop-product-basic.html">High weist pant</a>
-										<span class="product-variation">Color: Blue</span>
-									</td>
-
-									<td class="product-price"><span class="price">$10.00</span></td>
-
-									<td class="product-quantity">
-										<div class="pro-qty d-inline-block mx-0">
-											<input type="text" value="1">
-										</div>
-									</td>
-
-									<td class="total-price"><span class="price">$260.00</span></td>
-
-									<td class="product-remove">
-										<a href="#">
-											<i class="ion-android-close"></i>
-										</a>
-									</td>
-								</tr>
-							</tbody>
+									
+								</tbody>	
+								
 						</table>
+						
 					</div>
 
 					<!--=======  End of cart table  =======-->
@@ -172,6 +155,7 @@
 
 					<!--=======  End of coupon area  =======-->
 				</div>
+				{% endif %}
 
 				<div class="col-xl-4 offset-xl-8 col-lg-5 offset-lg-7">
 					<div class="cart-calculation-area">
