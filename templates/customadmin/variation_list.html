@@ -5,14 +5,14 @@
 <h2>Products Lists</h2>
 
 {% block title %}
-Products List
+Variations List
 {% endblock title %}
 
 {% block custom_css %}
 {% endblock custom_css %}
 
 {% block page_title %}
-Products List
+Variations List
 {% endblock page_title %}
 
 {% block page_content %}
@@ -20,7 +20,7 @@ Products List
 
     <div class="card">
         <div class="card-header">
-            <h4>Products List</h4>
+            <h4>Variations List</h4>
         <div class="card-header-form">
             <form>
             <div class="input-group">
@@ -45,14 +45,13 @@ Products List
                     </div>
                     </th>
                     <th>Product Name</th>
-                    <th>Image</th>
-                    <th>Category</th>
-                    <th>Availble</th>
-                    <th>Merchant</th>
+                    <th>Variation Category</th>
+                    <th>variation Value</th>
+                    <th>Is available</th>
                     <th>Update</th>
                     <th>Delete</th>
                 </tr>
-                {% for product in products %}
+                {% for var in variations %}
                 <tr>
                     <td class="p-0 text-center">
                         <div class="custom-checkbox custom-control">
@@ -60,28 +59,20 @@ Products List
                             <label for="checkbox-1" class="custom-control-label">&nbsp;</label>
                         </div>
                     </td>
-                    <td> {{product.product_name}} </td>
+                    <td> {{var.product.product_name}} </td>
                     <td>
-                        {% if product.images %}
-                        <!--<img alt="profil" src="{% static product.profile_pic %}" class="rounded-circle" width="35" data-toggle="tooltip" title="" data-original-title="Wildan Ahdian">-->
-                        <img alt="profile" src="{% if product.images %}{{ product.images.url }}{% else %}{% static 'path/to/default/image.jpg' %}{% endif %}" class="rounded-circle" width="35" data-toggle="tooltip" title="" data-original-title="{{ product.first_name }} {{ product.last_name }}">
-                        {% else %}
-                        <img src="{% static 'admin_assets/img/avatar/avatar-1.png' %}" class="rounded-circle" width="35" data-toggle="tooltip" title="" data-original-title="{{ product.first_name }} {{ product.last_name }}">
-                        
-                        {% endif %}
+                        {{var.variation_category}}
                     </td>
                     <td>
-                        {{product.category}}
+                        {{var.variation_value}}
                     </td>
                     <td class="align-middle">
-                        {% if product.is_available %}<a href="#" class="btn btn-icon btn-success"><i class="fas fa-check"></i></a> {% else %}<a href="#" class="btn btn-icon btn-danger"><i class="fas fa-times"></i></a> {% endif %}
+                        {% if var.is_active %}<a href="#" class="btn btn-icon btn-success"><i class="fas fa-check"></i></a> {% else %}<a href="#" class="btn btn-icon btn-danger"><i class="fas fa-times"></i></a> {% endif %}
                         
                     </td>
                     
-
-                    <td> {{product.merchant }} </td>
-                    <td><a href="{% url 'product_update' product.id %}" class="btn btn-warning">Update</a></td>
-                    <td><a href="{% url 'product_delete' product.id %}" class="btn btn-danger">Delete</a></td>
+                    <td><a href="#" class="btn btn-warning">Update</a></td>
+                    <td><a href="#" class="btn btn-danger">Delete</a></td>
                 </tr>
                 {% endfor %}
                 

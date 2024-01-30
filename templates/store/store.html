@@ -539,8 +539,8 @@
 											<a href="{{p.get_url}}">Select options</a>
 										</div>
 										<div class="price">
-											<span class="main-price discounted">₹ 460</span>
-											<span class="discounted-price">₹ {{p.price}} </span>
+											<span class="main-price discounted">₹ {{p.price}} </span>
+											<span class="discounted-price">₹ {{p.old_price}} </span>
 										</div>
 									</div>
 
@@ -551,8 +551,8 @@
 
 									<div class="single-product__image">
 										<a class="image-wrap" href="{{p.get_url}}">
-											<img src="{% static 'assets/images/products/cloth-1-1-600x800.jpg' %}" class="img-fluid" alt="">
-											<img src="{% static 'assets/images/products/cloth-1-2-600x800.jpg' %}" class="img-fluid" alt="">
+											<img src="{{ p.images.url }}" class="img-fluid" alt="">
+											
 										</a>
 
 										<div class="single-product__floating-badges">
@@ -565,8 +565,6 @@
 													data-tippy-animation="shift-away" data-tippy-delay="50" data-tippy-arrow="true"
 													data-tippy-theme="sharpborder" data-tippy-placement="bottom"><i
 														class="ion-android-favorite-outline"></i></a></span>
-
-				
 										</div>
 
 
@@ -579,18 +577,15 @@
 									<div class="single-product__content">
 
 										<div class="title">
-											<h3> <a href="shop-product-basic.html">High-waist Trousers</a></h3>
+											<h3> <a href="{{p.get_url}}"> {{p.product_name}} </a></h3>
 										</div>
 										<div class="price">
-											<span class="main-price discounted">$160.00</span>
-											<span class="discounted-price">$180.00</span>
+											<span class="main-price discounted">₹ {{p.price}} </span>
+											<span class="discounted-price">₹ {{p.old_price}} </span>
 										</div>
-										<p class="short-desc"> Lorem ipsum dolor sit amet consectetur, adipisicing elit. Laudantium
-											consequuntur voluptatem ad molestiae. Expedita nesciunt quam totam, sapiente eveniet consectetur
-											voluptas quas harum impedit quia quibusdam tempora ab facilis. Non assumenda veritatis,
-										</p>
+										<p class="short-desc"> {{ p.description }} </p>
 
-										<a href="#" class="lezada-button lezada-button--medium">ADD TO CART</a>
+										<a href="{{p.get_url}}" class="lezada-button lezada-button--medium">View deatails</a>
 
 									</div>
 

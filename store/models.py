@@ -1,13 +1,16 @@
 from django.db import models
+from django.dispatch import receiver
 from django.urls import reverse
 from accounts.models import *
 from category.models import Category
+from django.utils.text import slugify
+from django.db.models.signals import pre_save
 
 # Create your models here.
 
 class Product(models.Model):
     product_name    = models.CharField(max_length=225,unique=True)
-    slug            = models.SlugField(max_length=225,unique=True)
+    slug            = models.SlugField(max_length=225,unique=True, editable=False)
     description     = models.TextField(max_length=255,blank=True)
     price           = models.IntegerField()
     old_price       = models.IntegerField(null=True,blank=True, default=500)
@@ -27,6 +30,12 @@ class Product(models.Model):
     def __str__(self) -> str:
         return self.product_name
     
+@receiver(pre_save, sender=Product)
+def create_product_slug(sender, instance, **kwargs):
+    # Auto-populate slug only if it's not provided
+    if not instance.slug:
+        instance.slug = slugify(instance.product_name)
+
 class ProductImages(models.Model):
     images = models.ImageField(upload_to="product-images", default="product.jpg")
     product = models.ForeignKey(Product, on_delete=models.SET_NULL,related_name='p_images' , null=True)
@@ -49,12 +58,16 @@ variation_category_choice = (
 
 class Variation(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    variation_category  = models.CharField(max_length=100,choices = variation_category_choice)
-    variation_value     = models.CharField(max_length=100)
-    is_active           = models.BooleanField(default=True)
-    created_date        = models.DateTimeField(auto_now=True)
+    variation_category = models.CharField(max_length=100, choices=variation_category_choice)
+    variation_value = models.CharField(max_length=100)
+    is_active = models.BooleanField(default=True)
+    created_date = models.DateTimeField(auto_now=True)
 
     objects = VariationManager()
-    
+
+    class Meta:
+        # Add a unique constraint to ensure uniqueness within each combination of product, variation_category, and variation_value
+        unique_together = [['product', 'variation_category', 'variation_value']]
+
     def __str__(self) -> str:
-        return f"{self.product.product_name} - {self.variation_value} "
+        return f"{self.product.product_name} - {self.variation_value}"

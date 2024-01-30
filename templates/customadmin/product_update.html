@@ -37,6 +37,25 @@ Update Product
                                     {{ field.label }}
                                 </label>
                             </div>
+                        {% elif field.name == 'category' %}
+                            <div class="form-group">
+                                <label>{{ field.label }}</label>
+                                <select name="{{ field.name }}" id="{{ field.name }}" class="form-control">
+                                    {%  for choice_value, choice_label in field.field.choices %}
+                                        <option value="{{ choice_value }}" {% if choice_value == field.value %}selected{% endif %}>{{ choice_label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        
+                        {% elif field.name == 'merchant' %}
+                        <div class="form-group">
+                            <label>{{ field.label }}</label>
+                            <select name="{{ field.name }}" id="{{ field.name }}" class="form-control">
+                                {%  for choice_value, choice_label in field.field.choices %}
+                                    <option value="{{ choice_value }}" {% if choice_value == field.value %}selected{% endif %}>{{ choice_label }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
                         {% else %}
                             <div class="form-group">
                                 <label> {{ field.label }} </label>
@@ -51,7 +70,7 @@ Update Product
                     {% endfor %}                
                     
 
-                    <button class="btn btn-primary btn-block" type="submit">UPDATE USER</button>
+                    <button class="btn btn-primary btn-block" type="submit">UPDATE PRODUCT</button>
                 </form>
 
             </div>

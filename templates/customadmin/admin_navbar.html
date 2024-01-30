@@ -71,13 +71,23 @@
             {% url 'add_product' as add_product %}
             {% url 'products_list' as product_list %}
             {% url 'product_update' as product_update %}
-            <li class="dropdown {% if request.path == add_product %} active {% endif %}{% if request.path == product_list %} active {% endif %}{% if request.path == product_update %} active {% endif %}">
+            {% url 'variations_list' as variations_list %}
+            {% url 'add_variations' as add_variations %}
+            
+            <li class="dropdown {% if request.path == add_product %} active {% endif %}{% if request.path == product_list %} active {% endif %}{% if request.path == product_update %} active {% endif %} {% if request.path == add_variations %} active {% endif %} {% if request.path == variations_list %} active {% endif %}">
               <a href="#" class="nav-link has-dropdown"><i class="fas fa-fire"></i><span>Products</span></a>
               <ul class="dropdown-menu">
                 <li class="{% if request.path == product_list %} active {% endif %} {% if request.path == product_update %} active {% endif %}" ><a class="nav-link" href=" {% url 'products_list' %} ">Product List</a></li>
               </ul>
               <ul class="dropdown-menu">
                 <li class="{% if request.path == add_product %} active {% endif %}" ><a class="nav-link" href=" {% url 'add_product' %} ">Add Product</a></li>
+              </ul>
+              <!-- Variations -->
+              <ul class="dropdown-menu">
+                <li class="{% if request.path == variations_list %} active {% endif %}" ><a class="nav-link" href=" {% url 'variations_list' %} ">View Products variations</a></li>
+              </ul>
+              <ul class="dropdown-menu">
+                <li class="{% if request.path == add_variations %} active {% endif %}" ><a class="nav-link" href=" {% url 'add_variations' %} ">Add Products variations</a></li>
               </ul>
             </li>
             

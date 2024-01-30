@@ -12,12 +12,11 @@ from django.urls import reverse, reverse_lazy
 from django.http import HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
-from django import forms
 
 @login_required(login_url='admin_login')
 def admin_home(request):
     return render(request,'customadmin/admin_home.html', {'user': request.user})
-
+#============================Categories =======================================================================
 
 class CategoriesListView(ListView):
     model = Category
@@ -36,7 +35,7 @@ class CategoriesUpdate(SuccessMessageMixin, UpdateView):
     success_message = " Category updated!"
     fields = "__all__"
     template_name = "customadmin/category_update.html"
-
+#====================================Users=================================================================================
 class UsersListView(ListView):
     model = Account
     template_name = "customadmin/user_list.html"
@@ -95,7 +94,7 @@ class UserDeleteView(SuccessMessageMixin,DeleteView):
     def get_success_message(self, cleaned_data):
         return f"User deleteded successfully."
 
-
+#============================================Products=======================================================================
 class ProductListView(ListView):
     model = Product
     template_name = "customadmin/product_list.html"
@@ -126,8 +125,70 @@ class ProductCreateView(SuccessMessageMixin, CreateView):
     def get_success_message(self, cleaned_data):
         return f"Product {cleaned_data['product_name']} created successfully."
 
+
 class ProductUpdate(SuccessMessageMixin, UpdateView):
     model = Product
+    template_name = "customadmin/product_update.html"
+    fields = '__all__'
+    success_message = "The Product added!"
+    success_url = reverse_lazy('products_list') 
+
+    def form_valid(self, form):
+
+        responce = super().form_valid(form)
+
+        return responce
+    def get_success_message(self, cleaned_data):
+        return f"Product: {cleaned_data['product_name']} updated successfully."
+    
+@method_decorator(login_required, name='dispatch')
+class ProductDeleteView(SuccessMessageMixin, DeleteView):
+    model = Product
+    template_name = 'customadmin/product_delete.html'
+    success_message = "Product {{ product.product_name }} deleted successfully!"
+    success_url = reverse_lazy('products_list')
+
+    def get_object(self, queryset=None):
+        product_id = self.kwargs.get('pk')
+        return Product.objects.get(pk=product_id)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Delete Product'
+        return context
+#========================Variations=============================================================================
+class VariationtListView(ListView):
+    model = Variation
+    template_name = "customadmin/variation_list.html"
+    context_object_name = "variations"
+
+class VariationCreateView(SuccessMessageMixin, CreateView):
+    model = Variation
+    template_name = "customadmin/add_variations.html"
+    fields = '__all__'
+    success_message = "New variations added!"
+    success_url = reverse_lazy('variations_list') 
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.fields['product'].queryset = Product.objects.all().order_by('product_name')
+        return form
+
+    #def form_valid(self, form):
+    #    # Handle the creation of associated ProductImages
+    #    images = self.request.FILES.getlist('images')
+    #    for image in images:
+    #        product_image = ProductImages(images=image, product=self.object)
+    #        product_image.save()
+
+    #    return super().form_valid(form)
+
+    def get_success_message(self, cleaned_data):
+        return f"Variattion created successfully."
+
+
+class VariationUpdate(SuccessMessageMixin, UpdateView):
+    model = Variation
     template_name = "customadmin/product_update.html"
     fields = '__all__'
     success_message = "The Product added!"

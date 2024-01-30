@@ -25,8 +25,11 @@ urlpatterns = [
     path('add_product/', AdminViews.ProductCreateView.as_view(), name='add_product'),
     path('products_list/', AdminViews.ProductListView.as_view(), name='products_list'),
     path('product_update/<slug:pk>', AdminViews.ProductUpdate.as_view(), name='product_update'),
-    #path('product_delete/<int:pk>', AdminViews.ProductDeleteView.as_view(), name='product_delete'),
-
+    path('product_delete/<int:pk>', AdminViews.ProductDeleteView.as_view(), name='product_delete'),
+    
+    path('variations_list/', AdminViews.VariationtListView.as_view(), name='variations_list'),
+    path('add_variations/', AdminViews.VariationCreateView.as_view(), name='add_variations'),
+    
 ]   
 
 

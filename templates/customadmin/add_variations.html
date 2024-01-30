@@ -2,14 +2,14 @@
 {% load static %}
 
 {% block title %}
-Add Product 
+Add Variations in Products 
 {% endblock title %}
 
 {% block custom_css %}
 {% endblock custom_css %}
 
 {% block page_title %}
-Add Product
+Add Variations in Products
 {% endblock page_title %}
 
 {% block page_content %}
@@ -17,13 +17,13 @@ Add Product
         <div class="col-12 col-md-12 col-lg-12">
             <div class="card">
                 <div class="card-header">
-                    <h4>Add Product</h4>
+                    <h4>Add Variations in Products</h4>
                 </div>
                 <div class="card-body">
                     <form action="" method="POST" enctype="multipart/form-data">
                         {% csrf_token %}
                         {% for field in form %}
-                            {% if field.name == 'category' or field.name == 'merchant' %}
+                            {% if  field.name == 'product' or field.name == 'variation_category' %}
                                 <div class="form-group">
                                     <label>{{ field.label }}</label>
                                     <select name="{{ field.name }}" id="{{ field.name }}" class="form-control">
@@ -32,7 +32,6 @@ Add Product
                                         {% endfor %}
                                     </select>
                                 </div>
-                            
                             {% else %}
                                 <div class="form-group">
                                     <label>{{ field.label }}</label>
@@ -46,7 +45,7 @@ Add Product
                             {% endif %}
                         {% endfor %}
 
-                        <button class="btn btn-primary btn-block" type="submit">ADD PRODUCT</button>
+                        <button class="btn btn-primary btn-block" type="submit">ADD VARIATIONS</button>
                     </form>
 
                 </div>

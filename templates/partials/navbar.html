@@ -72,8 +72,24 @@
 
 							<div class="single-icon user-login">
 								<a href="{% url 'login' %}">
-									<i class="ion-android-person"></i>
+									
 								</a>
+								<div class="btn-group mb-2">
+									<a class="" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+										<i class="ion-android-person"></i>
+									</a>
+									<div class="dropdown-menu" x-placement="bottom-start" style="position: absolute; transform: translate3d(0px, 29px, 0px); top: 0px; left: 0px; will-change: transform;">
+										{% if user.is_authenticated %}
+										<a class="dropdown-item" href="#">{{user.username}}</a>
+										<a class="dropdown-item" href="{% url 'logout' %}"><logout class="fa-thin fa-right-to-bracket"/>logout</a>
+										<a class="dropdown-item" href="#">Dashbord</a>
+										
+										{%else%}
+										<div class="dropdown-divider"></div>
+										<a class="dropdown-item" href="{% url 'login' %}">Login/Register</a>
+										{% endif %}
+									</div>
+								</div>
 							</div>
 
 							<!--=======  End of single-icon  =======-->
@@ -93,7 +109,7 @@
 								<a href="javascript:void(0)" id="offcanvas-cart-icon">
 									<i class="ion-ios-cart"></i>
 									
-									<span class="count" id="cart-list"> {{request.session.cartdata|length}} </span>
+									<span class="count" id="cart-list"> {{cart_count}} </span>
 								</a>
 							</div>
 							<!--=======  End of single-icon  =======-->

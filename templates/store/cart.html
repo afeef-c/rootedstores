@@ -29,7 +29,7 @@
 					<!--=======  breadcrumb list  =======-->
 
 					<ul class="breadcrumb-list">
-						<li class="breadcrumb-list__item"><a href="index-2.html">HOME</a></li>
+						<li class="breadcrumb-list__item"><a href="{% url 'home' %}">HOME</a></li>
 						<li class="breadcrumb-list__item breadcrumb-list__item--active">shopping cart</li>
 					</ul>
 
@@ -48,19 +48,18 @@
 	<div class="shopping-cart-area mb-130">
 		<div class="container">
 			<div class="row">
-				{% if not  'cart_data'  %}
-
-					
-					<h2 class="text-center">Your cart is empty</h2>	
-					<br style="display: none;">
-					
-					<div class="text-center">
-						<a href="{% url 'store' %}" class="btn btn-primary">Continue planting!</a>
-					</div>
-				{% else %}
+				
 				<div class="col-lg-12 mb-30">
 					<!--=======  cart table  =======-->
-
+						{% if not cart_items %}
+							<h2 class="text-center d-block">Your cart is empty</h2>	
+							<br style="display: none;">
+							
+							<div class="text-center d-block">
+								<a href="{% url 'store' %}" class="btn btn-warning">Continue Shoping!</a>
+							</div>
+						{% else %}
+						
 					<div class="cart-table-container">
 						
 						<table class="cart-table">
@@ -75,34 +74,50 @@
 							</thead>
 							
 								<tbody>
-									{% for product_id, item in cart_data.items %}
+									{% for item in cart_items %}
 									<tr>
 										<td class="product-thumbnail">
-											<a href="shop-product-basic.html">
-												<img src=" {{ item.image }}" class="img-fluid" alt="">
+											<a href="">
+												<img src=" {{ item.product.images.url }}" class="img-fluid" alt="">
 											</a>
 										</td>
 										<td class="product-name">
-											<a href="{{ item.product.get_url }}"> {{ item.title }} </a>
-											<span class="product-variation">Color: Black</span>
+											<a href=""> {{ item.product.product_name }} </a>
+											
+											{% if item.variations.all %}
+												{% for var in item.variations.all %}
+												<span class="product-variation"></span>{{var.variation_category| capfirst}} : {{var.variation_value| capfirst}}</span><br> 
+												{% endfor %}
+											{% endif %}
+											
 										</td>
-										<td class="product-price"><span class="price"> {{ item.price }} </span></td>
+										<td class="product-price"><span class="price">₹ {{ item.product.price }} </span></td>
 										<td class="product-quantity">
+
 											<div class="d-inline-block mx-0">
-												<a href="#" class="dec qty-btn">-</a>
-												<input type="text" value="{{ item.qty }}" class="styled-input" onfocus="this.removeAttribute('readonly');">
-												<a href="#" class="inc qty-btn">+</a>
 												
+												<a href="{% url 'remove_cart' item.product_id item.id %}" class="btn btn-light d-inline"  >-</a>
+												
+												<input id="quantity-{{ item.product_id }}" type="text" value="{{ item.quantity }}" class="styled-input d-inline" readonly>
+												
+												<form action="{% url 'add_cart' item.product_id %}" method="POST" class="d-inline">
+													{% csrf_token %}
+													{% for i in item.variations.all %}
+														<input type="hidden" name="{{i.variation_category | lower}}" value="{{i.variation_value | capfirst }}">
+													{% endfor %}
+													<button type="submit" class="btn btn-light " >+</button>
+												</form>
 											</div>
+					
+
 										</td>
 										<td class="total-price">
-									    	<span class="price">₹ {% widthratio item.price 1 item.qty %} </span>
+									    	<span class="price">₹ {{item.item_total}} </span>
 										</td>
 
-										<!--<td class="total-price"><span class="price">₹ {% widthratio item.price 1 item.qty %} </span></td>-->
 										<td class="product-remove">
 
-											<a href="#">
+											<a href="{% url 'remove_cart_item' item.product_id item.id %}" onclick="return confirm('Are you sure to remove the item from cart!')">
 												<i class="ion-android-close"></i>
 											</a>
 										</td>
@@ -116,7 +131,7 @@
 						</table>
 						
 					</div>
-
+					
 					<!--=======  End of cart table  =======-->
 				</div>
 				<div class="col-lg-12 mb-80">
@@ -155,7 +170,7 @@
 
 					<!--=======  End of coupon area  =======-->
 				</div>
-				{% endif %}
+				
 
 				<div class="col-xl-4 offset-xl-8 col-lg-5 offset-lg-7">
 					<div class="cart-calculation-area">
@@ -164,11 +179,15 @@
 						<table class="cart-calculation-table mb-30">
 							<tr>
 								<th>SUBTOTAL</th>
-								<td class="subtotal">$100.00</td>
+								<td class="subtotal">₹ {{total}} </td>
+							</tr>
+							<tr>
+								<th>GST (2%) </th>
+								<td class="tax">₹ {{tax}} </td>
 							</tr>
 							<tr>
 								<th>TOTAL</th>
-								<td class="total">$100.00</td>
+								<td class="total">₹ {{grand_total}} </td>
 							</tr>
 						</table>
 
@@ -177,6 +196,8 @@
 						</div>
 					</div>
 				</div>
+				
+				{% endif %}
 			</div>
 		</div>
 	</div>
@@ -185,3 +206,28 @@
 
 
 {% endblock %}
+
+{% block js %}
+
+<!--<script>
+    $(document).ready(function() {
+        $(".inc.qty-btn").click(function() {
+            var productId = $(this).data("product-id");
+            $.ajax({
+                url: "{% url 'add_cart' 123 %}".replace("123", productId), // We use a placeholder and replace it with the actual product ID
+                method: "POST",
+                data: {
+                    action: "post",
+                    product_id: productId,
+                    csrfmiddlewaretoken: "{{ csrf_token }}"
+                },
+                success: function(data) {
+                    $('#quantity-' + productId).val(data.quantity);
+                }
+            });
+        });
+    });
+</script>-->
+
+
+{% endblock js %}
