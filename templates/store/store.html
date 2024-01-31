@@ -1,8 +1,6 @@
 {% extends 'partials/base.html' %}
 {% load static %}
 
-
-
 {% block content %}
 
 	<!--=======  breadcrumb area =======-->
@@ -11,6 +9,10 @@
 		<div class="container">
 			<div class="row">
 				<div class="col-lg-12">
+					{% if 'search' in request.path %}
+						<h1 class="breadcrumb-title">Search result</h1>
+						<span class="breadcrumb-list__item">{{product_count}} items found </span>
+					{% else %}
 					<h1 class="breadcrumb-title">Store</h1>
 
 					<!--=======  breadcrumb list  =======-->
@@ -21,7 +23,7 @@
 					</ul>
 
 					<!--=======  End of breadcrumb list  =======-->
-
+					{% endif %}
 				</div>
 			</div>
 		</div>
@@ -136,25 +138,9 @@
 							<div class="single-filter-widget">
 								<h2 class="single-filter-widget--title">Categories</h2>
 								<ul class="single-filter-widget--list single-filter-widget--list--category">
-									<li class="has-children">
-										<a href="shop-left-sidebar.html">Cosmetic </a> <span class="quantity">5</span>
-										<ul>
-											<li><a href="shop-left-sidebar.html">For body</a></li>
-											<li><a href="shop-left-sidebar.html">Make up</a></li>
-											<li><a href="shop-left-sidebar.html">New</a></li>
-											<li><a href="shop-left-sidebar.html">Perfumes</a></li>
-										</ul>
-									</li>
-									<li class="has-children">
-										<a href="shop-left-sidebar.html">Furniture </a> <span class="quantity">23</span>
-										<ul>
-											<li><a href="shop-left-sidebar.html">Sofas</a></li>
-											<li><a href="shop-left-sidebar.html">Armchairs</a></li>
-											<li><a href="shop-left-sidebar.html">Desk Chairs</a></li>
-											<li><a href="shop-left-sidebar.html">Dining Chairs</a></li>
-										</ul>
-									</li>
-									<li><a href="shop-left-sidebar.html">Watches </a> <span class="quantity">12</span></li>
+									{% for category in links %}
+										<li><a href="{{category.get_url}}"> {{category.cat_name}} </a> <span class="quantity"> {{category.product_set.count}} </span></li>
+									{% endfor %}
 								</ul>
 							</div>
 
@@ -164,7 +150,7 @@
 						<div class="col-lg-2 col-md-4 col-sm-6 mb-50">
 							<!--=======  single advance filte  =======-->
 
-							<div class="single-filter-widget">
+							<!--<div class="single-filter-widget">
 								<h2 class="single-filter-widget--title">Price filter</h2>
 								<ul class="single-filter-widget--list">
 									<li><a href="#">All</a></li>
@@ -174,7 +160,7 @@
 									<li><a href="#">$210.00 - $280.00</a></li>
 									<li><a href="#">$280.00 - $350.00</a></li>
 								</ul>
-							</div>
+							</div>-->
 
 							<!--=======  End of single advance filte  =======-->
 						</div>
@@ -278,9 +264,9 @@
 								<!--=======  search widget  =======-->
 
 								<div class="search-widget">
-									<form action="#">
-										<input type="search" placeholder="Search products ...">
-										<button type="button"><i class="ion-android-search"></i></button>
+									<form action="{% url 'search' %}" method="GET">
+										<input type="search" name="keyword" placeholder="Search products ...">
+										<button type="submit"><i class="ion-android-search"></i></button>
 									</form>
 								</div>
 
@@ -295,27 +281,10 @@
 							<div class="single-sidebar-widget mb-40">
 								<h2 class="single-sidebar-widget--title">Categories</h2>
 								<ul class="single-sidebar-widget--list single-sidebar-widget--list--category">
-									<li class="has-children">
-										<a href="shop-left-sidebar.html">Cosmetic </a> <span class="quantity">5</span>
-										<ul>
-											<li><a href="shop-left-sidebar.html">For body</a></li>
-											<li><a href="shop-left-sidebar.html">Make up</a></li>
-											<li><a href="shop-left-sidebar.html">New</a></li>
-											<li><a href="shop-left-sidebar.html">Perfumes</a></li>
-										</ul>
-									</li>
-									<li class="has-children">
-										<a href="shop-left-sidebar.html">Furniture </a> <span class="quantity">23</span>
-										<ul>
-											<li><a href="shop-left-sidebar.html">Sofas</a></li>
-											<li><a href="shop-left-sidebar.html">Armchairs</a></li>
-											<li><a href="shop-left-sidebar.html">Desk Chairs</a></li>
-											<li><a href="shop-left-sidebar.html">Dining Chairs</a></li>
-										</ul>
-									</li>
-									<li><a href="shop-left-sidebar.html">Watches </a> <span class="quantity">12</span></li>
-									<li><a href="shop-left-sidebar.html">Bags </a> <span class="quantity">22</span></li>
-									<li><a href="shop-left-sidebar.html">Uncategorized </a> <span class="quantity">14</span></li>
+									<li><a href="{% url 'store' %}">All..</a><span class="quantity"> {{products_set.count}} </span></li>
+									{% for category in links %}
+										<li><a href="{{category.get_url}}"> {{category.cat_name}} </a> <span class="quantity"> {{category.product_set.count}} </span></li>
+									{% endfor %}
 								</ul>
 							</div>
 
@@ -337,157 +306,71 @@
 							<!--=======  End of single sidebar widget  =======-->
 
 							<!--=======  single sidebar widget  =======-->
+							{% for product in products %}
+								{% if product.is_available == 'False' %}
+									<div class="single-sidebar-widget mb-40">
+										<h2 class="single-sidebar-widget--title">Popular products</h2>
 
-							<div class="single-sidebar-widget mb-40">
-								<h2 class="single-sidebar-widget--title">Popular products</h2>
+										<!--=======  widget product wrapper  =======-->
 
-								<!--=======  widget product wrapper  =======-->
-
-								<div class="widget-product-wrapper">
-									<!--=======  single widget product  =======-->
-									<div class="single-widget-product-wrapper">
-										<div class="single-widget-product">
-											<!--=======  image  =======-->
-
-											<div class="single-widget-product__image">
-												<a href="shop-product-basic.html">
-													<img src="{% static 'assets/images/products/product-furniture-2-100x100.jpg' %}" class="img-fluid" alt="">
-												</a>
-											</div>
-
-											<!--=======  End of image  =======-->
-
-											<!--=======  content  =======-->
-
-											<div class="single-widget-product__content">
-
-												<div class="single-widget-product__content__top">
-													<h3 class="product-title"><a href="shop-product-basic.html">Wooden Table</a></h3>
-													<div class="price">
-														<span class="main-price discounted">$270.00</span>
-														<span class="discounted-price">$220.00</span>
+										<div class="widget-product-wrapper">
+											<!--=======  single widget product  =======-->
+											<div class="single-widget-product-wrapper">
+												<div class="single-widget-product">
+													<!--=======  image  =======-->
+													
+													<div class="single-widget-product__image">
+														<a href="shop-product-basic.html">
+															<img src="{% static 'assets/images/products/product-furniture-2-100x100.jpg' %}" class="img-fluid" alt="">
+														</a>
 													</div>
-													<div class="rating">
-														<i class="ion-android-star"></i>
-														<i class="ion-android-star"></i>
-														<i class="ion-android-star-outline"></i>
-														<i class="ion-android-star-outline"></i>
-														<i class="ion-android-star-outline"></i>
+													
+
+													<!--=======  End of image  =======-->
+
+													<!--=======  content  =======-->
+
+													<div class="single-widget-product__content">
+
+														<div class="single-widget-product__content__top">
+															<h3 class="product-title"><a href="shop-product-basic.html">Wooden Table</a></h3>
+															<div class="price">
+																<span class="main-price discounted">$270.00</span>
+																<span class="discounted-price">$220.00</span>
+															</div>
+															<div class="rating">
+																<i class="ion-android-star"></i>
+																<i class="ion-android-star"></i>
+																<i class="ion-android-star-outline"></i>
+																<i class="ion-android-star-outline"></i>
+																<i class="ion-android-star-outline"></i>
+															</div>
+														</div>
+
 													</div>
+
+													<!--=======  End of content  =======-->
 												</div>
-
 											</div>
 
-											<!--=======  End of content  =======-->
+											<!--=======  End of single widget product  =======-->
 										</div>
+
+										<!--=======  End of widget product wrapper  =======-->
 									</div>
-
-									<!--=======  End of single widget product  =======-->
-
-									<!--=======  single widget product  =======-->
-									<div class="single-widget-product-wrapper">
-										<div class="single-widget-product">
-											<!--=======  image  =======-->
-
-											<div class="single-widget-product__image">
-												<a href="shop-product-basic.html">
-													<img src="{% static 'assets/images/products/product-furniture-11-100x100.jpg' %}" class="img-fluid" alt="">
-												</a>
-											</div>
-
-											<!--=======  End of image  =======-->
-
-											<!--=======  content  =======-->
-
-											<div class="single-widget-product__content">
-
-												<div class="single-widget-product__content__top">
-													<h3 class="product-title"><a href="shop-product-basic.html">Sofa with cushion</a></h3>
-													<div class="price">
-														<span class="main-price discounted">$660.00</span>
-														<span class="discounted-price">$600.00</span>
-													</div>
-													<div class="rating">
-														<i class="ion-android-star"></i>
-														<i class="ion-android-star"></i>
-														<i class="ion-android-star"></i>
-														<i class="ion-android-star"></i>
-														<i class="ion-android-star"></i>
-													</div>
-												</div>
-
-
-
-											</div>
-
-											<!--=======  End of content  =======-->
-										</div>
-									</div>
-
-									<!--=======  End of single widget product  =======-->
-
-									<!--=======  single widget product  =======-->
-									<div class="single-widget-product-wrapper">
-										<div class="single-widget-product">
-											<!--=======  image  =======-->
-
-											<div class="single-widget-product__image">
-												<a href="shop-product-basic.html">
-													<img src="{% static 'assets/images/products/soccer-4-100x100.jpg' %}" class="img-fluid" alt="">
-												</a>
-											</div>
-
-											<!--=======  End of image  =======-->
-
-											<!--=======  content  =======-->
-
-											<div class="single-widget-product__content">
-
-												<div class="single-widget-product__content__top">
-													<h3 class="product-title"><a href="shop-product-basic.html">High waist trousers</a></h3>
-													<div class="price">
-														<span class="main-price discounted">$36.00</span>
-														<span class="discounted-price">$33.00</span>
-													</div>
-													<div class="rating">
-														<i class="ion-android-star"></i>
-														<i class="ion-android-star"></i>
-														<i class="ion-android-star"></i>
-														<i class="ion-android-star"></i>
-														<i class="ion-android-star-outline"></i>
-													</div>
-												</div>
-
-
-											</div>
-
-											<!--=======  End of content  =======-->
-										</div>
-									</div>
-									<!--=======  End of single widget product  =======-->
-								</div>
-
-								<!--=======  End of widget product wrapper  =======-->
-							</div>
-
+								{% endif %}
+							{% endfor %}
 							<!--=======  End of single sidebar widget  =======-->
 
 							<!--=======  single sidebar widget  =======-->
 
 							<div class="single-sidebar-widget">
 								<h2 class="single-sidebar-widget--title">Tags</h2>
-
+								<!-- change to tags work on it -->
 								<div class="tag-container">
-									<a href="#">bags</a>
-									<a href="#">chair</a>
-									<a href="#">clock</a>
-									<a href="#">comestic</a>
-									<a href="#">fashion</a>
-									<a href="#">furniture</a>
-									<a href="#">holder</a>
-									<a href="#">mask</a>
-									<a href="#">men</a>
-									<a href="#">oil</a>
+									{% for link in links %}
+									<a href="#"> {{link}} </a>
+									{%endfor%}
 								</div>
 							</div>
 
@@ -501,6 +384,7 @@
 						<div class="row product-isotope shop-product-wrap five-column">
 
 							<!--=======  single product  =======-->
+							{% if products %}
 							{% for p in products %}
 							<div class="col-12 col-lg-is-5 col-md-6 col-sm-6 mb-45 hot sale">
 								<div class="single-product">
@@ -593,6 +477,11 @@
 								</div>
 							</div>
 							{% endfor %}
+							{% else %}
+							<div>
+								<h2>No result found. Pleas try again !</h2>
+							</div>
+							{% endif %}
 							<!--=======  End of single product  =======-->
 
 							
@@ -603,14 +492,13 @@
 
 						<div class="row">
 							<div class="col-lg-12 text-center mt-30">
-								<a class="lezada-button lezada-button--medium lezada-button--icon--left" href="#"><i
-										class="ion-android-add"></i> MORE</a>
 
-								<nav class="mt-4" aria-label="Page navigation sample">
-									{% if products.has_other_pages %}
-										<ul class="pagination ">
+								
+								{% if products.has_other_pages %}
+								<nav class="mt-4 lezada-button lezada-button--medium lezada-button--icon--left" aria-label="Page navigation sample"></nav>
+									<ul class="pagination ">
 											{% if product.has_previous %}
-												<li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">&laquo;</a></li>
+												<li class="page-item "><a class="page-link" href="?page={{ page_obj.previous_page_number }}">&laquo;</a></li>
 											{% else %}
 												<li class="page-item disabled"><a class="page-link" href="#">&laquo;</a></li>
 											{% endif %}
@@ -628,8 +516,9 @@
 												<li class="page-item disabled"><a class="page-link" href="#">&raquo;</a></li>
 											{% endif %}
 										</ul>
-									{% endif %}
+									
 								</nav>
+								{% endif %}
 							</div>
 						</div>
 						

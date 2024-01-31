@@ -79,6 +79,7 @@
 
 	<!--=======  End of about overlay  =======-->
 
+
 	<!--=======  wishlist overlay  =======-->
 
 	<div class="wishlist-overlay" id="wishlist-overlay">
@@ -233,11 +234,23 @@
 
 			<div class="offcanvas-cart-content-container">
 				<h3 class="cart-title">Cart</h3>
+				{% if not cart_items %}
+					<h2 class="text-center d-block">Your cart is empty</h2>	
+					<br style="display: none;">
+					
+					<div class="text-center d-block">
+						<a href="{% url 'store' %}" class="btn btn-warning">Continue Shoping!</a>
+						<div class="cart-buttons">
+						<a class="btn btn-dark align-middle" href="{% url 'cart' %}">view cart</a>
+					</div>
+					</div>
+					
+				{% else %}
 
 				<div class="cart-product-wrapper">
 					<div class="cart-product-container  ps-scroll">
 						<!--=======  single cart product  =======-->
-
+						
 						{% for item in cart_items %}
 						<div class="single-cart-product">
 							<span class="cart-close-icon">
@@ -284,6 +297,7 @@
 
 					<!--=======  End of free shipping text  =======-->
 				</div>
+				{% endif %}
 			</div>
 
 			<!--=======  End of offcanvas cart content container   =======-->

@@ -43,7 +43,7 @@
 					<!--=======  slider image  =======-->
 
 					<div class="slider-image">
-						<img src="{% static 'assets/images/slider/banner-carousel-1.jpg' %}" class="img-fluid" alt="">
+						<img src="{% static 'assets/images/slider/wall2.jpg' %}" class="img-fluid" alt="">
 
 					</div>
 
@@ -53,15 +53,15 @@
 
 					<div class="slider-content">
 						<div class="color-title color-title--blue">
-							accessories
+							decor
 						</div>
 
 						<div class="main-title">
-							Bottle Grinder, <br>
-							Small, 2-Piecehe
+							Transform your space, <br>
+							one leaf at a time.
 						</div>
 
-						<a href="shop-left-sidebar.html" class="lezada-button lezada-button--medium">shop now</a>
+						<a href="{% url 'store' %}" class="lezada-button lezada-button--medium">shop now</a>
 					</div>
 
 					<!--=======  End of slider content  =======-->
@@ -76,7 +76,7 @@
 					<!--=======  slider image  =======-->
 
 					<div class="slider-image">
-						<img src="{% static 'assets/images/slider/banner-carousel-2.jpg' %}" class="img-fluid" alt="">
+						<img src="{% static 'assets/images/slider/wall1.jpg' %}" class="img-fluid" alt="">
 
 					</div>
 
@@ -86,15 +86,15 @@
 
 					<div class="slider-content">
 						<div class="color-title color-title--brown">
-							handmade
+							Love
 						</div>
 
 						<div class="main-title">
-							Large, <br>
-							Food board
+							Transform Your Home with Nature's Touch: <br>
+							 Discover Our Plant Collection
 						</div>
 
-						<a href="shop-left-sidebar.html" class="lezada-button lezada-button--medium">shop now</a>
+						<a href="{% url 'store' %}" class="lezada-button lezada-button--medium">shop now</a>
 					</div>
 
 					<!--=======  End of slider content  =======-->
@@ -109,7 +109,7 @@
 					<!--=======  slider image  =======-->
 
 					<div class="slider-image">
-						<img src="{% static 'assets/images/slider/banner-carousel-3.jpg' %}" class="img-fluid" alt="">
+						<img src="{% static 'assets/images/slider/wall3.jpg' %}" class="img-fluid" alt="">
 
 					</div>
 
@@ -119,15 +119,15 @@
 
 					<div class="slider-content">
 						<div class="color-title color-title--green">
-							decor
+							Cactus
 						</div>
 
 						<div class="main-title">
-							Tribeca Hubert <br>
-							Pendant
+							Blossom Your Space: <br>
+							Explore Our Diverse Range of Plants! 
 						</div>
 
-						<a href="shop-left-sidebar.html" class="lezada-button lezada-button--medium">shop now</a>
+						<a href="{% url 'store' %}" class="lezada-button lezada-button--medium">shop now</a>
 					</div>
 
 					<!--=======  End of slider content  =======-->
@@ -204,7 +204,7 @@
 										<div class="single-product__content" >
 											<div class="title">
 												<h3> <a href="{{ p.geturl }}"> {{p.product_name}} </a></h3>
-												<a href="{% url 'add_cart' p.id %}">Add to cart</a>
+												<a href="{{ p.geturl }}"> View details</a>
 												
 											</div>
 											<div class="price">

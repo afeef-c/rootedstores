@@ -178,50 +178,54 @@
 
 									<!--=======  End of shop product short description  =======-->
 									<form action="{% url 'add_cart' single_product.id  %}" method="POST">
-    {% csrf_token %}
-    
-    <!--=======  shop product size block  =======-->
-    {% if single_product.variation_set.sizes %}
-    <div class="shop-product__block shop-product__block--size mb-20">
-        <div class="shop-product__block__title">Size: </div>
-        <div class="shop-product__block__value">
-            <div class="shop-product-size-list">
-                <select class="form-control" name="size" id="size" required>
-                    <option value="" disabled selected>Choose size</option>
-                    {% for i in single_product.variation_set.sizes %}
-                        <option value="{{i.variation_value|lower}}">{{i.variation_value|capfirst}}</option>
-                    {% endfor %}
-                </select>
-            </div>
-        </div>
-    </div>
-    {% endif %}
-    <!--=======  End of shop product size block  =======-->
+										{% csrf_token %}
+										
+										<!--=======  shop product size block  =======-->
+										{% if single_product.variation_set.sizes %}
+										<div class="shop-product__block shop-product__block--size mb-20">
+											<div class="shop-product__block__title">Size: </div>
+											<div class="shop-product__block__value">
+												<div class="shop-product-size-list">
+													<select class="form-control" name="size" id="size" required>
+														<option value="" disabled selected>Choose size</option>
+														{% for i in single_product.variation_set.sizes %}
+															<option value="{{i.variation_value|lower}}">{{i.variation_value|capfirst}}</option>
+														{% endfor %}
+													</select>
+												</div>
+											</div>
+										</div>
+										{% endif %}
+										<!--=======  End of shop product size block  =======-->
 
-    <!--=======  shop product color block  =======-->
-    {% if single_product.variation_set.colors %}
-    <div class="shop-product__block shop-product__block--color mb-20">
-        <div class="shop-product__block__title">Color: </div>
-        <div class="shop-product__block__value">
-            <div class="shop-product-color-list">
-                <select class="form-control" name="color" id="color" required>
-                    <option value="" disabled selected>Choose color</option>
-                    {% for i in single_product.variation_set.colors %}
-                        <option value="{{i.variation_value|lower}}">{{i.variation_value|capfirst}}</option>
-                    {% endfor %}
-                </select>
-            </div>
-        </div>
-    </div>
-    {% endif %}
-    <!--=======  End of shop product color block  =======-->
+										<!--=======  shop product color block  =======-->
+										{% if single_product.variation_set.colors %}
+										<div class="shop-product__block shop-product__block--color mb-20">
+											<div class="shop-product__block__title">Color: </div>
+											<div class="shop-product__block__value">
+												<div class="shop-product-color-list">
+													<select class="form-control" name="color" id="color" required>
+														<option value="" disabled selected>Choose color</option>
+														{% for i in single_product.variation_set.colors %}
+															<option value="{{i.variation_value|lower}}">{{i.variation_value|capfirst}}</option>
+														{% endfor %}
+													</select>
+												</div>
+											</div>
+										</div>
+										{% endif %}
+										<!--=======  End of shop product color block  =======-->
 
-    <!--=======  shop product buttons  =======-->
-    <div class="shop-product__buttons mb-40">
-        <button type="submit" class="lezada-button lezada-button--medium">add to cart</button>
-    </div>
-    <!--=======  End of shop product buttons  =======-->
-</form>
+										<!--=======  shop product buttons  =======-->
+										<div class="shop-product__buttons mb-40">
+											{% if single_product.stock <= 0 %}
+												<h3 class='text-danger' >Out of Stock</h3>
+											{% else %}
+												<button type="submit" class="lezada-button lezada-button--medium">add to cart</button>
+											{% endif %}	
+										</div>
+										<!--=======  End of shop product buttons  =======-->
+									</form>
 
 
 									
