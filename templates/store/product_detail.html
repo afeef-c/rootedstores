@@ -220,6 +220,8 @@
 										<div class="shop-product__buttons mb-40">
 											{% if single_product.stock <= 0 %}
 												<h3 class='text-danger' >Out of Stock</h3>
+											{% elif single_product.is_available == False  %}
+												<h3 class='text-warning' >Not available now pleas try again later</h3>
 											{% else %}
 												<button type="submit" class="lezada-button lezada-button--medium">add to cart</button>
 											{% endif %}	
@@ -256,18 +258,17 @@
 											<tr class="single-info">
 												<td class="quickview-title">Categories: </td>
 												<td class="quickview-value">
-													<a href="#">Fashion</a>,
-													<a href="#">Men</a>,
-													<a href="#">Sunglasses</a>
+													<a href="#"> {{single_product.category}} </a>,
+													
 												</td>
 											</tr>
-											<tr class="single-info">
+											<!--<tr class="single-info">
 												<td class="quickview-title">Tags: </td>
 												<td class="quickview-value">
 													<a href="#">Fashion</a>,
 													<a href="#">Men</a>
 												</td>
-											</tr>
+											</tr>-->
 											<tr class="single-info">
 												<td class="quickview-title">Share on: </td>
 												<td class="quickview-value">

@@ -29,7 +29,9 @@ urlpatterns = [
     
     path('variations_list/', AdminViews.VariationtListView.as_view(), name='variations_list'),
     path('add_variations/', AdminViews.VariationCreateView.as_view(), name='add_variations'),
-    
+    path('update_variation/<slug:pk>', AdminViews.VariationUpdate.as_view(), name='update_variation'),
+    path('delete_variation/<int:pk>', AdminViews.VariationDeleteView.as_view(), name='delete_variation'),
+
 ]   
 
 

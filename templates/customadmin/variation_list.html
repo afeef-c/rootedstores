@@ -71,8 +71,8 @@ Variations List
                         
                     </td>
                     
-                    <td><a href="#" class="btn btn-warning">Update</a></td>
-                    <td><a href="#" class="btn btn-danger">Delete</a></td>
+                    <td><a href="{% url 'update_variation' var.id %}" class="btn btn-warning">Update</a></td>
+                    <td><a href="{% url 'delete_variation' var.id %}" class="btn btn-danger">Delete</a></td>
                 </tr>
                 {% endfor %}
                 

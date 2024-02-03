@@ -15,7 +15,7 @@ urlpatterns = [
     path('otp_fp/<str:uid>/', views.otp_fp_verify, name='otp_fp_verify'),
     
     path('reset_password/<str:uid>/', views.reset_password, name='reset_password'),
-
+    
 ]
 
 

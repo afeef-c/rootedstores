@@ -14,24 +14,67 @@ def store(request, category_slug=None):
 
     if category_slug != None:
         categories = get_object_or_404(Category,slug=category_slug)
-        products = Product.objects.filter(category=categories, is_available=True)
+        products = Product.objects.filter(category=categories, is_available=True).order_by('price')
+
         paginator = Paginator(products,5) 
         page = request.GET.get('page')
         paged_products = paginator.get_page(page)
         product_count = products.count()
-        
-    else:    
-        products = Product.objects.all().order_by('id')
+    
+    else:
+        products = Product.objects.all().order_by('price')
         paginator = Paginator(products,5) 
         page = request.GET.get('page')
         paged_products = paginator.get_page(page)
         product_count = products.count()
+
+    new_products = Product.objects.all().order_by('-created_date')
+    top_new_products = Product.objects.all().order_by('-created_date')[:3]    
     context ={
         'products':paged_products,
         'product_count':product_count,
+        'categories':categories,
+        'top_new_products':top_new_products,
+        'new_products':new_products,
     }
 
     return render(request, 'store/store.html',context)
+
+
+def sort(request):
+    products = Product.objects.all()
+    top_new_products = Product.objects.all().order_by('-created_date')[:3]
+    #if request.method == 'POST':
+    if 'sort_by' in request.GET:        
+        sort_by =  request.GET['sort_by']
+        if sort_by == 'price_low_to_high':
+            sort = 'Price low to high'
+            products = products.order_by('price')
+            
+        elif sort_by == 'price_high_to_low':
+            sort = 'Price high to low'
+            products = products.order_by('-price')    
+            
+        elif  sort_by == 'default':
+            sort = 'Default'
+            products = products
+        elif sort_by == 'latest':
+                    sort = 'Latest '
+                    products = products.order_by('-created_date')
+        else:
+            sort = 'Default'
+            products = products
+                            
+                
+            
+
+    context = {
+        'products':products,
+        'sort':sort,
+        'top_new_products':top_new_products,
+    }    
+    
+    return render(request, 'store/store.html' , context)
 
 def product_detail(request, category_slug,product_slug):
     try:
@@ -52,6 +95,7 @@ def product_detail(request, category_slug,product_slug):
 
 
 def search(request):
+    top_new_products = Product.objects.all().order_by('-created_date')[:3]
     if 'keyword' in request.GET:
         keyword = request.GET['keyword']
         if keyword:
@@ -59,7 +103,34 @@ def search(request):
             product_count = products.count()
         context = {
             'products':products,
-            'product_count':product_count
+            'product_count':product_count,
+            'top_new_products':top_new_products
         }
 
     return render(request, 'store/store.html',context)
+
+def filter_products(request):
+    top_new_products = Product.objects.all().order_by('-created_date')[:3]
+    if request.method == 'POST':
+        # Retrieve minimum and maximum prices from the form submission
+        min_price = int(request.POST.get('min_price'))
+        max_price = int(request.POST.get('max_price'))
+        # Filter products based on the submitted price range
+        products = Product.objects.filter(price__gte=min_price, price__lte=max_price)
+
+        product_count = products.count()
+        context = {
+            'max_price': max_price,
+            'min_price' : min_price,
+            'products' : products,
+            'product_count': product_count,
+            'top_new_products':top_new_products
+        }
+
+        # Render the template with the filtered products
+        return render(request, 'store/store.html', context)
+ # If the request method is not POST (e.g., GET), handle it accordingly
+    # For example, you might render the form initially or handle other actions
+    else:
+        # Render the template with the form
+        return render(request, 'store/store.html') 

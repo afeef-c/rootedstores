@@ -19,6 +19,7 @@ from django.conf import settings
 from django.contrib.auth.hashers import make_password
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth import update_session_auth_hash
+import requests
 
 User = get_user_model()  # Use the get_user_model() function to get the User model
 
@@ -125,11 +126,22 @@ def login(request):
                 pass
             auth.login(request, user)
             messages.success(request, 'You are logged in')
-            return redirect('home')
+            url = request.META.get('HTTP_REFERER')
+            try:
+                query = requests.utils.urlparse(url).query
+                #print('query : ', query) :query :  next=/cart/checkout/
+                params = dict(x.split('=') for x in query.split('&'))
+                if 'next' in params:
+                    next_page = params['next']
+                    return redirect(next_page)
+                
+            except:
+                return redirect('home')
+
         else:
             messages.error(request, 'Invalid login credentials!!')
             return redirect('login')
-
+            
     return render(request, 'accounts/account.html')
 
 @login_required(login_url='login')
@@ -260,7 +272,6 @@ def reset_password(request,uid):
         if password == confirm_password:
             #uid = request.session.get('uid')
             
-            print(uid)
             if uid:
                 try:
                     user = Account.objects.get(uid=uid)
@@ -281,3 +292,4 @@ def reset_password(request,uid):
             return redirect('reset_password')
     else:
         return render(request, "accounts/reset_password.html",{'uid': uid})
+    

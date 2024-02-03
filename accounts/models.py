@@ -91,7 +91,7 @@ class Account(AbstractBaseUser):
     is_active       = models.BooleanField(default=False)
     is_superadmin    = models.BooleanField(default=False)
     is_merchant = models.BooleanField(default=False)
-
+    is_blocked = models.BooleanField(default=False)
     
 
 

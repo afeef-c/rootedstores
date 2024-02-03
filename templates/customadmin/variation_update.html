@@ -1,0 +1,58 @@
+{% extends 'customadmin/admin_base.html' %}
+{% load static %}
+
+{% block title %}
+Update Variations in Products 
+{% endblock title %}
+
+{% block custom_css %}
+{% endblock custom_css %}
+
+{% block page_title %}
+Update Variations in Products
+{% endblock page_title %}
+
+{% block page_content %}
+    <div class="r">
+        <div class="col-12 col-md-12 col-lg-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Update Variations in Products</h4>
+                </div>
+                <div class="card-body">
+                    <form action="" method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        {% for field in form %}
+                            {% if  field.name == 'product' or field.name == 'variation_category' %}
+                                <div class="form-group">
+                                    <label>{{ field.label }}</label>
+                                    <select name="{{ field.name }}" id="{{ field.name }}" class="form-control">
+                                        {% for category_choice in field.field.choices %}
+                                            <option value="{{ category_choice.0 }}">{{ category_choice.1 }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            {% else %}
+                                <div class="form-group">
+                                    <label>{{ field.label }}</label>
+                                    <input type="{{ field.field.widget.input_type }}" name="{{ field.name }}" id="{{ field.name }}" class="form-control">
+                                    {% if field.errors %}
+                                        <div class="alert alert-danger" style="margin: 10px; padding:0px">
+                                            {{ field.errors }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+
+                        <button class="btn btn-primary btn-block" type="submit">ADD VARIATIONS</button>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock page_content %}
+{% block custom_js %}
+
+{% endblock custom_js %}

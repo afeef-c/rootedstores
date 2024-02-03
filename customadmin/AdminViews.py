@@ -12,6 +12,7 @@ from django.urls import reverse, reverse_lazy
 from django.http import HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
+from django.http import Http404
 
 @login_required(login_url='admin_login')
 def admin_home(request):
@@ -41,11 +42,11 @@ class UsersListView(ListView):
     template_name = "customadmin/user_list.html"
     context_object_name = "users"
 
-
+@method_decorator(login_required, name='dispatch')
 class UserCreateView(SuccessMessageMixin, CreateView):
     model = Account
     template_name = "customadmin/user_create.html"
-    fields = ['first_name','last_name','username','email','password','phone_number','profile_pic','is_admin','is_active','is_merchant','is_staff']
+    fields = ['first_name','last_name','username','email','password','profile_pic','is_admin','is_active','is_merchant','is_staff','is_blocked']
     success_message = "New user added!"
     success_url = reverse_lazy('users_list') 
 
@@ -58,11 +59,12 @@ class UserCreateView(SuccessMessageMixin, CreateView):
         # Customize the success message based on the form data
         # You can access form.cleaned_data to retrieve form input values
         return f"User {cleaned_data['username']} created successfully."
-    
+
+@method_decorator(login_required, name='dispatch')    
 class UserUpdate(SuccessMessageMixin, UpdateView):
     model = Account
     template_name = "customadmin/user_update.html"
-    fields = ['first_name','last_name','username','email','password','phone_number','profile_pic','is_admin','is_active','is_merchant','is_staff']
+    fields = ['first_name','last_name','username','email','password','profile_pic','is_admin','is_active','is_merchant','is_staff','is_blocked']
     success_message = "New user added!"
     success_url = reverse_lazy('users_list') 
 
@@ -100,6 +102,7 @@ class ProductListView(ListView):
     template_name = "customadmin/product_list.html"
     context_object_name = "products"
 
+@method_decorator(login_required, name='dispatch')
 class ProductCreateView(SuccessMessageMixin, CreateView):
     model = Product
     template_name = "customadmin/add_product.html"
@@ -125,7 +128,7 @@ class ProductCreateView(SuccessMessageMixin, CreateView):
     def get_success_message(self, cleaned_data):
         return f"Product {cleaned_data['product_name']} created successfully."
 
-
+@method_decorator(login_required, name='dispatch')
 class ProductUpdate(SuccessMessageMixin, UpdateView):
     model = Product
     template_name = "customadmin/product_update.html"
@@ -162,6 +165,7 @@ class VariationtListView(ListView):
     template_name = "customadmin/variation_list.html"
     context_object_name = "variations"
 
+@method_decorator(login_required, name='dispatch')
 class VariationCreateView(SuccessMessageMixin, CreateView):
     model = Variation
     template_name = "customadmin/add_variations.html"
@@ -186,13 +190,13 @@ class VariationCreateView(SuccessMessageMixin, CreateView):
     def get_success_message(self, cleaned_data):
         return f"Variattion created successfully."
 
-
+@method_decorator(login_required, name='dispatch')
 class VariationUpdate(SuccessMessageMixin, UpdateView):
     model = Variation
-    template_name = "customadmin/product_update.html"
+    template_name = "customadmin/variation_update.html"
     fields = '__all__'
-    success_message = "The Product added!"
-    success_url = reverse_lazy('products_list') 
+    success_message = "The Variation updated!"
+    success_url = reverse_lazy('variations_list') 
 
     def form_valid(self, form):
 
@@ -200,4 +204,26 @@ class VariationUpdate(SuccessMessageMixin, UpdateView):
 
         return responce
     def get_success_message(self, cleaned_data):
-        return f"Product: {cleaned_data['product_name']} updated successfully."
+        return f"Variation updated successfully."
+
+
+@method_decorator(login_required, name='dispatch')
+class VariationDeleteView(SuccessMessageMixin, DeleteView):
+    model = Variation
+    template_name = 'customadmin/variation_delete.html'
+    success_message = "Variation  deleted successfully!"
+    success_url = reverse_lazy('variations_list')
+
+    def get_object(self, queryset=None):
+        variation_id = self.kwargs.get('pk')
+        try:
+            variation = Variation.objects.get(pk=variation_id)
+        except Variation.DoesNotExist:
+            raise Http404("Variation does not exist")
+        return variation
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Delete Variation'
+        return context
+

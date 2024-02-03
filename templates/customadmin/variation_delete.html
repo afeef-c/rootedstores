@@ -23,10 +23,10 @@ Delete User
                 <div class="card-body">
                     <form action="" method="POST" enctype="multipart/form-data">
                         {% csrf_token %}
-                        <p>Are you sure you want to delete {{user.username}} account?</p>
+                        <p>Are you sure you want to delete {{variation.product}} - Variation : {{variation.variation_category}}-{{ variation.variation_value }} ??</p>
                         <button class="btn btn-danger" type="submit">Yes, delete my account</button>
                     </form>
-                    <p><a href="{% url 'users_list' %}">Cancel</a></p>
+                    <p><a href="{% url 'variations_list' %}">Cancel</a></p>
                 </div>
             </div>
         </div>

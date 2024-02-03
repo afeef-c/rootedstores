@@ -1,0 +1,36 @@
+{% extends 'partials/base.html' %}
+{% load static %}
+
+
+
+{% block content %}
+
+
+
+    <!--=============================================
+    =            page content         =
+    =============================================-->
+
+	<div class="nothing-found-area bg-404">
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-6">
+					<div class="nothing-found-content">
+						<h3>Oops!</h3>
+						<h3 class="mb-50">You are blockef from the page please contact with team !</h3>
+						<p class="direction-page">PLEASE GO BACK TO <a href="{% url 'home' %}">homepage</a> </p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!--=====  End of shop by page content  ======-->
+
+
+
+
+</html>
+
+
+{% endblock %}

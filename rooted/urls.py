@@ -10,9 +10,13 @@ urlpatterns = [
     path('dj-admin/', admin.site.urls),
     path('admin/', include('customadmin.urls')),
     path('',views.home, name='home'),
+    path('blocked/', views.blocked_page, name='blocked_page'),
     path('store/', include('store.urls')),
     path('cart/', include('cart.urls')),
     path('accounts/', include('accounts.urls')),
+    
+    #orders
+    path('orders/', include('orders.urls')),
     
 ]
 

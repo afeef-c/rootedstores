@@ -39,7 +39,7 @@
 				<div class="col-12">
 					<div class="lezada-form">
 						<!-- Checkout Form s-->
-						<form action="#" method="POST"  class="checkout-form">
+						<form action="{% url 'place_order' %}" method="POST"  class="checkout-form">
 						{% csrf_token %}
 							<div class="row row-40">
 
@@ -53,59 +53,65 @@
 
 											<div class="col-md-6 col-12 mb-20">
 												<label>First Name*</label>
-												<input type="text" placeholder="First Name" required>
+												<input type="text" placeholder="First Name" name="first_name" required>
 											</div>
 
 											<div class="col-md-6 col-12 mb-20">
 												<label>Last Name*</label>
-												<input type="text" placeholder="Last Name" required>
+												<input type="text" placeholder="Last Name" name="last_name" required>
 											</div>
 
 											<div class="col-md-6 col-12 mb-20">
 												<label>Email Address*</label>
-												<input type="email" placeholder="Email Address" required>
+												<input type="email" placeholder="Email Address" name="email" required>
 											</div>
 
 											<div class="col-md-6 col-12 mb-20">
 												<label>Phone no*</label>
-												<input type="text" placeholder="Phone number" required>
+												<input type="text" placeholder="Phone number" name="phone" required>
 											</div>
 
-											<div class="col-12 mb-20">
+											<!--<div class="col-12 mb-20">
 												<label>Company Name</label>
 												<input type="text" placeholder="Company Name">
-											</div>
+											</div>-->
 
 											<div class="col-12 mb-20">
 												<label>Address*</label>
-												<input type="text" placeholder="Address line 1" required>
-												<input type="text" placeholder="Address line 2" required>
+												<input type="text" placeholder="Address line 1" name="address_line_1" required>
+												<input type="text" placeholder="Address line 2" name="address_line_2" required>
 											</div>
 
 											<div class="col-md-6 col-12 mb-20">
 												<label>Country*</label>
-												<select class="nice-select" required>
-													<option>Bangladesh</option>
-													<option>China</option>
-													<option>country</option>
+												<select class="nice-select" name="country" required>
 													<option>India</option>
+													<option>Qatar</option>
 													<option>Japan</option>
+													<option>Turkey</option>
+													<option>Thailand</option>
+													<option>UK</option>
+													<option>US</option>
+													<option>India</option>
+													<option>UAE</option>
+													<option>China</option>
+													
 												</select>
 											</div>
 
 											<div class="col-md-6 col-12 mb-20">
 												<label>Town/City*</label>
-												<input type="text" placeholder="Town/City" required>
+												<input name="city" type="text" placeholder="Town/City" required>
 											</div>
 
 											<div class="col-md-6 col-12 mb-20">
 												<label>State*</label>
-												<input type="text" placeholder="State" required>
+												<input name="state" type="text" placeholder="State" required>
 											</div>
 
 											<div class="col-md-6 col-12 mb-20">
 												<label>pin Code*</label>
-												<input type="text" placeholder="pin Code" required>
+												<input name="pin_code" type="text" placeholder="pin Code" required>
 											</div>
 
 											<div class="col-12 mb-20">

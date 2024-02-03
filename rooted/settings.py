@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'accounts',
     'store',
     'cart',
+    'orders',
     
     'customadmin'
 
@@ -55,6 +56,12 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    #custome middleware
+    # for restric logged user to login page
+    'accounts.middleware.RedirectAuthenticatedUserMiddleware',
+    #restrict blocked user
+    #'yourapp.middleware.BlockedUserMiddleware',
+    'rooted.middleware.BlockedUserMiddleware',
 ]
 
 ROOT_URLCONF = 'rooted.urls'

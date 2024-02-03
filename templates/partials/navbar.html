@@ -61,10 +61,16 @@
 						<div class="header-right-icons d-flex justify-content-end align-items-center h-100">
 							<!--=======  single-icon  =======-->
 
-							<div class="single-icon search">
+							<!--<div class="single-icon search">
 								<a href="javascript:void(0)" id="search-icon">
-									<i class="ion-ios-search-strong"></i>
-								</a>
+									<i class="ion-ios-search-strong"></i> 
+								</a> 
+							</div>-->
+							<div class="search-widget">
+								<form action="/store/search/" method="GET">
+									<input type="search" name="keyword" placeholder="Search ...">
+									<button type="submit"><i class="ion-android-search"></i></button>
+								</form>
 							</div>
 
 							<!--=======  End of single-icon  =======-->

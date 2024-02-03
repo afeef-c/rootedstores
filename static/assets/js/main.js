@@ -1016,20 +1016,20 @@
 
   $("#price-range").slider({
     range: true,
-    min: 25,
-    max: 350,
-    values: [25, 350],
+    min: 50,
+    max: 3500,
+    values: [50, 3500],
     slide: function (event, ui) {
       $("#price-amount").val(
-        "Price: " + "$" + ui.values[0] + " - $" + ui.values[1]
+        "Price: " + "₹" + ui.values[0] + " - ₹" + ui.values[1]
       );
     }
   });
   $("#price-amount").val(
     "Price: " +
-      "$" +
+      "₹" +
       $("#price-range").slider("values", 0) +
-      " - $" +
+      " - ₹" +
       $("#price-range").slider("values", 1)
   );
 

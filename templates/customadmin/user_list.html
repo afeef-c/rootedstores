@@ -23,12 +23,12 @@ Users List
             <h4>Users List</h4>
         <div class="card-header-form">
             <form>
-            <div class="input-group">
+            <!--<div class="input-group">
                 <input type="text" class="form-control" placeholder="Search">
                 <div class="input-group-btn">
                 <button class="btn btn-primary"><i class="fas fa-search"></i></button>
                 </div>
-            </div>
+            </div>-->
             </form>
         </div>
         </div>
@@ -38,34 +38,21 @@ Users List
                 <table class="table table-striped">
                 <tbody>
                 <tr>
-                    <th>
-                    <div class="custom-checkbox custom-control">
-                        <input type="checkbox" data-checkboxes="mygroup" data-checkbox-role="dad" class="custom-control-input" id="checkbox-all">
-                        <label for="checkbox-all" class="custom-control-label">&nbsp;</label>
-                    </div>
-                    </th>
                     <th>User Name</th>
                     <th>User type</th>
                     <th>Profile Pic</th>
-                    <th>date_joined</th>
+                    <th>Is blocked</th>
                     <th>Phone</th>
                     <th>Update</th>
                     <th>Delete</th>
                 </tr>
                 {% for user in users %}
                 <tr>
-                    <td class="p-0 text-center">
-                        <div class="custom-checkbox custom-control">
-                            <input type="checkbox" data-checkboxes="mygroup" class="custom-control-input" id="checkbox-1">
-                            <label for="checkbox-1" class="custom-control-label">&nbsp;</label>
-                        </div>
-                    </td>
                     <td> {{user.username}} </td>
                     <td class="align-middle">
                         {% if user.is_admin %}<span class="badge badge-success">Admin</span>{% endif %}
                         {% if user.is_staff %} <span class="badge badge-secondary">Staff</span>{% endif %}
                         {% if user.is_active%} <span class="badge badge-primary">Active</span>{% endif %}
-                        {% if user.is_superadmin %}<span class="badge badge-danger">Super Admin</span>{% endif %}
                         {% if user.is_merchant%}<span class="badge badge-light">Merchant</span> {% endif %}
                         {% if not user.is_admin and not user.is_staff and not user.is_active and not user.is_merchant and not user.is_superadmin %}<span class="badge badge-warning">Just register</span>{% endif %}
                         
@@ -81,8 +68,8 @@ Users List
                         {% endif %}
                     </td>
 
-                    <td> {{user.date_joined|date:"Y-m-d" }} </td>
-                    <td><div class="badge badge-success"> {{user.phone_number}} </div></td>
+                    <td> {% if user.is_blocked %}<a href="#" class="btn btn-icon btn-danger"><i class="fas fa-times"></i></a>{% else %}<a href="#" class="btn btn-icon btn-success"><i class="fas fa-check"></i></a> {% endif %} </td>
+                    <td><div class="badge "> {{user.phone_number}} </div></td>
                     <td><a href="{% url 'user_update' user.id %}" class="btn btn-warning">Update</a></td>
                     <td><a href="{% url 'user_delete' user.id %}" class="btn btn-danger">Delete</a></td>
                 </tr>

@@ -10,7 +10,17 @@
 			<div class="row">
 				<div class="col-lg-12">
 					{% if 'search' in request.path %}
-						<h1 class="breadcrumb-title">Search result</h1>
+						<h1 class="breadcrumb-title">Search Result</h1>
+						<span class="breadcrumb-list__item">{{product_count}} items found </span>
+					{% elif 'category' in request.path %}
+						<h1 class="breadcrumb-title"> {{categories}} </h1>
+						<span class="breadcrumb-list__item">{{product_count}} items found </span>
+					{% elif 'sort' in request.path %}
+						<h1 class="breadcrumb-title"> Sorted Products </h1>
+						<span class="breadcrumb-list__item">{{sort}} </span>
+					
+					{% elif 'filter-products' in request.path %}
+						<h5 class="breadcrumb-title"> Price range: ₹{{min_price}} - ₹{{max_price}} </h5>
 						<span class="breadcrumb-list__item">{{product_count}} items found </span>
 					{% else %}
 					<h1 class="breadcrumb-title">Store</h1>
@@ -49,8 +59,8 @@
 							<ul class="product-filter-menu">
 								<li class="active" data-filter="*">All</li>
 								<li data-filter=".hot">hot products</li>
-								<li data-filter=".new">new products</li>
-								<li data-filter=".sale">sale products</li>
+								<li data-filter=".new" value="new" >new products</li>
+								<li >sale products</li>
 							</ul>
 						</div>
 						<!--=======  End of fitler titles  =======-->
@@ -63,13 +73,13 @@
 							<!--=======  filter dropdown  =======-->
 
 							<div class="single-icon filter-dropdown">
-								<select class="nice-select">
-									<option value="0">Default sorting</option>
-									<option value="1">Sort ny popularity</option>
-									<option value="0">Sort by average rating</option>
-									<option value="0">Sort by latest</option>
-									<option value="0">Sort by price: low to high</option>
-									<option value="0">Sort by price: high to low</option>
+								<select class="nice-select" name="sort_by" id="sort_by">
+									<option value="default">Default sorting</option>
+									<option value="popularity">Sort by popularity</option>
+									<option value="rating">Sort by average rating</option>
+									<option value="latest">Sort by latest</option>
+									<option value="price_low_to_high">Sort by price: low to high</option>
+									<option value="price_high_to_low">Sort by price: high to low</option>
 								</select>
 							</div>
 
@@ -114,25 +124,29 @@
 			<div class="shop-advance-filter-wrapper pt-50">
 				<div class="container">
 					<div class="row">
-						<div class="col-lg-2 col-md-4 col-sm-6 mb-50">
+						<div class="col-lg-4 col-md-4 col-sm-6 mb-50">
 							<!--=======  single advance filte  =======-->
-
+							<form id="sortForm" method="POST" action="{% url 'sort' %}">
+							{% csrf_token %}
 							<div class="single-filter-widget">
-								<h2 class="single-filter-widget--title">Sort by</h2>
-								<ul class="single-filter-widget--list">
-									<li><a href="#">Default</a></li>
-									<li><a href="#">Popularity</a></li>
-									<li><a href="#">Average rating</a></li>
-									<li><a href="#">Newness</a></li>
-									<li><a href="#">Price: low to high</a></li>
-									<li><a href="#">Price: high to low</a></li>
+								<h2  class="single-filter-widget--title">Sort by</h2>
+								<ul name="sort_by" id="sort_by" class="single-filter-widget--list">
+									<li><a href="#" value="default">Default</a></li>
+									<li><a href="#" value="popularity">Popularity</a></li>
+									<li><a href="#" value="rating">Average rating</a></li>
+									<li><a href="#" value="latest" >Newness</a></li>
+									<li><a href="#" value="price_low_to_high" >Price: low to high</a></li>
+									<li><a href="#" value="price_high_to_low" >Price: high to low</a></li>
+									
 								</ul>
 							</div>
 
+							</form>
+							
 							<!--=======  End of single advance filte  =======-->
 						</div>
 
-						<div class="col-lg-2 col-md-4 col-sm-6 mb-50">
+						<div class="col-lg-4 col-md-4 col-sm-6 mb-50">
 							<!--=======  single advance filte  =======-->
 
 							<div class="single-filter-widget">
@@ -147,13 +161,13 @@
 							<!--=======  End of single advance filte  =======-->
 						</div>
 
-						<div class="col-lg-2 col-md-4 col-sm-6 mb-50">
+						<div class="col-lg-4 col-md-4 col-sm-6 mb-50">
 							<!--=======  single advance filte  =======-->
 
 							<!--<div class="single-filter-widget">
 								<h2 class="single-filter-widget--title">Price filter</h2>
 								<ul class="single-filter-widget--list">
-									<li><a href="#">All</a></li>
+									<li><a href="###" name="all" >All</a></li>
 									<li><a href="#">$0.00 - $70.00</a></li>
 									<li><a href="#">$70.00 - $140.00</a></li>
 									<li><a href="#">$140.00 - $210.00</a></li>
@@ -168,41 +182,6 @@
 						<div class="col-lg-2 col-md-4 col-sm-6 mb-50">
 							<!--=======  single advance filte  =======-->
 
-							<div class="single-filter-widget">
-								<h2 class="single-filter-widget--title">Color</h2>
-								<ul class="single-filter-widget--list single-filter-widget--list--color">
-									<li><a class="active" href="#" data-tippy="Black" data-tippy-inertia="true"
-											data-tippy-animation="shift-away" data-tippy-delay="50" data-tippy-arrow="true"
-											data-tippy-theme="sharpborder"><span class="color-picker black"></span></a></li>
-									<li><a href="#" data-tippy="Blue" data-tippy-inertia="true" data-tippy-animation="shift-away"
-											data-tippy-delay="50" data-tippy-arrow="true" data-tippy-theme="sharpborder"><span
-												class="color-picker blue"></span></a></li>
-									<li><a href="#" data-tippy="Brown" data-tippy-inertia="true" data-tippy-animation="shift-away"
-											data-tippy-delay="50" data-tippy-arrow="true" data-tippy-theme="sharpborder"><span
-												class="color-picker brown"></span></a></li>
-									<li><a href="#" data-tippy="Gold" data-tippy-inertia="true" data-tippy-animation="shift-away"
-											data-tippy-delay="50" data-tippy-arrow="true" data-tippy-theme="sharpborder"><span
-												class="color-picker gold"></span></a></li>
-									<li><a href="#" data-tippy="Green Coral" data-tippy-inertia="true" data-tippy-animation="shift-away"
-											data-tippy-delay="50" data-tippy-arrow="true" data-tippy-theme="sharpborder"><span
-												class="color-picker green-coral"></span></a></li>
-									<li><a href="#" data-tippy="Grey" data-tippy-inertia="true" data-tippy-animation="shift-away"
-											data-tippy-delay="50" data-tippy-arrow="true" data-tippy-theme="sharpborder"><span
-												class="color-picker grey"></span></a></li>
-									<li><a href="#" data-tippy="Oak" data-tippy-inertia="true" data-tippy-animation="shift-away"
-											data-tippy-delay="50" data-tippy-arrow="true" data-tippy-theme="sharpborder"><span
-												class="color-picker oak"></span></a></li>
-									<li><a href="#" data-tippy="Pink" data-tippy-inertia="true" data-tippy-animation="shift-away"
-											data-tippy-delay="50" data-tippy-arrow="true" data-tippy-theme="sharpborder"><span
-												class="color-picker pink"></span></a></li>
-									<li><a href="#" data-tippy="Silver" data-tippy-inertia="true" data-tippy-animation="shift-away"
-											data-tippy-delay="50" data-tippy-arrow="true" data-tippy-theme="sharpborder"><span
-												class="color-picker silver"></span></a></li>
-									<li><a href="#" data-tippy="White" data-tippy-inertia="true" data-tippy-animation="shift-away"
-											data-tippy-delay="50" data-tippy-arrow="true" data-tippy-theme="sharpborder"><span
-												class="color-picker white"></span></a></li>
-								</ul>
-							</div>
 
 							<!--=======  End of single advance filte  =======-->
 						</div>
@@ -210,15 +189,6 @@
 						<div class="col-lg-2 col-md-4 col-sm-6 mb-50">
 							<!--=======  single advance filte  =======-->
 
-							<div class="single-filter-widget">
-								<h2 class="single-filter-widget--title">Size</h2>
-								<ul class="single-filter-widget--list single-filter-widget--list--size">
-									<li><a href="#">L</a> <span class="quantity">5</span></li>
-									<li><a href="#">M</a> <span class="quantity">5</span></li>
-									<li><a href="#">S</a> <span class="quantity">5</span></li>
-									<li><a href="#">XS</a> <span class="quantity">5</span></li>
-								</ul>
-							</div>
 
 							<!--=======  End of single advance filte  =======-->
 						</div>
@@ -226,17 +196,6 @@
 						<div class="col-lg-2 col-md-4 col-sm-6 mb-50">
 							<!--=======  single advance filte  =======-->
 
-							<div class="single-filter-widget">
-								<h2 class="single-filter-widget--title">Brands</h2>
-								<ul class="single-filter-widget--list single-filter-widget--list--brand">
-									<li><a href="#">Alliop</a> <span class="quantity">(12)</span></li>
-									<li><a href="#">Burberry</a> <span class="quantity">(15)</span></li>
-									<li><a href="#">Catmen</a> <span class="quantity">(13)</span></li>
-									<li><a href="#">Houdini</a> <span class="quantity">(10)</span></li>
-									<li><a href="#">Love</a> <span class="quantity">(70)</span></li>
-									<li><a href="#">Made</a> <span class="quantity">(15)</span></li>
-								</ul>
-							</div>
 
 							<!--=======  End of single advance filte  =======-->
 						</div>
@@ -293,35 +252,45 @@
 							<!--=======  single sidebar widget  =======-->
 
 							<div class="single-sidebar-widget mb-40">
-								<h2 class="single-sidebar-widget--title">Filters</h2>
-								<div class="sidebar-price">
-									<div id="price-range"></div>
-									<div class="output-wrapper mt-20">
-										<input type="text" id="price-amount" class="price-amount" readonly>
-										<a class="price-range-button" href="#"><i class="ion-android-funnel"></i> Filter</a>
+								<form id="filter-form" action="{% url 'filter_products' %}" method="POST">
+									{% csrf_token %}
+									<h2 class="single-sidebar-widget--title">Filters</h2>
+									<div class="sidebar-price">
+										<div id="price-range"></div>
+										<div class="output-wrapper mt-20">
+											<input type="text" id="price-amount" class="price-amount" readonly>
+											<button type="submit" class="price-range-button"><i class="ion-android-funnel"></i> Filter</button>
+										</div>
 									</div>
-								</div>
+									<!-- Hidden input fields to store min and max price values -->
+									<input type="hidden" id="min-price" name="min_price">
+									<input type="hidden" id="max-price" name="max_price">
+								</form>
 							</div>
+
+
 
 							<!--=======  End of single sidebar widget  =======-->
 
 							<!--=======  single sidebar widget  =======-->
-							{% for product in products %}
-								{% if product.is_available == 'False' %}
+							
+								
 									<div class="single-sidebar-widget mb-40">
-										<h2 class="single-sidebar-widget--title">Popular products</h2>
+										<h2 class="single-sidebar-widget--title">New Arrivals</h2>
 
 										<!--=======  widget product wrapper  =======-->
 
 										<div class="widget-product-wrapper">
 											<!--=======  single widget product  =======-->
-											<div class="single-widget-product-wrapper">
+											{% if 'sort' or 'search' or 'filter' in request.path  %}
+												{% for p in top_new_products %}
+												<div class="single-widget-product-wrapper">
 												<div class="single-widget-product">
 													<!--=======  image  =======-->
 													
 													<div class="single-widget-product__image">
 														<a href="shop-product-basic.html">
-															<img src="{% static 'assets/images/products/product-furniture-2-100x100.jpg' %}" class="img-fluid" alt="">
+															<img src="{{p.images.url}}" class="img-fluid" alt="">
 														</a>
 													</div>
 													
@@ -333,10 +302,10 @@
 													<div class="single-widget-product__content">
 
 														<div class="single-widget-product__content__top">
-															<h3 class="product-title"><a href="shop-product-basic.html">Wooden Table</a></h3>
+															<h3 class="product-title"><a href="shop-product-basic.html"> {{p.product_name}} </a></h3>
 															<div class="price">
-																<span class="main-price discounted">$270.00</span>
-																<span class="discounted-price">$220.00</span>
+																<span class="main-price discounted">₹ {{p.old_price}}.00</span>
+																<span class="discounted-price">₹ {{p.price}}.00</span>
 															</div>
 															<div class="rating">
 																<i class="ion-android-star"></i>
@@ -351,15 +320,55 @@
 
 													<!--=======  End of content  =======-->
 												</div>
-											</div>
+												</div>
+												{% endfor %}	
+											{% else %}
+												{% for p in top_new_products %}
+												<div class="single-widget-product-wrapper">
+													<div class="single-widget-product">
+														<!--=======  image  =======-->
+														
+														<div class="single-widget-product__image">
+															<a href="shop-product-basic.html">
+																<img src="{{p.images.url}}" class="img-fluid" alt="">
+															</a>
+														</div>
+														
 
+														<!--=======  End of image  =======-->
+
+														<!--=======  content  =======-->
+
+														<div class="single-widget-product__content">
+
+															<div class="single-widget-product__content__top">
+																<h3 class="product-title"><a href="shop-product-basic.html"> {{p.product_name}} </a></h3>
+																<div class="price">
+																	<span class="main-price discounted">₹ {{p.old_price}}.00</span>
+																	<span class="discounted-price">₹ {{p.price}}.00</span>
+																</div>
+																<div class="rating">
+																	<i class="ion-android-star"></i>
+																	<i class="ion-android-star"></i>
+																	<i class="ion-android-star-outline"></i>
+																	<i class="ion-android-star-outline"></i>
+																	<i class="ion-android-star-outline"></i>
+																</div>
+															</div>
+
+														</div>
+
+														<!--=======  End of content  =======-->
+													</div>
+												</div>
+												{% endfor %}
+											{% endif %}
 											<!--=======  End of single widget product  =======-->
 										</div>
 
 										<!--=======  End of widget product wrapper  =======-->
 									</div>
-								{% endif %}
-							{% endfor %}
+							
 							<!--=======  End of single sidebar widget  =======-->
 
 							<!--=======  single sidebar widget  =======-->
@@ -423,8 +432,8 @@
 											<a href="{{p.get_url}}">Select options</a>
 										</div>
 										<div class="price">
-											<span class="main-price discounted">₹ {{p.price}} </span>
-											<span class="discounted-price">₹ {{p.old_price}} </span>
+											<span class="main-price discounted">₹ {{p.old_price}} </span>
+											<span class="discounted-price">₹ {{p.price}} </span>
 										</div>
 									</div>
 
@@ -489,39 +498,48 @@
 
 
 						</div>
-
+						
+						<!--=======  pagination  =======-->
+						
+						{% if products.has_other_pages %}
 						<div class="row">
-							<div class="col-lg-12 text-center mt-30">
-
+							<div class="col-lg-12">
 								
-								{% if products.has_other_pages %}
-								<nav class="mt-4 lezada-button lezada-button--medium lezada-button--icon--left" aria-label="Page navigation sample"></nav>
-									<ul class="pagination ">
-											{% if product.has_previous %}
-												<li class="page-item "><a class="page-link" href="?page={{ page_obj.previous_page_number }}">&laquo;</a></li>
-											{% else %}
-												<li class="page-item disabled"><a class="page-link" href="#">&laquo;</a></li>
-											{% endif %}
 
-											{% for i in products.paginator.page_range %}
-												{% if products.number == i %}    
-													<li class="page-item active"><a class="page-link" href="#"> {{i}} </a></li>
-												{% else %}
-													<li class="page-item"><a class="page-link" href="?page={{i}}"> {{i}} </a></li>
-												{% endif %}        
-											{% endfor %}
-											{% if product.has_next %}
-												<li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">&raquo;</a></li>
+								<div class="pagination text-center">
+
+									<ul >
+										{% if product.has_previous %}
+											<li class="active"><a href="#">1</a></li>
+											<li class="page-item "><a class="page-link" href="?page={{ page_obj.previous_page_number }}"></a></li>
+											
+										{% endif %}
+
+										{% for i in products.paginator.page_range %}
+											{% if products.number == i %}
+												<li class="page-item active"><a class="page-link" href="#"> {{i}} </a></li>
 											{% else %}
-												<li class="page-item disabled"><a class="page-link" href="#">&raquo;</a></li>
+												<li class="page-item"><a class="page-link" href="?page={{i}}"> {{i}} </a></li>
 											{% endif %}
-										</ul>
+										{% endfor %}
+										{% if product.has_next %}
+											<li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">NEXT</a></li>
+											
+										{% endif %}
 									
-								</nav>
-								{% endif %}
+									</ul>
+					
+								</div>
+
 							</div>
 						</div>
+						{% endif %}
+									
+								<!--=======  End of pagination  =======-->
 						
+						
+						
+					
 
 					</div>
 				</div>
@@ -536,3 +554,53 @@
 
 
 {% endblock %}
+
+{% block js %}
+
+<script>
+	//need corrections not properly working
+$(document).ready(function() {
+    // Initialize price range slider
+    $("#price-range").slider({
+        range: true,
+        min: 50,
+        max: 3500,
+        values: [50, 3500],
+        slide: function(event, ui) {
+            $("#price-amount").val("Price: ₹" + ui.values[0] + " - ₹" + ui.values[1]);
+        }
+    });
+    
+    // Form submission event listener
+    $("#filter-form").submit(function(event) {
+        // Get the current minimum and maximum values of the price range slider
+        var minPrice = $("#price-range").slider("values", 0);
+        var maxPrice = $("#price-range").slider("values", 1);
+
+        // Set the values of the hidden input fields
+        $("#min-price").val(minPrice);
+        $("#max-price").val(maxPrice);
+
+        // Log minPrice and maxPrice to console
+    });
+});
+
+    document.addEventListener("DOMContentLoaded", function () {
+        var sortOptions = document.querySelectorAll('#sort_by a');
+
+        sortOptions.forEach(function (option) {
+            option.addEventListener('click', function (event) {
+                event.preventDefault();
+                var sortValue = option.getAttribute('value');
+                var form = document.getElementById('sortForm');
+                form.action = '{% url "sort" %}?sort_by=' + sortValue;
+                form.submit();
+            });
+        });
+    });
+
+
+
+</script>
+
+{% endblock js %}
