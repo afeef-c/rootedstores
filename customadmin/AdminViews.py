@@ -159,6 +159,39 @@ class ProductDeleteView(SuccessMessageMixin, DeleteView):
         context = super().get_context_data(**kwargs)
         context['title'] = 'Delete Product'
         return context
+#========================Product Images=============================================================================
+class ProductImagesListView(ListView):
+    model = ProductImages
+    template_name = "customadmin/product_images.html"
+    context_object_name = "images"
+
+@method_decorator(login_required, name='dispatch')
+class ProductImagesCreateView(SuccessMessageMixin, CreateView):
+    model = ProductImages
+    template_name = "customadmin/add_product_images.html"
+    fields = '__all__'
+    success_message = "New Images added!"
+    success_url = reverse_lazy('products_list') 
+
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        form.fields['category'].queryset = Category.objects.all().order_by('cat_name')
+        form.fields['merchant'].queryset = Account.objects.filter(is_merchant=True)
+        return form
+
+    def form_valid(self, form):
+        # Handle the creation of associated ProductImages
+        images = self.request.FILES.getlist('images')
+        for image in images:
+            product_image = ProductImages(images=image, product=self.object)
+            product_image.save()
+
+        return super().form_valid(form)
+
+    def get_success_message(self, cleaned_data):
+        return f"Product {cleaned_data['product_name']} created successfully."
+
+
 #========================Variations=============================================================================
 class VariationtListView(ListView):
     model = Variation

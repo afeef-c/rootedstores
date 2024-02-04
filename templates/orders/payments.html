@@ -1,0 +1,241 @@
+{% extends 'partials/base.html' %}
+{% load static %}
+
+{% block content %}
+	<!--=======  breadcrumb area =======-->
+
+	<div class="breadcrumb-area breadcrumb-bg-1 pt-50 pb-70 mb-130">
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-12">
+					<h1 class="breadcrumb-title">Payments</h1>
+
+					<!--=======  breadcrumb list  =======-->
+                    <p>Review your order and make payment</p>
+					<ul class="breadcrumb-list">
+						<li class="breadcrumb-list__item"><a href="{% url 'home' %}">HOME</a></li>
+						<li class="breadcrumb-list__item"> <a href="{% url 'checkout' %}"> checkout</a></li>
+                        
+						<li class="breadcrumb-list__item breadcrumb-list__item--active">Payments</li>
+					</ul>
+
+					<!--=======  End of breadcrumb list  =======-->
+
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!--=======  End of breadcrumb area =======-->
+
+<div class="container">
+    <div class="row">
+        
+        <div class="col-12 col-md-7 col-lg-7 ">
+            <div class="card">
+                <div class="card-header">
+                    <h4><b><u>Billing Details</u></b></h4>
+                </div>
+                <div class="card-body">
+                    <div id="accordion">
+                        <div class="accordion">
+                            <div class="accordion-header" role="button" data-toggle="collapse" data-target="#panel-body-1" aria-expanded="true">
+                                <h4><b>Billing Address</b></h4>
+                            </div>
+                            <div class="accordion-body collapse show" id="panel-body-1" data-parent="#accordion">
+                                <p>{{order.full_name}}</p>
+                                <p>{{order.full_address}}</p>
+                                <p>{{order.city}}</p>
+                                <p>{{order.state}}</p>
+                                <p>{{order.country}}</p>
+                                {% if order.pin_code %}
+                                <p>PIN: {{order.pin_code}}</p>
+                                {% endif %}
+                                <p>Mail Id: {{order.email}}</p>
+                                <p>Phone: {{order.phone}}</p>
+                                {% if order.order_note %}
+                                <p>Order note: {{order.order_note}}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div id="accordion">
+                        <div class="accordion">
+                            <div class="accordion-header" role="button" data-toggle="collapse" data-target="#panel-body-1" aria-expanded="true">
+                                <h4><b>Payment Method</b></h4>
+                            </div>
+                            <div class="accordion-body collapse show" id="panel-body-1" data-parent="#accordion">
+                                <p> PayPal </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div id="accordion">
+                        <div class="accordion">
+                            <div class="accordion-header" role="button" data-toggle="collapse" data-target="#panel-body-1" aria-expanded="true">
+                                <h4><b>Review Products</b></h4>
+                            </div>
+                            <div class="accordion-body collapse show" id="panel-body-1" data-parent="#accordion">
+                                <div class="cart-table-container">
+						
+                                    <table class="cart-table">
+                                        <thead>
+                                            <tr>
+                                                <th class="product-name" colspan="2">Product</th>
+                                                <th class="product-price">Price</th>
+                                                <th class="product-quantity">Quantity</th>
+                                                <th class="product-subtotal">Total</th>
+                                            </tr>
+                                        </thead>
+                                        
+                                            <tbody>
+                                                {% for item in cart_items %}
+                                                <tr>
+                                                    <td class="product-thumbnail">
+                                                        <a href="{{item.product.geturl}}">
+                                                            <img src=" {{ item.product.images.url }}" class="img-fluid" alt="">
+                                                        </a>
+                                                    </td>
+                                                    <td class="product-name">
+                                                        <a href="{{item.product.geturl}}"> {{ item.product.product_name }} </a>
+                                                        
+                                                        {% if item.variations.all %}
+                                                            {% for var in item.variations.all %}
+                                                            <span class="product-variation"></span>{{var.variation_category| capfirst}} : {{var.variation_value| capfirst}}</span><br> 
+                                                            {% endfor %}
+                                                        {% endif %}
+                                                        
+                                                    </td>
+                                                    <td class="product-price"><span class="price">₹ {{ item.product.price }} </span></td>
+                                                    <td class="product-quantity">
+                                                        <p>{{ item.quantity }}</p>
+                                                        
+                                                    </td>
+                                                    <td class="total-price">
+                                                        <span class="price">₹ {{item.item_total}} </span>
+                                                    </td>
+
+                                                </tr>
+                                                {% endfor %}
+
+
+                                                
+                                            </tbody>	
+                                            
+                                    </table>
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                    
+            </div>
+
+        </div>
+
+        <div class="col-lg-5">
+            <div class="row">
+
+                <!-- Cart Total -->
+                <div class="col-12 mb-60">
+
+                    <h4 class="checkout-title">Cart Total</h4>
+
+                    <div class="checkout-cart-total">
+
+                        <h4>Product <span>Total</span></h4>
+                        {% for item in cart_items %}
+                        <ul>
+                            
+                            <li>{{item.product.product_name}}  X {% if item.quantity < 10 %}0{{ item.quantity }}{% else %}{{ item.quantity }}{% endif %} <span>₹ {{item.item_total}} </span></li>
+                            
+                        </ul>
+                        {% endfor %}
+                        <p>Sub Total <span>₹ {{total}} </span></p>
+                        <p>Shipping Fee <span>₹ {{shipping_fee}} </span></p>
+                        <p>GST <span>₹ {{tax}} </span></p>
+
+                        <h4>Grand Total <span>₹ {{grand_total}} </span></h4>
+
+                    </div>
+
+                </div>
+
+                <!-- Payment Method -->
+                <div class="col-12">
+
+                    <h4 class="checkout-title">Payment Method</h4>
+
+                    <div class="checkout-payment-method">
+
+                        <div class="single-method">
+                            <input type="radio" id="payment_check" name="payment-method" value="check">
+                            <label for="payment_check">Check Payment</label>
+                            <p data-method="check">Currently, the only acceptable payment method is PayPal. Please cooperate with us..</p>
+                        </div>
+
+                        <div class="single-method">
+                            <input type="radio" id="payment_bank" name="payment-method" value="bank">
+                            <label for="payment_bank">Direct Bank Transfer</label>
+                            <p data-method="bank">Currently, the only acceptable payment method is PayPal. Please cooperate with us.</p>
+                        </div>
+
+                        <div class="single-method">
+                            <input type="radio" id="payment_cash" name="payment-method" value="cash">
+                            <label for="payment_cash">Cash on Delivery</label>
+                            <p data-method="cash">Currently, the only acceptable payment method is PayPal. Please cooperate with us.</p>
+                        </div>
+
+                        <div class="single-method">
+                            <input type="radio" id="payment_paypal" name="payment-method" value="paypal">
+                            <label for="payment_paypal">Paypal</label>
+                            <p data-method="paypal">Please send a Check to Store name with Store Street, Store Town, Store
+                                State, Store Postcode, Store Country.</p>
+                        </div>
+
+                        <div class="single-method">
+                            <input type="radio" id="payment_payoneer" name="payment-method" value="payoneer">
+                            <label for="payment_payoneer">Payoneer</label>
+                            <p data-method="payoneer">Currently, the only acceptable payment method is PayPal. Please cooperate with us.</p>
+                        </div>
+
+                        <div class="single-method">
+                            <input type="checkbox" id="accept_terms">
+                            <label for="accept_terms">I’ve read and accept the terms & conditions</label>
+                        </div>
+
+                    </div>
+
+                    <button type="submit" name="submit" class="lezada-button lezada-button--medium mt-30">Make payment</button>
+                    
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+    
+
+
+
+{% endblock content %}
+
+
+{% block js %}
+<script>
+    // JavaScript to prevent collapsing of the first accordion panel
+    document.addEventListener("DOMContentLoaded", function () {
+        var panel1 = document.getElementById("panel-body-1");
+        panel1.addEventListener("hide.bs.collapse", function (event) {
+            if (event.target.id === "panel-body-1") {
+                event.preventDefault();
+            }
+        });
+    });
+</script>
+{% endblock js %}
