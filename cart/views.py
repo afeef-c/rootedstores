@@ -175,6 +175,7 @@ def cart(request, total=0, quantity=0, cart_item=None):
     grand_total = 0
     tax = 0
     variations = {}
+    shipping_fee = 0
     if cart_item is None:
         cart_items = []
     try:
@@ -193,16 +194,20 @@ def cart(request, total=0, quantity=0, cart_item=None):
             quantity += cart_item.quantity
             total += cart_item.item_total
         
-        
+        if total>=1000:
+            shipping_fee = 0
+        else:
+            shipping_fee = 100
         tax = (2 * total) / 100
-        grand_total = total + tax
+        grand_total = total + tax +shipping_fee
+        
     except ObjectDoesNotExist:
         cart_items =[]
 
     context = {
         'total': total,
         'quantity': quantity,
-        
+        'shipping_fee':shipping_fee,
         'cart_items': cart_items,
         'grand_total': grand_total,
         'tax': tax,

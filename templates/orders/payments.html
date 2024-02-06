@@ -164,54 +164,33 @@
                     </div>
 
                 </div>
-
                 <!-- Payment Method -->
-                <div class="col-12">
-
-                    <h4 class="checkout-title">Payment Method</h4>
-
-                    <div class="checkout-payment-method">
-
-                        <div class="single-method">
-                            <input type="radio" id="payment_check" name="payment-method" value="check">
-                            <label for="payment_check">Check Payment</label>
-                            <p data-method="check">Currently, the only acceptable payment method is PayPal. Please cooperate with us..</p>
-                        </div>
-
-                        <div class="single-method">
-                            <input type="radio" id="payment_bank" name="payment-method" value="bank">
-                            <label for="payment_bank">Direct Bank Transfer</label>
-                            <p data-method="bank">Currently, the only acceptable payment method is PayPal. Please cooperate with us.</p>
-                        </div>
-
-                        <div class="single-method">
-                            <input type="radio" id="payment_cash" name="payment-method" value="cash">
-                            <label for="payment_cash">Cash on Delivery</label>
-                            <p data-method="cash">Currently, the only acceptable payment method is PayPal. Please cooperate with us.</p>
-                        </div>
-
-                        <div class="single-method">
-                            <input type="radio" id="payment_paypal" name="payment-method" value="paypal">
-                            <label for="payment_paypal">Paypal</label>
-                            <p data-method="paypal">Please send a Check to Store name with Store Street, Store Town, Store
-                                State, Store Postcode, Store Country.</p>
-                        </div>
-
-                        <div class="single-method">
-                            <input type="radio" id="payment_payoneer" name="payment-method" value="payoneer">
-                            <label for="payment_payoneer">Payoneer</label>
-                            <p data-method="payoneer">Currently, the only acceptable payment method is PayPal. Please cooperate with us.</p>
-                        </div>
-
-                        <div class="single-method">
-                            <input type="checkbox" id="accept_terms">
-                            <label for="accept_terms">I’ve read and accept the terms & conditions</label>
-                        </div>
-
-                    </div>
-
-                    <button type="submit" name="submit" class="lezada-button lezada-button--medium mt-30">Make payment</button>
+                <div class="col-12 checkout-cart-total">
                     
+                        
+                    <div class="payment-icon mb-60 d-flex justify-content-center">
+                        <img src="/static/assets/images/icons/pay.png" class="img-fluid" alt="">
+                    </div>
+                    {% if payment_method == 'paypal' %}
+
+                        <div id="paypal-button-container">
+                            <!-- paypal payment button  -->
+                        </div>
+                    {% else %}
+                        <form action="{% url 'payments' %}" method="POST">
+                            {% csrf_token %}
+                            <div class="check-box">
+                                <input type="checkbox" id="cod" name="cod" required>
+                                <label for="cod">Confirm COD</label>
+                            </div>
+                            <div class="d-flex justify-content-center">
+                                
+                                <button type="submit" name="submit" class="lezada-button lezada-button--medium mt-30 ">Confirme Checkout</button>
+                            </div>
+                        </form>
+                        
+                    {% endif %}
+                                        
                 </div>
 
             </div>
@@ -227,15 +206,54 @@
 
 
 {% block js %}
-<script>
-    // JavaScript to prevent collapsing of the first accordion panel
-    document.addEventListener("DOMContentLoaded", function () {
-        var panel1 = document.getElementById("panel-body-1");
-        panel1.addEventListener("hide.bs.collapse", function (event) {
-            if (event.target.id === "panel-body-1") {
-                event.preventDefault();
+
+<!-- paypal payment js -->
+    <script>
+        // Render the PayPal button into #paypal-button-container
+        paypal.Buttons({
+
+            style: {
+                color:  'blue',
+                shape:  'pill',
+                label:  'pay',
+                height: 40
+            },
+            
+            // set the transaction
+            createOrder: function(data, actions) {
+                return actions.order.create({
+                    purchase_units:[{
+                        amount: {
+                            value: '88.44'
+                        }
+                    }]
+                });
+                
+            },
+
+            // finalize the transaction
+            onApprove: function(data, actions) {
+                return actions.order.captures().then(function(details){
+                    // show success message
+                    alert('Transaction completed by '+ details.payer.name.given_name + '!');
+                });
+                    
             }
+
+        }).render('#paypal-button-container');
+
+// ======================== paypal end! ================================
+
+ 
+
+        // JavaScript to prevent collapsing of the first accordion panel
+        document.addEventListener("DOMContentLoaded", function () {
+            var panel1 = document.getElementById("panel-body-1");
+            panel1.addEventListener("hide.bs.collapse", function (event) {
+                if (event.target.id === "panel-body-1") {
+                    event.preventDefault();
+                }
+            });
         });
-    });
-</script>
+    </script>
 {% endblock js %}

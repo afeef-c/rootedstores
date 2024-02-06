@@ -6,23 +6,30 @@ from store.models import Product, Variation
 # Create your models here.
 
 class Payment(models.Model):
+    STATUS = (
+        ('Processing','Processing'),
+        ('Pending','Pending'),
+        ('Completed','Completed'),
+        ('Cancelled','Cancelled'),
+
+    )
     user = models.ForeignKey(Account, on_delete=models.CASCADE)
-    payment_id = models.CharField(max_length=100)
+    payment_id = models.CharField(max_length=100, null=True)
     payment_method = models.CharField(max_length=100)
     amount_paid = models.CharField(max_length=100)
-    status = models.CharField(max_length=100)
+    status = models.CharField(max_length=100, choices=STATUS, default='Pending')
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self) -> str:
-        return self.payment_id
+        return f"{self.user}-{self.payment_method}"
     
 class Order(models.Model):
     
     STATUS = (
         ('New','New'),
+        ('Pending','Pending'),
         ('Accepted','Accepted'),
         ('Completed','Completed'),
-        ('Pending','Pending'),
         ('Cancelled','Cancelled'),
 
     )
@@ -66,10 +73,9 @@ class OrderProduct(models.Model):
     payment = models.ForeignKey(Payment, on_delete=models.SET_NULL, blank=True, null=True)
     user = models.ForeignKey(Account, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    variation = models.ForeignKey(Variation, on_delete=models.CASCADE)
-    color = models.CharField(max_length=50)
-    size = models.CharField(max_length=50)
+    variations = models.ManyToManyField(Variation, blank=True)
     quantity = models.IntegerField()
+    product_price = models.FloatField(null=True)
     ordered = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
