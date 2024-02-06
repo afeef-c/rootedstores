@@ -1,0 +1,226 @@
+
+{% extends 'partials/base.html' %}
+{% load static %}
+
+{% block css %}
+<style>
+	.styled-input {
+    text-align: center;
+    border: none;
+    outline: none; /* Remove the focus border */
+    background-color: #f0f0f0; /* Set the background color */
+    padding: 5px; /* Adjust padding as needed */
+    border-radius: 5px; /* Add border-radius for rounded corners */
+    width: 50px; /* Adjust width as needed */
+}
+
+</style>
+{% endblock css %}
+
+{% block content %}
+<!--=======  breadcrumb area =======-->
+
+	<div class="breadcrumb-area breadcrumb-bg-1 pt-50 pb-70 mb-130">
+		<div class="container">
+			<div class="row">
+				<div class="col-lg-12">
+					<h1 class="breadcrumb-title">Shopping Cart</h1>
+
+					<!--=======  breadcrumb list  =======-->
+
+					<ul class="breadcrumb-list">
+						<li class="breadcrumb-list__item"><a href="{% url 'home' %}">HOME</a></li>
+						<li class="breadcrumb-list__item breadcrumb-list__item--active">shopping cart</li>
+					</ul>
+
+					<!--=======  End of breadcrumb list  =======-->
+
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!--=======  End of breadcrumb area =======-->
+	<!--=============================================
+	=            cart page content         =
+	=============================================-->
+
+	<div class="shopping-cart-area mb-130">
+		<div class="container">
+			<div class="row">
+				
+				<div class="col-lg-12 mb-30">
+					<!--=======  cart table  =======-->
+						{% if not cart_items %}
+							<h2 class="text-center d-block">Your cart is empty</h2>	
+							<br style="display: none;">
+							
+							<div class="text-center d-block">
+								<a href="" class="btn btn-warning">Continue Shoping!</a>
+							</div>
+						{% else %}
+						
+					<div class="cart-table-container">
+						
+						<table class="cart-table">
+							<thead>
+								<tr>
+									<th class="product-name" colspan="2">Product</th>
+									<th class="product-price">Price</th>
+									<th class="product-quantity">Quantity</th>
+									<th class="product-subtotal">Total</th>
+									<th class="product-remove">&nbsp;</th>
+								</tr>
+							</thead>
+							
+								<tbody>
+									{% for item in order %}
+									<tr>
+										<td class="product-thumbnail">
+											<a href="">
+												<img src=" " class="img-fluid" alt="">
+											</a>
+										</td>
+										<td class="product-name">
+											<a href="{{item.product.geturl}}"> {{ item.product.product_name }} </a>
+											
+											{% if item.variations.all %}
+												{% for var in item.variations.all %}
+												<span class="product-variation"></span>{{var.variation_category| capfirst}} : {{var.variation_value| capfirst}}</span><br> 
+												{% endfor %}
+											{% endif %}
+											
+										</td>
+										<td class="product-price"><span class="price">₹ {{ item.product.price }} </span></td>
+										<td class="product-quantity">
+
+											<div class="d-inline-block mx-0">
+												
+												<p id="quantity-{{ item.product_id }}" type="text" value="{{ item.quantity }}" class="styled-input d-inline" readonly>
+												
+											</div>
+					
+
+										</td>
+										<td class="total-price">
+									    	<span class="price">₹ {{item.item_total}} </span>
+										</td>
+
+										<td class="product-remove">
+
+											
+										</td>
+									</tr>
+									{% endfor %}
+
+
+									
+								</tbody>	
+								
+						</table>
+						
+					</div>
+					
+					<!--=======  End of cart table  =======-->
+				</div>
+				<div class="col-lg-12 mb-80">
+					<!--=======  coupon area  =======-->
+
+					<div class="cart-coupon-area pb-30">
+						<div class="row align-items-center">
+							<div class="col-lg-6 mb-md-30 mb-sm-30">
+								<!--=======  coupon form  =======-->
+
+								<div class="lezada-form coupon-form">
+									<form action="#">
+										<div class="row">
+											<div class="col-md-7 mb-sm-10">
+												<input type="text" placeholder="Enter your coupon code">
+											</div>
+											<div class="col-md-5">
+												<button class="lezada-button lezada-button--medium">apply coupon</button>
+											</div>
+										</div>
+									</form>
+								</div>
+
+								<!--=======  End of coupon form  =======-->
+							</div>
+
+							<div class="col-lg-6 text-left text-lg-right">
+								<!--=======  update cart button  =======-->
+
+								<button class="lezada-button lezada-button--medium">update cart</button>
+
+								<!--=======  End of update cart button  =======-->
+							</div>
+						</div>
+					</div>
+
+					<!--=======  End of coupon area  =======-->
+				</div>
+				
+
+				<div class="col-xl-4 offset-xl-8 col-lg-5 offset-lg-7">
+					<div class="cart-calculation-area">
+						<h2 class="mb-40">Cart totals</h2>
+
+						<table class="cart-calculation-table mb-30">
+							<tr>
+								<th>SUBTOTAL</th>
+								<td class="subtotal">₹ {{total}} </td>
+							</tr>
+							<tr>
+								<th>GST (2%) </th>
+								<td class="tax">₹ {{tax}} </td>
+							</tr>
+							<tr>
+								<th>Shipping  </th>
+								<td class="tax">₹ {{shipping_fee}}.0 </td>
+							</tr>
+							<tr>
+								<th>TOTAL</th>
+								<td class="total">₹ {{grand_total}} </td>
+							</tr>
+						</table>
+
+						<div class="cart-calculation-button text-center">
+							<button  class="lezada-button lezada-button--medium"><a href="{% url 'checkout' %}">proceed to checkout</a></button>
+						</div>
+					</div>
+				</div>
+				
+				{% endif %}
+			</div>
+		</div>
+	</div>
+
+	<!--=====  End of cart page content  ======-->
+
+
+{% endblock %}
+
+{% block js %}
+
+<!--<script>
+    $(document).ready(function() {
+        $(".inc.qty-btn").click(function() {
+            var productId = $(this).data("product-id");
+            $.ajax({
+                url: "{% url 'add_cart' 123 %}".replace("123", productId), // We use a placeholder and replace it with the actual product ID
+                method: "POST",
+                data: {
+                    action: "post",
+                    product_id: productId,
+                    csrfmiddlewaretoken: "{{ csrf_token }}"
+                },
+                success: function(data) {
+                    $('#quantity-' + productId).val(data.quantity);
+                }
+            });
+        });
+    });
+</script>-->
+
+
+{% endblock js %}

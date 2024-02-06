@@ -8,13 +8,18 @@ urlpatterns = [
     path('register/', views.register , name='register' ),
     path('login/', views.login , name='login' ),
     path('logout/', views.logout , name='logout' ),
-    path('dashbord/', views.dashbord , name='dashbord'),
+    path('dashboard/', views.dashboard , name='dashboard'),
     path('forgotPassword/', views.forgotPassword , name='forgotPassword'),
     
     path('otp/<str:uid>/', views.otp_verify, name='otp_verify'),
     path('otp_fp/<str:uid>/', views.otp_fp_verify, name='otp_fp_verify'),
     
     path('reset_password/<str:uid>/', views.reset_password, name='reset_password'),
+
+    path('my_orders/',views.my_orders, name='my_orders'),
+    path('edit_profile/',views.edit_profile, name='edit_profile'),
+    path('change_password/',views.change_password, name='change_password'),
+    path('order_detail/<int:order_id>',views.order_detail, name='order_detail'),
     
 ]
 

@@ -4,7 +4,7 @@ from django import forms
 from django.core.files.base import File
 from django.db.models.base import Model
 from django.forms.utils import ErrorList
-from .models import Account
+from .models import Account, UserProfile
 
 class RegistrationForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput(attrs={
@@ -42,3 +42,15 @@ class RegistrationForm(forms.ModelForm):
 
 class OTPVerificationForm(forms.Form):
     otp = forms.CharField(label='Enter OTP', max_length=6, min_length=6, widget=forms.TextInput(attrs={'autocomplete': 'off'}))
+
+class UserForm(forms.ModelForm):
+    
+    class Meta:
+        model = Account
+        fields = ('first_name','last_name','email','phone_number')
+
+class UserProfileForm(forms.ModelForm):
+    profile_pic = forms.ImageField(required=False, error_messages={'invalid': "Image files only"}, widget=forms.FileInput)
+    class Meta:
+        model = UserProfile
+        fields = ('address_line_1','address_line_2','city','state','country','profile_pic')

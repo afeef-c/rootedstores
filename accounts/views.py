@@ -5,6 +5,7 @@ from django.urls import reverse
 
 from cart.models import Cart, CartItem
 from cart.views import _cart_id
+from orders.models import Order, OrderProduct
 
 from .forms import *
 from .models import Account
@@ -184,9 +185,23 @@ def otp_verify(request, uid):
 
 
 @login_required(login_url='login')
-def  dashbord(request):
+def  dashboard(request):
+    orders = Order.objects.order_by('created_at').filter(user_id=request.user.id, is_ordered=True)
+    orders_count = orders.count()
+    
+    userprofile = get_object_or_404(UserProfile,user=request.user)
 
-    return render(request, 'accounts/dashbord.html')
+    user_form = UserForm(instance=request.user)
+    profile_form = UserProfileForm(instance=userprofile)
+
+    context={
+        'orders_count':orders_count,
+        'orders':orders,
+        'user_form':user_form,
+        'profile_form':profile_form,
+        'userprofile':userprofile,
+    }
+    return render(request, 'accounts/dashboard.html',context)
 
 
 def forgotPassword(request):
@@ -293,3 +308,70 @@ def reset_password(request,uid):
     else:
         return render(request, "accounts/reset_password.html",{'uid': uid})
     
+
+def my_orders(request):
+
+    return render(request,'orders')
+
+@login_required(login_url='login')
+def edit_profile(request):
+    userprofile = get_object_or_404(UserProfile, user=request.user)
+
+    if request.method == 'POST':
+        user_form = UserForm(request.POST, instance=request.user)
+        profile_form = UserProfileForm(request.POST, request.FILES, instance=userprofile)
+        
+        if user_form.is_valid() and profile_form.is_valid():
+            user_form.save()
+            profile_form.save()
+            messages.success(request, "Your profile has been updated.")
+            return redirect('dashboard')  # Redirect to the dashboard or profile page after successful update
+        else:
+            messages.error(request, "There was an error updating your profile. Please correct the errors below.")
+
+    else:
+        user_form = UserForm(instance=request.user)
+        profile_form = UserProfileForm(instance=userprofile)
+
+    context = {
+        'user_form': user_form,
+        'profile_form': profile_form,
+    }
+
+    return render(request, 'accounts/dashboard.html', context)
+
+@login_required(login_url='login')
+def change_password(request):
+    if request.method == 'POST':
+        current_password = request.POST.get('current_password')
+        new_password = request.POST.get('new_password')
+        confirm_password = request.POST.get('confirm_password')
+
+        user = request.user
+
+        if new_password == current_password:
+            messages.error(request, "New password cannot be the same as the current password")
+        elif new_password == confirm_password:
+            if user.check_password(current_password):
+                user.set_password(new_password)
+                user.save()
+                messages.success(request, 'Password updated successfully')
+                return redirect('dashboard')
+            else:
+                messages.error(request, 'Please enter a valid current password')
+        else:
+            messages.error(request, "Passwords do not match!")
+
+    return redirect('dashboard')
+
+@login_required(login_url='login')
+def order_detail(request, order_id):
+    order_detail = OrderProduct.objects.filter(order__order_number=order_id)
+    order = Order.objects.get(order_number=order_id)
+
+    context = {
+        'order_detail':order_detail,
+        'order':order
+    }
+
+    return render(request, 'accounts/order_detail.html',context)
