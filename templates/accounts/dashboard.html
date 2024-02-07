@@ -75,7 +75,7 @@
                           <div class="card-body" style="text-align: center;">
                             <h5 class="card-title"><b>Total Orders</b></h5>
                             <h4> {{orders_count}} </h4>
-                            <a href="">View Orders</a>
+                            <a href="#orders" data-toggle="tab">View Orders</a>
                           </div>
                         </div>
                       </div>
@@ -83,7 +83,7 @@
                       <div class="col-md-6">
                         <div class="card">
                           <div class="card-body" style="text-align: center;">
-                            <img src="{% static 'assets/images/blog/post-thumbnail-9.png' %}" alt="" width="50" height="50" style="border-radius: 50%;">
+                            <img src="{{ userprofile.profile_pic.url }}" alt="" width="50" height="50" style="border-radius: 50%;">
                             <p> {{user.email}} </p>
                             <p> {{user.phone}} </p>
                           </div>
@@ -121,7 +121,7 @@
                             <td> {{order.created_at}} </td>
                             <td> {{order.status}} </td>
                             <td>₹ {{order.order_total}} </td>
-                            <td><a href="shop-cart.html" class="check-btn sqr-btn ">View</a></td>
+                            <td><a href="{% url 'order_detail' order.order_number %}" class="check-btn sqr-btn ">View</a></td>
                           </tr>
                           {% endfor %}
                           

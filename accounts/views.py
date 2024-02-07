@@ -88,60 +88,57 @@ def login(request):
         user = auth.authenticate(email=email, password=password)
             
         if user is not None:
-            try:
-                cart = Cart.objects.get(cart_id = _cart_id(request))
-                is_cart_item_exists = CartItem.objects.filter(cart=cart).exists()
-                if is_cart_item_exists:
-                    cart_item = CartItem.objects.filter(cart=cart)
-                    
-                    # getting product var by cartid
-                    product_variation = []
-                    for item in cart_item:
-                        variation = item.variations.all()
-                        product_variation.append(list(variation))
+            if user.is_active:
+                # Check if the user has a cart and merge it with the guest cart if exists
+                try:
+                    cart = Cart.objects.get(cart_id = _cart_id(request))
+                    is_cart_item_exists = CartItem.objects.filter(cart=cart).exists()
+                    if is_cart_item_exists:
+                        cart_item = CartItem.objects.filter(cart=cart)
+                        
+                        # getting product var by cartid
+                        product_variation = []
+                        for item in cart_item:
+                            variation = item.variations.all()
+                            product_variation.append(list(variation))
 
-                    #get the cart items from the user to access its prod-var
-                    cart_item = CartItem.objects.filter(user=user)
-                    ex_var_list = []
-                    id  = []
-                    for item in cart_item:
-                        existing_variations = item.variations.all()
-                        ex_var_list.append(list(existing_variations))
-                        id.append(item.id)
+                        #get the cart items from the user to access its prod-var
+                        cart_item = CartItem.objects.filter(user=user)
+                        ex_var_list = []
+                        id  = []
+                        for item in cart_item:
+                            existing_variations = item.variations.all()
+                            ex_var_list.append(list(existing_variations))
+                            id.append(item.id)
 
-                    for pr in product_variation:
-                        if pr in ex_var_list:
-                            index = ex_var_list.index(pr)
-                            item_id = id[index]
-                            item = CartItem.objects.get(id=item_id)
-                            item.quantity += 1
-                            item.user=user
-                            item.save()
-                        else:
-                            cart_item = CartItem.objects.filter(cart=cart)
-                            for item in cart_item:
-                                item.user = user
+                        for pr in product_variation:
+                            if pr in ex_var_list:
+                                index = ex_var_list.index(pr)
+                                item_id = id[index]
+                                item = CartItem.objects.get(id=item_id)
+                                item.quantity += 1
+                                item.user=user
                                 item.save()
-                    
-            except:
-                pass
-            auth.login(request, user)
-            messages.success(request, 'You are logged in')
-            url = request.META.get('HTTP_REFERER')
-            try:
-                query = requests.utils.urlparse(url).query
-                #print('query : ', query) :query :  next=/cart/checkout/
-                params = dict(x.split('=') for x in query.split('&'))
-                if 'next' in params:
-                    next_page = params['next']
-                    return redirect(next_page)
+                            else:
+                                cart_item = CartItem.objects.filter(cart=cart)
+                                for item in cart_item:
+                                    item.user = user
+                                    item.save()
+                        
+                except:
+                    pass
+                # Login the user
+                auth.login(request, user)
+                messages.success(request, 'You are logged in')
                 
-            except:
-                return redirect('home')
-
-        else:
-            messages.error(request, 'Invalid login credentials!!')
-            return redirect('login')
+                # Redirect the user to the previous page or home
+                next_page = request.GET.get('next')
+                return redirect(next_page) if next_page else redirect('home')
+            else:
+                # Inactive user, display error message
+                messages.error(request, 'Please verify your email to activate your account')
+                return redirect('login')
+        
             
     return render(request, 'accounts/account.html')
 
@@ -237,44 +234,57 @@ def forgotPassword(request):
         
     return render(request, 'accounts/forgotPassword.html')
 
+# In your view function where you render the template
+
+def resend_otp(request, uid):
+    try:
+        profile = Account.objects.get(uid=uid)
+        otp = random.randint(100000, 999999)
+        request.session['otp_fp'] = otp
+        request.session['otp_timestamp'] = str(timezone.now())  # Convert datetime to string
+        
+        # Send the OTP via email
+        send_mail(
+            "User Data",
+            f"Verify your email by OTP: {otp}",
+            settings.EMAIL_HOST_USER,
+            [profile.email],
+            fail_silently=False
+        )
+        
+        messages.success(request, 'OTP has been resent.')
+    except ObjectDoesNotExist:
+        messages.error(request, 'Error: Account not found.')
+    except Exception as e:
+        messages.error(request, f'Error: {e}')
+
+    return redirect('otp_fp_verify', uid=uid)
 
 
 def otp_fp_verify(request, uid):
-    if request.method == "POST":
-        try:
-            profile = Account.objects.get(uid=uid)
+    try:
+        profile = Account.objects.get(uid=uid)
+        if request.method == "POST":
+            stored_otp = request.session.get('otp_fp')
+            entered_otp = request.POST.get('otp')
 
-            # Check if the 'can_otp_enter' cookie is set to True
-            if request.COOKIES.get('can_otp_enter') == 'True':
-                stored_otp = request.session.get('otp_fp')
-                entered_otp = request.POST.get('otp')
+            if stored_otp and entered_otp and int(stored_otp) == int(entered_otp):
+                # Clear OTP session variables after successful verification
+                del request.session['otp_fp']
+                del request.session['otp_timestamp']
+                
+                request.session['uid'] = profile.uid
+                messages.success(request, 'Now you can edit your password.')
+                
+                # Redirect to the reset_password page after successful activation
+                return redirect('reset_password', uid=profile.uid)
 
-                if stored_otp and entered_otp and int(stored_otp) == int(entered_otp):
-                    # Clear OTP session variables after successful verification
-                    del request.session['otp_fp']
-                    del request.session['otp_timestamp']
-                    
-                    request.session['uid'] = profile.uid
+            messages.error(request, 'Wrong OTP. Try again')
 
-                    messages.success(request, 'Now you can edit your password.')
-                    
-                    # Redirect to the reset_password page after successful activation
-                    #red = redirect('reset_password')
-                    red = redirect(f'/accounts/reset_password/{profile.uid}/')
-                    red.set_cookie('verified', True)
-                    return red
-
-                messages.error(request, 'Wrong OTP. Try again')
-
-            else:
-                messages.error(request, 'OTP verification expired. Please try again.')
-            
-            return redirect(request.path)  # Redirect to the same page on OTP failure
-
-        except (ObjectDoesNotExist, MultipleObjectsReturned):
-            # Handle the case where the user is not found or multiple accounts are found
-            messages.error(request, 'Error: Account not found or multiple accounts found for the given UID.')
-            return redirect('forgotPassword')  # Redirect to an error page or handle it appropriately
+    except ObjectDoesNotExist:
+        messages.error(request, 'Error: Account not found.')
+    except MultipleObjectsReturned:
+        messages.error(request, 'Error: Multiple accounts found for the given UID.')
 
     return render(request, "accounts/otp_fp.html", {'id': uid})
 
@@ -308,6 +318,7 @@ def reset_password(request,uid):
     else:
         return render(request, "accounts/reset_password.html",{'uid': uid})
     
+
 
 def my_orders(request):
 
@@ -368,10 +379,28 @@ def change_password(request):
 def order_detail(request, order_id):
     order_detail = OrderProduct.objects.filter(order__order_number=order_id)
     order = Order.objects.get(order_number=order_id)
+    subtotal = 0
+    tax=0
+    shipping_fee=0
+    for item in order_detail:
+        item.item_total = item.product_price*item.quantity
+        subtotal += item.item_total
+    
+    tax = (2*subtotal)/100
+    if subtotal>= 1000:
+        shipping_fee=0
+    else:
+        shipping_fee=100
+    grand_total = subtotal+tax+ shipping_fee
 
     context = {
         'order_detail':order_detail,
-        'order':order
+        'order':order,
+        'subtotal':subtotal,
+        'shipping_fee':shipping_fee,
+        'tax':tax,
+        'shipping_fee':shipping_fee,
+        'grand_total':grand_total
     }
 
     return render(request, 'accounts/order_detail.html',context)

@@ -4,6 +4,7 @@
 
 
 {% block content %}
+
 	<!--=======  breadcrumb area =======-->
 
 	<div class="breadcrumb-area breadcrumb-bg-1 pt-50 pb-70 mb-130">
@@ -16,7 +17,7 @@
 
 					<ul class="breadcrumb-list">
 						<li class="breadcrumb-list__item"><a href="{% url 'home' %}">HOME</a></li>
-						<li class="breadcrumb-list__item breadcrumb-list__item--active">customer login</li>
+						<li class="breadcrumb-list__item breadcrumb-list__item--active">customer login/registration</li>
 					</ul>
 
 					<!--=======  End of breadcrumb list  =======-->
@@ -30,6 +31,32 @@
 	<!--=============================================
     =            login page content         =
     =============================================-->
+
+	
+	 {% if messages %}
+        <ul class="messages">
+            {% for message in messages %}
+                <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+		    <!-- Display form errors -->
+    {% if form.errors %}
+        <div class="alert alert-danger">
+            <strong>Error:</strong> Please correct the following errors:
+            <ul>
+                {% for field, errors in form.errors.items %}
+                    {% for error in errors %}
+                        <li>{{ field|capfirst }}: {{ error }}</li>
+                    {% endfor %}
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+
+
+
 
 	<div class="login-area mb-130 mb-md-70 mb-sm-70 mb-xs-70 mb-xxs-70">
 		<div class="container">

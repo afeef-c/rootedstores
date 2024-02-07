@@ -1,36 +1,22 @@
-
 {% extends 'partials/base.html' %}
 {% load static %}
 
-{% block css %}
-<style>
-	.styled-input {
-    text-align: center;
-    border: none;
-    outline: none; /* Remove the focus border */
-    background-color: #f0f0f0; /* Set the background color */
-    padding: 5px; /* Adjust padding as needed */
-    border-radius: 5px; /* Add border-radius for rounded corners */
-    width: 50px; /* Adjust width as needed */
-}
-
-</style>
-{% endblock css %}
-
 {% block content %}
-<!--=======  breadcrumb area =======-->
+	<!--=======  breadcrumb area =======-->
 
 	<div class="breadcrumb-area breadcrumb-bg-1 pt-50 pb-70 mb-130">
 		<div class="container">
 			<div class="row">
 				<div class="col-lg-12">
-					<h1 class="breadcrumb-title">Shopping Cart</h1>
+					<h1 class="breadcrumb-title">Order Details</h1>
 
 					<!--=======  breadcrumb list  =======-->
-
+                    <p>Review your order details</p>
 					<ul class="breadcrumb-list">
 						<li class="breadcrumb-list__item"><a href="{% url 'home' %}">HOME</a></li>
-						<li class="breadcrumb-list__item breadcrumb-list__item--active">shopping cart</li>
+						<li class="breadcrumb-list__item"> <a href="{% url 'dashboard' %}"> Dashboard</a></li>
+                        
+						<li class="breadcrumb-list__item breadcrumb-list__item--active">Order Details</li>
 					</ul>
 
 					<!--=======  End of breadcrumb list  =======-->
@@ -41,186 +27,220 @@
 	</div>
 
 	<!--=======  End of breadcrumb area =======-->
-	<!--=============================================
-	=            cart page content         =
-	=============================================-->
 
-	<div class="shopping-cart-area mb-130">
-		<div class="container">
-			<div class="row">
-				
-				<div class="col-lg-12 mb-30">
-					<!--=======  cart table  =======-->
-						{% if not cart_items %}
-							<h2 class="text-center d-block">Your cart is empty</h2>	
-							<br style="display: none;">
-							
-							<div class="text-center d-block">
-								<a href="" class="btn btn-warning">Continue Shoping!</a>
-							</div>
-						{% else %}
-						
-					<div class="cart-table-container">
-						
-						<table class="cart-table">
-							<thead>
-								<tr>
-									<th class="product-name" colspan="2">Product</th>
-									<th class="product-price">Price</th>
-									<th class="product-quantity">Quantity</th>
-									<th class="product-subtotal">Total</th>
-									<th class="product-remove">&nbsp;</th>
-								</tr>
-							</thead>
-							
-								<tbody>
-									{% for item in order %}
-									<tr>
-										<td class="product-thumbnail">
-											<a href="">
-												<img src=" " class="img-fluid" alt="">
-											</a>
-										</td>
-										<td class="product-name">
-											<a href="{{item.product.geturl}}"> {{ item.product.product_name }} </a>
-											
-											{% if item.variations.all %}
-												{% for var in item.variations.all %}
-												<span class="product-variation"></span>{{var.variation_category| capfirst}} : {{var.variation_value| capfirst}}</span><br> 
-												{% endfor %}
-											{% endif %}
-											
-										</td>
-										<td class="product-price"><span class="price">₹ {{ item.product.price }} </span></td>
-										<td class="product-quantity">
-
-											<div class="d-inline-block mx-0">
-												
-												<p id="quantity-{{ item.product_id }}" type="text" value="{{ item.quantity }}" class="styled-input d-inline" readonly>
-												
-											</div>
-					
-
-										</td>
-										<td class="total-price">
-									    	<span class="price">₹ {{item.item_total}} </span>
-										</td>
-
-										<td class="product-remove">
-
-											
-										</td>
-									</tr>
-									{% endfor %}
-
-
-									
-								</tbody>	
+<div class="container">
+    <div class="row">
+        
+        <div class="col-12 col-md-7 col-lg-7 ">
+            <div class="card">
+                <div class="card-header">
+                    <h4><b><u>Order Details</u></b></h4>
+                </div>
+				<div class="card-body">
+                    <div id="accordion">
+                        <div class="accordion">
+                            <div class="accordion-header" role="button" data-toggle="collapse" data-target="#panel-body-1" aria-expanded="true">
+                                <h4><b>Order Details</b></h4>
+                            </div>
+                            <div class="accordion-body collapse show" id="panel-body-1" data-parent="#accordion">
+                                <p><b>Order ID: </b>{{order.order_number}} </p>
+								<p><b>Transaction ID: </b> {{order.payment.payment_id}} </p>
+								<p><b>Order Status: </b>{{order.status}} </p>
+								<p><b>Payment Method: </b>Cash On Delivery </p>
 								
-						</table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div id="accordion">
+                        <div class="accordion">
+                            <div class="accordion-header" role="button" data-toggle="collapse" data-target="#panel-body-1" aria-expanded="true">
+                                <h4><b>Order Address</b></h4>
+                            </div>
+                            <div class="accordion-body collapse show" id="panel-body-1" data-parent="#accordion">
+                                <p>{{order.full_name}}</p>
+                                <p>{{order.full_address}}</p>
+                                <p>{{order.city}}</p>
+                                <p>{{order.state}}</p>
+                                <p>{{order.country}}</p>
+                                {% if order.pin_code %}
+                                <p>PIN: {{order.pin_code}}</p>
+                                {% endif %}
+                                <p>Mail Id: {{order.email}}</p>
+                                <p>Phone: {{order.phone}}</p>
+                                {% if order.order_note %}
+                                <p>Order note: {{order.order_note}}</p>
+                                {% endif %}
+								
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div id="accordion">
+                        <div class="accordion">
+                            <div class="accordion-header" role="button" data-toggle="collapse" data-target="#panel-body-1" aria-expanded="true">
+                                <h4><b>Products Details</b></h4>
+                            </div>
+                            <div class="accordion-body collapse show" id="panel-body-1" data-parent="#accordion">
+                                <div class="cart-table-container">
 						
+                                    <table class="cart-table">
+                                        <thead>
+                                            <tr>
+                                                <th class="product-name" colspan="2">Product</th>
+                                                <th class="product-price">Price</th>
+                                                <th class="product-quantity">Quantity</th>
+                                                <th class="product-subtotal">Total</th>
+                                            </tr>
+                                        </thead>
+                                        
+                                            <tbody>
+                                                {% for item in order_detail %}
+                                                <tr>
+                                                    <td class="product-thumbnail">
+                                                        <a href="{{item.product.geturl}}">
+                                                            <img src=" {{ item.product.images.url }}" class="img-fluid" alt="">
+                                                        </a>
+                                                    </td>
+                                                    <td class="product-name">
+                                                        <a href="{{item.product.geturl}}"> {{ item.product.product_name }} </a>
+                                                        
+                                                        {% if item.variations.all %}
+                                                            {% for var in item.variations.all %}
+                                                            <span class="product-variation"></span>{{var.variation_category| capfirst}} : {{var.variation_value| capfirst}}</span><br> 
+                                                            {% endfor %}
+                                                        {% endif %}
+                                                        
+                                                    </td>
+                                                    <td class="product-price"><span class="price">₹ {{ item.product.price }} </span></td>
+                                                    <td class="product-quantity">
+                                                        <p>{{ item.quantity }}</p>
+                                                        
+                                                    </td>
+                                                    <td class="total-price">
+                                                        <span class="price">₹ {{item.item_total}} </span>
+                                                    </td>
+
+                                                </tr>
+                                                {% endfor %}
+
+
+                                                
+                                            </tbody>	
+                                            
+                                    </table>
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                    
+            </div>
+
+        </div>
+
+        <div class="col-lg-5">
+            <div class="row">
+
+                <!-- Cart Total -->
+                <div class="col-12 mb-60">
+
+                    <h4 class="checkout-title">Order Total</h4>
+
+                    <div class="checkout-cart-total">
+
+                        <h4>Product <span>Total</span></h4>
+                        {% for item in order_detail %}
+                        <ul>
+                            
+                            <li>{{item.product.product_name}}  X {% if item.quantity < 10 %}0{{ item.quantity }}{% else %}{{ item.quantity }}{% endif %} <span>₹ {{item.item_total}} </span></li>
+                            
+                        </ul>
+                        {% endfor %}
+                        <p>Sub Total <span>₹ {{subtotal}} </span></p>
+                        <p>Shipping Fee <span>₹ {{shipping_fee}} </span></p>
+                        <p>GST <span>₹ {{tax}} </span></p>
+
+                        <h4>Grand Total <span>₹ {{grand_total}} </span></h4>
+
+                    </div>
+
+                </div>
+                <!-- Payment Method -->
+                <div class="col-12 checkout-cart-total">
+                    
+                    
+					<div class="d-flex justify-content-center">
+						
+						<button type="submit" name="submit" class="lezada-button lezada-button--medium mt-30 ">Edit Order</button>
 					</div>
-					
-					<!--=======  End of cart table  =======-->
-				</div>
-				<div class="col-lg-12 mb-80">
-					<!--=======  coupon area  =======-->
+											
+                </div>
 
-					<div class="cart-coupon-area pb-30">
-						<div class="row align-items-center">
-							<div class="col-lg-6 mb-md-30 mb-sm-30">
-								<!--=======  coupon form  =======-->
+            </div>
+        </div>
 
-								<div class="lezada-form coupon-form">
-									<form action="#">
-										<div class="row">
-											<div class="col-md-7 mb-sm-10">
-												<input type="text" placeholder="Enter your coupon code">
-											</div>
-											<div class="col-md-5">
-												<button class="lezada-button lezada-button--medium">apply coupon</button>
-											</div>
-										</div>
-									</form>
-								</div>
-
-								<!--=======  End of coupon form  =======-->
-							</div>
-
-							<div class="col-lg-6 text-left text-lg-right">
-								<!--=======  update cart button  =======-->
-
-								<button class="lezada-button lezada-button--medium">update cart</button>
-
-								<!--=======  End of update cart button  =======-->
-							</div>
-						</div>
-					</div>
-
-					<!--=======  End of coupon area  =======-->
-				</div>
-				
-
-				<div class="col-xl-4 offset-xl-8 col-lg-5 offset-lg-7">
-					<div class="cart-calculation-area">
-						<h2 class="mb-40">Cart totals</h2>
-
-						<table class="cart-calculation-table mb-30">
-							<tr>
-								<th>SUBTOTAL</th>
-								<td class="subtotal">₹ {{total}} </td>
-							</tr>
-							<tr>
-								<th>GST (2%) </th>
-								<td class="tax">₹ {{tax}} </td>
-							</tr>
-							<tr>
-								<th>Shipping  </th>
-								<td class="tax">₹ {{shipping_fee}}.0 </td>
-							</tr>
-							<tr>
-								<th>TOTAL</th>
-								<td class="total">₹ {{grand_total}} </td>
-							</tr>
-						</table>
-
-						<div class="cart-calculation-button text-center">
-							<button  class="lezada-button lezada-button--medium"><a href="{% url 'checkout' %}">proceed to checkout</a></button>
-						</div>
-					</div>
-				</div>
-				
-				{% endif %}
-			</div>
-		</div>
-	</div>
-
-	<!--=====  End of cart page content  ======-->
+    </div>
+</div>
+    
 
 
-{% endblock %}
+
+{% endblock content %}
+
 
 {% block js %}
 
-<!--<script>
-    $(document).ready(function() {
-        $(".inc.qty-btn").click(function() {
-            var productId = $(this).data("product-id");
-            $.ajax({
-                url: "{% url 'add_cart' 123 %}".replace("123", productId), // We use a placeholder and replace it with the actual product ID
-                method: "POST",
-                data: {
-                    action: "post",
-                    product_id: productId,
-                    csrfmiddlewaretoken: "{{ csrf_token }}"
-                },
-                success: function(data) {
-                    $('#quantity-' + productId).val(data.quantity);
+<!-- paypal payment js -->
+    <script>
+        // Render the PayPal button into #paypal-button-container
+        paypal.Buttons({
+
+            style: {
+                color:  'blue',
+                shape:  'pill',
+                label:  'pay',
+                height: 40
+            },
+            
+            // set the transaction
+            createOrder: function(data, actions) {
+                return actions.order.create({
+                    purchase_units:[{
+                        amount: {
+                            value: '88.44'
+                        }
+                    }]
+                });
+                
+            },
+
+            // finalize the transaction
+            onApprove: function(data, actions) {
+                return actions.order.captures().then(function(details){
+                    // show success message
+                    alert('Transaction completed by '+ details.payer.name.given_name + '!');
+                });
+                    
+            }
+
+        }).render('#paypal-button-container');
+
+// ======================== paypal end! ================================
+
+ 
+
+        // JavaScript to prevent collapsing of the first accordion panel
+        document.addEventListener("DOMContentLoaded", function () {
+            var panel1 = document.getElementById("panel-body-1");
+            panel1.addEventListener("hide.bs.collapse", function (event) {
+                if (event.target.id === "panel-body-1") {
+                    event.preventDefault();
                 }
             });
         });
-    });
-</script>-->
-
-
+    </script>
 {% endblock js %}

@@ -1,0 +1,76 @@
+{% extends 'customadmin/admin_base.html' %}
+{% load static %}
+
+
+<h2>Orders list</h2>
+
+{% block title %}
+Orders List
+{% endblock title %}
+
+{% block custom_css %}
+{% endblock custom_css %}
+
+{% block page_title %}
+Orders List
+{% endblock page_title %}
+
+{% block page_content %}
+<div class="row">    
+
+    <div class="card col-lg-12">
+        <div class="card-header">
+            <h4>Orders List</h4>
+        <div class="card-header-form">
+            <form>
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="Search">
+                <div class="input-group-btn">
+                <button class="btn btn-primary"><i class="fas fa-search"></i></button>
+                </div>
+            </div>
+            </form>
+        </div>
+        </div>
+        
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                <tbody>
+                <tr>
+                    <th>Order </th>
+                    <th>Billing Name</th>
+                    <th>Status</th>
+                    <th>Total</th>
+                    <th>Date</th>
+                    <th>Update</th>
+                    
+                </tr>
+                {% for order in orders %}
+                <tr>
+                    <td> {{order.order_number}} </td>
+                    <td> {{order.full_name}} </td>
+                    <td>
+                        {{order.status}}
+                    </td>
+                    <td>₹ {{order.order_total}} </td>
+                    <td> {{order.created_at|date:"F j, Y" }} </td>
+
+                    <td><a href="{% url 'order_update' order.id %}" class="btn btn-warning">Update</a></td>
+                </tr>
+                {% endfor %}
+                
+                
+                </tbody></table>
+            </div>
+        </div>
+        
+    </div>
+    
+</div> 
+
+{% endblock page_content %}
+
+{% block custom_js %}
+
+{% endblock custom_js %}

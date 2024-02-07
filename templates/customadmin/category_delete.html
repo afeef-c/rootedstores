@@ -1,0 +1,41 @@
+
+{% extends 'customadmin/admin_base.html' %}
+{% load static %}
+
+{% block title %}
+Category User 
+{% endblock title %}
+
+{% block custom_css %}
+{% endblock custom_css %}
+
+{% block page_title %}
+Category User 
+{% endblock page_title %}
+
+{% block page_content %}
+    <div class="row">
+        <div class="col-12 col-md-12 col-lg-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Delete Category </h4>
+                </div>
+                <div class="card-body">
+                    <form action="" method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <p>Are you sure you want to delete {{category.cat_name}} category?</p>
+                        <p>If delete this category product under this category also removed!</p>
+                        <button class="btn btn-danger" type="submit">Yes, delete category</button>
+                    </form>
+                    <p><a href="{% url 'category_list' %}">Cancel</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+{% endblock page_content %}
+
+{% block custom_js %}
+
+{% endblock custom_js %}

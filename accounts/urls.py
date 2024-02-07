@@ -10,6 +10,8 @@ urlpatterns = [
     path('logout/', views.logout , name='logout' ),
     path('dashboard/', views.dashboard , name='dashboard'),
     path('forgotPassword/', views.forgotPassword , name='forgotPassword'),
+    path('resend_otp/<str:uid>/', views.resend_otp, name='resend_otp'),
+
     
     path('otp/<str:uid>/', views.otp_verify, name='otp_verify'),
     path('otp_fp/<str:uid>/', views.otp_fp_verify, name='otp_fp_verify'),

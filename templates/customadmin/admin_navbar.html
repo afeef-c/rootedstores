@@ -70,6 +70,8 @@
               </ul>
             </li>
             
+            <!--  products manu -->
+            
             {% url 'add_product' as add_product %}
             {% url 'products_list' as product_list %}
             {% url 'product_update' as product_update %}
@@ -92,6 +94,24 @@
                 <li class="{% if request.path == add_variations %} active {% endif %}" ><a class="nav-link" href=" {% url 'add_variations' %} ">Add Products variations</a></li>
               </ul>
             </li>
+            
+            <!--  order manu payment_list-->
+            
+            {% url 'orders_list' as orders_list %}
+            {% url 'order_update' as order_update %}
+            {% url 'payment_list' as payment_list %}
+            {% url 'payment_update' as payment_update %}
+            <li class="dropdown {% if request.path == orders_list %} active {% endif %}{% if request.path == order_update %} active {% endif %} {% if request.path == payment_list %} active {% endif %} {% if request.path == payment_update %} active {% endif %}">
+              <a href="#" class="nav-link has-dropdown"><i class="fas fa-bicycle"></i><span>Orders</span></a>
+              <ul class="dropdown-menu">
+                <li class="{% if request.path == orders_list %} active {% endif %} {% if request.path == order_update %} active {% endif %}"><a class="nav-link" href=" {% url 'orders_list' %} "> Orders </a></li>
+              </ul>
+              <ul class="dropdown-menu">
+                <li class="{% if request.path == payment_list %} active {% endif %} {% if request.path == payment_update %} active {% endif %}"><a class="nav-link" href=" {% url 'payment_list' %} "> Payments </a></li>
+              </ul>
+            </li>
+            
+            
             
           </ul>
 

@@ -17,32 +17,63 @@ Category List
 
 {% block page_content %}
 <div class="row">    
-    {% for category in categories %}
-    <div class="col-12 col-sm-6 col-md-6 col-lg-3">
-        <article class="article article-style-b">
-            <div class="article-header">
-                <div class="article-image" data-background="/media/{{ category.cat_image }}" style="background-image: url(&quot;assets/img/news/img13.jpg&quot;);">
-                </div>
-                <div class="article-badge">
-                <div class="article-badge-item bg-danger"><i class="fas fa-fire"></i> Trending</div>
-                </div>
-            </div>
-            <div class="article-details">
-                <div class="article-title">
-                <h2><a href="#"> {{ category.cat_name }} </a></h2>
-                </div>
-                <p> {{category.description}} </p>
-                <p><span class="badge badge-secondary">Url Slug: {{category.slug}}</span> </p>
-                
-                <div class="article-cta">
-                
-                <a href="{% url 'category_update' category.id %}" class="btn btn-warning">EDIT <i class="fas fa-chevron-right"></i></a>
+
+    <div class="card col-lg-12">
+        <div class="card-header">
+            <h4>Products List</h4>
+        <div class="card-header-form">
+            <form>
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="Search">
+                <div class="input-group-btn">
+                <button class="btn btn-primary"><i class="fas fa-search"></i></button>
                 </div>
             </div>
-        </article>
+            </form>
+        </div>
+        </div>
+        
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                <tbody>
+                <tr>
+                    <th>Category Name</th>
+                    <th>Image</th>
+                    <th>Slug</th>
+                    <th>Update</th>
+                    <th>Delete</th>
+                </tr>
+                {% for category in categories %}
+                <tr>
+                    <td> {{category.cat_name}} </td>
+                    <td>
+                        {% if category.cat_image %}
+                        <!--<img alt="profil" src="{% static product.profile_pic %}" class="rounded-circle" width="35" data-toggle="tooltip" title="" data-original-title="Wildan Ahdian">-->
+                        <img alt="{{category.cat_name}}" src="{% if category.cat_image %}{{ category.cat_image.url }}{% else %}{% static 'path/to/default/image.jpg' %}{% endif %}" class="rounded-circle" width="40" height="40" data-toggle="tooltip" title="" data-original-title="{{category.cat_name}}">
+                        {% else %}
+                        <img src="{% static 'admin_assets/img/avatar/avatar-1.png' %}" class="rounded-circle" width="35" data-toggle="tooltip" title="" data-original-title="{{ category.name }}">
+                        
+                        {% endif %}
+                    </td>
+                    <td>
+                        {{category.slug}}
+                    </td>
+                
+                    <td><a href="{% url 'category_update' category.id %}" class="btn btn-warning">Update</a></td>
+                    <td><a href="{% url 'category_delete' category.id %}" class="btn btn-danger">Delete</a></td>
+                </tr>
+                {% endfor %}
+                
+                
+                </tbody></table>
+            </div>
+        </div>
+        
     </div>
-    {% endfor %}
-</div>    
+    
+</div> 
+
 {% endblock page_content %}
 
 {% block custom_js %}

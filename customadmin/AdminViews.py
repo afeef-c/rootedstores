@@ -3,6 +3,7 @@ from django.shortcuts import redirect, render
 from django.contrib.auth.decorators import login_required
 from django.views.generic import ListView,CreateView,UpdateView,DetailView,DeleteView
 from accounts.models import *
+from orders.models import Order, Payment
 from store.models import *
 from category.models import Category
 from django.contrib.messages.views import SuccessMessageMixin
@@ -36,6 +37,26 @@ class CategoriesUpdate(SuccessMessageMixin, UpdateView):
     success_message = " Category updated!"
     fields = "__all__"
     template_name = "customadmin/category_update.html"
+
+@method_decorator(login_required, name='dispatch')
+class CategoryDeleteView(SuccessMessageMixin,DeleteView):
+    model = Category
+    template_name = 'customadmin/category_delete.html'  
+    success_message = " User {{category.cat_name}} deleted!"
+    success_url = reverse_lazy('category_list') 
+
+    def get_object(self, queryset=None):
+        category_slug = self.kwargs.get('pk')
+        return Category.objects.get(pk=category_slug)
+    
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Delete User Account'
+        return context
+    
+    def get_success_message(self, cleaned_data):
+        return f"Category deleteded successfully."
 #====================================Users=================================================================================
 class UsersListView(ListView):
     model = Account
@@ -175,7 +196,7 @@ class ProductImagesCreateView(SuccessMessageMixin, CreateView):
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
-        form.fields['category'].queryset = Category.objects.all().order_by('cat_name')
+        form.fields['payment'].queryset = Payment.objects.all().order_by('cat_name')
         form.fields['merchant'].queryset = Account.objects.filter(is_merchant=True)
         return form
 
@@ -260,3 +281,49 @@ class VariationDeleteView(SuccessMessageMixin, DeleteView):
         context['title'] = 'Delete Variation'
         return context
 
+#============================================Order Management=======================================================================
+class OrderListView(ListView):
+    model = Order
+    template_name = "customadmin/order_list.html"
+    context_object_name = "orders"
+
+
+@method_decorator(login_required, name='dispatch')
+class OrderUpdate(SuccessMessageMixin, UpdateView):
+    model = Order
+    template_name = "customadmin/order_update.html"
+    fields = '__all__'
+    success_message = "The order updated!"
+    success_url = reverse_lazy('order_list') 
+
+    def form_valid(self, form):
+
+        responce = super().form_valid(form)
+
+        return responce
+    def get_success_message(self, cleaned_data):
+        return f"Order: {cleaned_data['order.name']}-{{order.order_number}} updated successfully."
+
+
+#============================================ Paymment =======================================================================
+class PaymentListView(ListView):
+    model = Payment
+    template_name = "customadmin/payment_list.html"
+    context_object_name = "payments"
+
+
+@method_decorator(login_required, name='dispatch')
+class PaymentUpdate(SuccessMessageMixin, UpdateView):
+    model = Payment
+    template_name = "customadmin/payment_update.html"
+    fields = '__all__'
+    success_message = "The order updated!"
+    success_url = reverse_lazy('payment_list') 
+
+    def form_valid(self, form):
+
+        responce = super().form_valid(form)
+
+        return responce
+    def get_success_message(self, cleaned_data):
+        return f"Payment: {cleaned_data['payment_id']} updated successfully."

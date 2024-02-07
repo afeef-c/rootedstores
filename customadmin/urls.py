@@ -14,7 +14,7 @@ urlpatterns = [
     path('category_list/', AdminViews.CategoriesListView.as_view(), name='category_list'),
     path('category_create/', AdminViews.CategoriesCreate.as_view(), name='category_create'),
     path('category_update/<slug:pk>', AdminViews.CategoriesUpdate.as_view(), name='category_update'),
-
+    path('category_delete/<slug:pk>', AdminViews.CategoryDeleteView.as_view(), name='category_delete'),
     # user
     path('user_create/', AdminViews.UserCreateView.as_view(), name='user_create'),
     path('users_list/', AdminViews.UsersListView.as_view(), name='users_list'),
@@ -27,10 +27,19 @@ urlpatterns = [
     path('product_update/<slug:pk>', AdminViews.ProductUpdate.as_view(), name='product_update'),
     path('product_delete/<int:pk>', AdminViews.ProductDeleteView.as_view(), name='product_delete'),
     
+    #variations
     path('variations_list/', AdminViews.VariationtListView.as_view(), name='variations_list'),
     path('add_variations/', AdminViews.VariationCreateView.as_view(), name='add_variations'),
     path('update_variation/<slug:pk>', AdminViews.VariationUpdate.as_view(), name='update_variation'),
     path('delete_variation/<int:pk>', AdminViews.VariationDeleteView.as_view(), name='delete_variation'),
+
+    # orders
+    path('orders_list/', AdminViews.OrderListView.as_view(), name='orders_list'),
+    path('order_update/<int:pk>', AdminViews.OrderUpdate.as_view(), name='order_update'),
+
+    # payments
+    path('payment_list/', AdminViews.PaymentListView.as_view(), name='payment_list'),
+    path('payment_update/<int:pk>', AdminViews.PaymentUpdate.as_view(), name='payment_update'),
 
 ]   
 

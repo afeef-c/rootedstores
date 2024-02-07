@@ -28,10 +28,10 @@ class Order(models.Model):
     STATUS = (
         ('New','New'),
         ('Pending','Pending'),
+        ('Confirmed','Confirmed'),
         ('Accepted','Accepted'),
-        ('Completed','Completed'),
         ('Cancelled','Cancelled'),
-
+        ('Completed','Completed'),
     )
 
     user = models.ForeignKey(Account, on_delete=models.SET_NULL, null=True)

@@ -143,6 +143,7 @@ def place_order(request,total=0,quantity=0):
             
             order_number = current_date + str(data.id)
             data.order_number = order_number
+            data.status = 'Confirmed'
             data.save()
 
             payment_method = request.POST.get('payment-method')  # Selected payment method
@@ -179,7 +180,7 @@ def order_complete(request):
         try:
             order = Order.objects.get(order_number=order_number, is_ordered=True)
             order_products = OrderProduct.objects.filter(order_id=order.id)
-
+            order.status = 'Confirmed'
             subtotal = 0
             shipping_fee = 100
             tax=0
