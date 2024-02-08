@@ -130,6 +130,7 @@ class UserProfile(models.Model):
     profile_pic = models.ImageField(upload_to='profile_pics/', null=True, blank=True, default='')
     city = models.CharField(blank=True, max_length=20)
     state = models.CharField(blank=True, max_length=20)
+    pin_code = models.CharField(max_length=20, null=True, blank=True )
     country = models.CharField(blank=True, max_length=20)
 
     def __str__(self) -> str:
@@ -137,3 +138,19 @@ class UserProfile(models.Model):
     
     def full_address(self):
         return f"{self.address_line_1} {self.address_line_2} "
+
+class AddressBook(models.Model):
+    user = models.ForeignKey(Account, on_delete=models.CASCADE)
+    first_name = models.CharField(max_length=50)
+    last_name = models.CharField(max_length=50)
+    phone = models.CharField(max_length=15)
+    email = models.EmailField(max_length=50)
+    address_line1 = models.CharField(max_length=100)
+    address_line2 = models.CharField(max_length=100)
+    city = models.CharField(max_length=50)
+    state = models.CharField(max_length=50)
+    pin_code = models.CharField(max_length=20)
+    country = models.CharField(max_length=50)
+
+    def __str__(self):
+        return f"{self.user.username}'s Address"

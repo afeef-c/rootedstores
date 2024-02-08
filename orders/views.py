@@ -111,7 +111,9 @@ def place_order(request,total=0,quantity=0):
          
     if request.method == "POST":
         form = OrderForm(request.POST)
-        
+        save_address = request.POST.get('save_address')
+        #if save_address:
+        #    address = Addre
         accept_terms = request.POST.get('accept_terms')
         if form.is_valid():
             #store all order info in side order table

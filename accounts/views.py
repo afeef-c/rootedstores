@@ -79,6 +79,7 @@ def register(request):
 
     return render(request, 'accounts/account.html', {'form': form})
 
+
 def login(request):
     
     if request.method == 'POST':
@@ -88,59 +89,63 @@ def login(request):
         user = auth.authenticate(email=email, password=password)
             
         if user is not None:
-            if user.is_active:
-                # Check if the user has a cart and merge it with the guest cart if exists
-                try:
-                    cart = Cart.objects.get(cart_id = _cart_id(request))
-                    is_cart_item_exists = CartItem.objects.filter(cart=cart).exists()
-                    if is_cart_item_exists:
-                        cart_item = CartItem.objects.filter(cart=cart)
-                        
-                        # getting product var by cartid
-                        product_variation = []
-                        for item in cart_item:
-                            variation = item.variations.all()
-                            product_variation.append(list(variation))
+            try:
+                cart = Cart.objects.get(cart_id = _cart_id(request))
+                is_cart_item_exists = CartItem.objects.filter(cart=cart).exists()
+                if is_cart_item_exists:
+                    cart_item = CartItem.objects.filter(cart=cart)
+                    
+                    # getting product var by cartid
+                    product_variation = []
+                    for item in cart_item:
+                        variation = item.variations.all()
+                        product_variation.append(list(variation))
 
-                        #get the cart items from the user to access its prod-var
-                        cart_item = CartItem.objects.filter(user=user)
-                        ex_var_list = []
-                        id  = []
-                        for item in cart_item:
-                            existing_variations = item.variations.all()
-                            ex_var_list.append(list(existing_variations))
-                            id.append(item.id)
+                    #get the cart items from the user to access its prod-var
+                    cart_item = CartItem.objects.filter(user=user)
+                    ex_var_list = []
+                    id  = []
+                    for item in cart_item:
+                        existing_variations = item.variations.all()
+                        ex_var_list.append(list(existing_variations))
+                        id.append(item.id)
 
-                        for pr in product_variation:
-                            if pr in ex_var_list:
-                                index = ex_var_list.index(pr)
-                                item_id = id[index]
-                                item = CartItem.objects.get(id=item_id)
-                                item.quantity += 1
-                                item.user=user
+                    for pr in product_variation:
+                        if pr in ex_var_list:
+                            index = ex_var_list.index(pr)
+                            item_id = id[index]
+                            item = CartItem.objects.get(id=item_id)
+                            item.quantity += 1
+                            item.user=user
+                            item.save()
+                        else:
+                            cart_item = CartItem.objects.filter(cart=cart)
+                            for item in cart_item:
+                                item.user = user
                                 item.save()
-                            else:
-                                cart_item = CartItem.objects.filter(cart=cart)
-                                for item in cart_item:
-                                    item.user = user
-                                    item.save()
-                        
-                except:
-                    pass
-                # Login the user
-                auth.login(request, user)
-                messages.success(request, 'You are logged in')
+                    
+            except:
+                pass
+            auth.login(request, user)
+            messages.success(request, 'You are logged in')
+            url = request.META.get('HTTP_REFERER')
+            try:
+                query = requests.utils.urlparse(url).query
+                #print('query : ', query) :query :  next=/cart/checkout/
+                params = dict(x.split('=') for x in query.split('&'))
+                if 'next' in params:
+                    next_page = params['next']
+                    return redirect(next_page)
                 
-                # Redirect the user to the previous page or home
-                next_page = request.GET.get('next')
-                return redirect(next_page) if next_page else redirect('home')
-            else:
-                # Inactive user, display error message
-                messages.error(request, 'Please verify your email to activate your account')
-                return redirect('login')
-        
+            except:
+                return redirect('home')
+
+        else:
+            messages.error(request, 'Invalid login credentials!!')
+            return redirect('login')
             
     return render(request, 'accounts/account.html')
+
 
 @login_required(login_url='login')
 def logout(request):
@@ -157,6 +162,7 @@ def otp_verify(request, uid):
             # Check if the 'can_otp_enter' cookie is set
             if request.COOKIES.get('can_otp_enter') is not None:
                 stored_otp = request.session['otp']
+                
                 entered_otp = request.POST.get('otp')
 
                 if int(stored_otp) == int(entered_otp):
@@ -240,9 +246,18 @@ def resend_otp(request, uid):
     try:
         profile = Account.objects.get(uid=uid)
         otp = random.randint(100000, 999999)
-        request.session['otp_fp'] = otp
-        request.session['otp_timestamp'] = str(timezone.now())  # Convert datetime to string
         
+        
+         # Determine the redirect URL based on the session variable
+        if request.session.get('otp', False):
+            redirect_url = reverse('otp_verify', kwargs={'uid': uid})
+            request.session['otp'] = otp
+            request.session['otp_timestamp'] = str(timezone.now())  # Convert datetime to string
+        else:
+            request.session['otp_fp'] = otp
+            request.session['otp_timestamp'] = str(timezone.now())  # Convert datetime to string
+            redirect_url = reverse('otp_fp_verify', kwargs={'uid': uid})
+
         # Send the OTP via email
         send_mail(
             "User Data",
@@ -252,13 +267,14 @@ def resend_otp(request, uid):
             fail_silently=False
         )
         
+        
         messages.success(request, 'OTP has been resent.')
     except ObjectDoesNotExist:
         messages.error(request, 'Error: Account not found.')
     except Exception as e:
         messages.error(request, f'Error: {e}')
 
-    return redirect('otp_fp_verify', uid=uid)
+    return redirect(redirect_url)
 
 
 def otp_fp_verify(request, uid):
@@ -375,6 +391,8 @@ def change_password(request):
 
     return redirect('dashboard')
 
+
+
 @login_required(login_url='login')
 def order_detail(request, order_id):
     order_detail = OrderProduct.objects.filter(order__order_number=order_id)
@@ -404,3 +422,12 @@ def order_detail(request, order_id):
     }
 
     return render(request, 'accounts/order_detail.html',context)
+
+
+def cancel_order(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+
+    if request.method == "POST":
+        order.status = 'Cancelled'
+        order.save()
+    return redirect('order_detail', order_id=order.order_number)

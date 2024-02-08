@@ -46,7 +46,7 @@
                 <a href="#payment-method" data-toggle="tab"> Edit Password</a>
                 <a href="#address-edit" data-toggle="tab"> address</a>
                 <a href="#account-info" data-toggle="tab"> Account Details</a>
-                <a href="shop-customer-login.html"> Logout</a>
+                <a href="{% url 'logout' %}"> Logout</a>
               </div>
             </div>
             <!-- My Account Tab Menu End -->
@@ -119,7 +119,7 @@
                             <td> {{order.order_number}} </td>
                             <td> {{order.full_name}} </td>
                             <td> {{order.created_at}} </td>
-                            <td> {{order.status}} </td>
+                            <td> {% if order.status == 'Cancelled' %} <span class="text-danger">{{order.status}} </span> {% else %} <span class="text-success">{{order.status}} </span>{% endif %}</td>
                             <td>₹ {{order.order_total}} </td>
                             <td><a href="{% url 'order_detail' order.order_number %}" class="check-btn sqr-btn ">View</a></td>
                           </tr>
@@ -208,13 +208,37 @@
                 <div class="tab-pane fade" id="address-edit" role="tabpanel">
                   <div class="myaccount-content">
                     <h3>Billing Address</h3>
-                    <address>
-                      <p><strong>Alex Tuntuni</strong></p>
-                      <p>1355 Market St, Suite 900 <br>
-                        San Francisco, CA 94103</p>
-                      <p>Mobile: (123) 456-7890</p>
-                    </address>
-                    <a href="#" class="check-btn sqr-btn "><i class="fa fa-edit"></i> Edit Address</a>
+                    <div class="row">
+                      {% for i in orders %}
+                      <div class="col-12 col-md-6 col-lg-6">
+                        <div class="card mb-3">
+                          <div class="card-header">
+                            <h4>{{i.full_name}}</h4>
+                          </div>
+
+                          <div class="card-body">
+                            <p>{{i.address_line_1}}</p>
+                            <p>{{i.address_line_2}}</p>
+                            <div class="d-flex justify-content-between">
+                              <p><b>City: </b> {{i.city}}</p>
+                              <p><b>State: </b> {{i.state}} </p> 
+                              <p><b>Country: </b> {{i.country}} </p>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                              <p><b>PIN: </b> {{i.pin_code}} </p>
+                              <p><b>Email: </b> {{i.email}} </p>
+                              <p><b>Mobile:</b>{{i.phone}}</p>  
+                            </div>
+                            
+                          </div>
+                          <div class="card-footer">
+                            <a href="#" class="check-btn sqr-btn "><i class="fa fa-edit"></i> Edit Address</a>
+                          </div>
+                        </div>
+                        
+                      </div>
+                      {% endfor %}
+                    </div>
                   </div>
                 </div>
                 <!-- Single Tab Content End -->

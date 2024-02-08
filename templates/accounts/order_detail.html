@@ -45,7 +45,9 @@
                             <div class="accordion-body collapse show" id="panel-body-1" data-parent="#accordion">
                                 <p><b>Order ID: </b>{{order.order_number}} </p>
 								<p><b>Transaction ID: </b> {{order.payment.payment_id}} </p>
-								<p><b>Order Status: </b>{{order.status}} </p>
+								<p><b>Order Status: </b>
+                                    {% if order.status == 'Cancelled' %} <span class="text-danger">{{order.status}} </span> {% else %} <span class="text-success">{{order.status}} </span>{% endif %}
+                                </p>
 								<p><b>Payment Method: </b>Cash On Delivery </p>
 								
                             </div>
@@ -171,12 +173,30 @@
                 </div>
                 <!-- Payment Method -->
                 <div class="col-12 checkout-cart-total">
-                    
-                    
-					<div class="d-flex justify-content-center">
-						
-						<button type="submit" name="submit" class="lezada-button lezada-button--medium mt-30 ">Edit Order</button>
-					</div>
+                    {% if order.status == 'Cancelled' %}
+                        <h4 class="text-warning">The order already cancelled !! </h4>
+                        <div class="d-flex justify-content-center">					
+                            <button type="button" id="cancelButton" class="btn btn-warning ">Continue Shopping</button>
+                        </div>
+                    {% elif order.status == 'Completed' %}
+                        <h4 class="text-warning">The order delivered ..</h4>
+                        <div class="d-flex justify-content-center">					
+                            <a type="button" href="" class="btn btn-secondary">Rate us</a>
+                        </div>
+                        
+                        <div class="d-flex justify-content-center">					
+                            <a type="button" href="{% url 'home' %}" class="btn btn-warning ">Continue Shopping</a>
+                        </div>
+                    {% else %}
+                    <form action="{% url 'cancel_order' order.id %}" method="POST">
+                    {% csrf_token %}
+                        <input type="hidden" value="{{order.id}}" name="order_id" >
+                        <div class="d-flex justify-content-center">					
+                            <button type="submit" id="cancelButton" class="btn btn-danger">Cancel Order</button>
+                        </div>
+
+                    </form>
+                    {% endif %}
 											
                 </div>
 
@@ -196,6 +216,8 @@
 
 <!-- paypal payment js -->
     <script>
+        
+
         // Render the PayPal button into #paypal-button-container
         paypal.Buttons({
 
