@@ -33,15 +33,8 @@
     =============================================-->
 
 	
-	 {% if messages %}
-        <ul class="messages">
-            {% for message in messages %}
-                <li>{{ message }}</li>
-            {% endfor %}
-        </ul>
-    {% endif %}
-		    <!-- Display form errors
-    <!--{% if form.errors %}
+		<!-- Display form errors-->
+    {% if form.errors %}
         <div class="alert alert-danger">
             <strong>Error:</strong> Please correct the following errors:
             <ul>
@@ -52,7 +45,7 @@
                 {% endfor %}
             </ul>
         </div>
-    {% endif %}-->
+    {% endif %}
 
 
 

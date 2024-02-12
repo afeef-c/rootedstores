@@ -38,6 +38,7 @@
 		<div class="container">
 			<div class="row">
 				<div class="col-12">
+					<h4 class="checkout-title">Billing Address</h4>
 					<div class="lezada-form">
 						<!-- Checkout Form s-->
 						<form action="{% url 'place_order' %}" method="POST"  class="checkout-form">
@@ -45,31 +46,81 @@
 							<div class="row row-40">
 
 								<div class="col-lg-7 mb-20">
+									<div class="container">
+										<div class="row">
+											{% for i in address %}
+											<div class="col-12 col-md-6 col-lg-6 mb-4">
+												<div class="card">
+													<div class="card-header">
+														<div class="single-method">
+															<input type="radio" id="{{i.id}}" name="address_method" value="{{i.id}}" required>
+															<label for="{{i.id}}">Select</label>
+															<p data-method="{i.id}">To ship to this address, please select it!</p>
+														</div>
+														<h4>{{i.full_name}}</h4>
+													</div>
+
+													<div class="card-body">
+														<p>{{i.address_line_1}}</p>
+														<p>{{i.address_line_2}}</p>
+														
+													</div>
+													<div class="card-footer">
+														<a href="#" class="check-btn sqr-btn" data-toggle="collapse" data-target="#collapse{{i.id}}" aria-expanded="false" aria-controls="collapse{{i.id}}"><i class="fa fa-add"></i> Show more</a>
+													</div>
+													<div id="collapse{{i.id}}" class="collapse">
+														<!-- Collapsible content here -->
+														<div class="mb-3">
+															<p><b>City: </b> {{i.city}}</p>
+															<p><b>State: </b> {{i.state}} </p> 
+															<p><b>Country: </b> {{i.country}} </p>
+														</div>
+														<div class="mb-3">
+															<p><b>Email: </b> {{i.email}} </p>
+															<p><b>Mobile: </b>{{i.phone}}</p>  
+														</div>
+														<p><b>PIN: </b> {{i.pin_code}}</p>
+														<!-- You can put any content you want to be collapsed here -->
+													</div>
+												</div>
+											</div>
+											{% endfor %}
+										</div>
+									</div>
+
 
 									<!-- Billing Address -->
 									<div id="billing-form" class="mb-40">
-										<h4 class="checkout-title">Billing Address</h4>
+										
+										
+										<div class="single-method">
+											<input type="radio" id="new_address" name="address_method" value="new_address" required>
+											<label for="new_address">SHIP TO DIFFERENT ADDRESS</label>
+											<p data-method="new_address">For ship to new address !! and fill the form below </p>
+										</div>
+										
+										
 
 										<div class="row">
 
 											<div class="col-md-6 col-12 mb-20">
 												<label>First Name*</label>
-												<input type="text" placeholder="First Name" name="first_name" required>
+												<input type="text" placeholder="First Name" name="first_name">
 											</div>
 
 											<div class="col-md-6 col-12 mb-20">
 												<label>Last Name*</label>
-												<input type="text" placeholder="Last Name" name="last_name" required>
+												<input type="text" placeholder="Last Name" name="last_name" >
 											</div>
 
 											<div class="col-md-6 col-12 mb-20">
 												<label>Email Address*</label>
-												<input type="email" placeholder="Email Address" name="email" required>
+												<input type="email" placeholder="Email Address" name="email" >
 											</div>
 
 											<div class="col-md-6 col-12 mb-20">
 												<label>Phone no*</label>
-												<input type="text" placeholder="Phone number" name="phone" required>
+												<input type="text" placeholder="Phone number" name="phone" >
 											</div>
 
 											<!--<div class="col-12 mb-20">
@@ -79,13 +130,13 @@
 
 											<div class="col-12 mb-20">
 												<label>Address*</label>
-												<input type="text" placeholder="Address line 1" name="address_line_1" required>
-												<input type="text" placeholder="Address line 2" name="address_line_2" required>
+												<input type="text" placeholder="Address line 1" name="address_line_1" >
+												<input type="text" placeholder="Address line 2" name="address_line_2" >
 											</div>
 
 											<div class="col-md-6 col-12 mb-20">
 												<label>Country*</label>
-												<select class="nice-select" name="country" required>
+												<select class="nice-select" name="country" >
 													<option>India</option>
 													<option>Qatar</option>
 													<option>Japan</option>
@@ -102,17 +153,17 @@
 
 											<div class="col-md-6 col-12 mb-20">
 												<label>Town/City*</label>
-												<input name="city" type="text" placeholder="Town/City" required>
+												<input name="city" type="text" placeholder="Town/City" >
 											</div>
 
 											<div class="col-md-6 col-12 mb-20">
 												<label>State*</label>
-												<input name="state" type="text" placeholder="State" required>
+												<input name="state" type="text" placeholder="State" >
 											</div>
 
 											<div class="col-md-6 col-12 mb-20">
 												<label>pin Code*</label>
-												<input name="pin_code" type="text" placeholder="pin Code" required>
+												<input name="pin_code" type="text" placeholder="pin Code" >
 											</div>
 											<div class="col-12 mb-20">
 												<label>Order Note</label>
@@ -122,85 +173,16 @@
 											<div class="col-12 mb-20">
 												<div class="check-box">
 													<input type="checkbox" id="save_address" name="save_address">
-													<label for="create_account">Save Address?</label>
+													<label for="save_address">Save Address?</label>
 												</div>
-												<div class="check-box">
-													<input type="checkbox" id="shiping_address" data-shipping>
-													<label for="shiping_address">Ship to Different Address</label>
-												</div>
+												
 											</div>
 
 										</div>
 
 									</div>
 
-									<!-- Shipping Address -->
-									<!--<div id="shipping-form" class="mb-40">
-										<h4 class="checkout-title">Shipping Address</h4>
-
-										<div class="row">
-
-											<div class="col-md-6 col-12 mb-20">
-												<label>First Name*</label>
-												<input type="text" placeholder="First Name">
-											</div>
-
-											<div class="col-md-6 col-12 mb-20">
-												<label>Last Name*</label>
-												<input type="text" placeholder="Last Name">
-											</div>
-
-											<div class="col-md-6 col-12 mb-20">
-												<label>Email Address*</label>
-												<input type="email" placeholder="Email Address">
-											</div>
-
-											<div class="col-md-6 col-12 mb-20">
-												<label>Phone no*</label>
-												<input type="text" placeholder="Phone number">
-											</div>
-
-											<div class="col-12 mb-20">
-												<label>Company Name</label>
-												<input type="text" placeholder="Company Name">
-											</div>
-
-											<div class="col-12 mb-20">
-												<label>Address*</label>
-												<input type="text" placeholder="Address line 1">
-												<input type="text" placeholder="Address line 2">
-											</div>
-
-											<div class="col-md-6 col-12 mb-20">
-												<label>Country*</label>
-												<select class="nice-select">
-													<option>Bangladesh</option>
-													<option>China</option>
-													<option>country</option>
-													<option>India</option>
-													<option>Japan</option>
-												</select>
-											</div>
-
-											<div class="col-md-6 col-12 mb-20">
-												<label>Town/City*</label>
-												<input type="text" placeholder="Town/City">
-											</div>
-
-											<div class="col-md-6 col-12 mb-20">
-												<label>State*</label>
-												<input type="text" placeholder="State">
-											</div>
-
-											<div class="col-md-6 col-12 mb-20">
-												<label>Zip Code*</label>
-												<input type="text" placeholder="Zip Code">
-											</div>
-
-										</div>
-
-									</div>-->
-
+									
 								</div>
 
 								<div class="col-lg-5">
@@ -259,14 +241,13 @@
 												<div class="single-method">
 													<input type="radio" id="payment_cash" name="payment-method" value="cash" required>
 													<label for="payment_cash">Cash on Delivery</label>
-													<p data-method="cash">Currently, the only acceptable payment method is PayPal. Please cooperate with us.</p>
+													<p data-method="cash">Currently, the only acceptable payment method is PayPal and Cash on Delivered. Please cooperate with us.</p>
 												</div>
 
 												<div class="single-method">
 													<input type="radio" id="payment_paypal" name="payment-method" value="paypal" required>
 													<label for="payment_paypal">Paypal</label>
-													<p data-method="paypal">Please send a Check to Store name with Store Street, Store Town, Store
-														State, Store Postcode, Store Country.</p>
+													<p data-method="paypal">Currently, the only acceptable payment method is PayPal and Cash on Delivered. Please cooperate with us.</p>
 												</div>
 
 												
@@ -275,18 +256,18 @@
 													<input type="checkbox" id="accept_terms" name="accept_terms" required>
 													<label for="accept_terms">I’ve read and accept the terms & conditions</label>
 												</div>
-											    
+												
 												
 											</div>
 										</div>	
 
 									
-								</div>
-
-										<button type="submit" name="submit" class="lezada-button lezada-button--medium mt-30">Place order</button>
 									</div>
+									<button type="submit" name="submit" class="lezada-button lezada-button--medium mt-30">Place order</button>
 								</div>
-
+								
+							</div>
+							
 							</div>
 						</form>
 					</div>

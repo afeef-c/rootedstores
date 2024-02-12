@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 
 def home(request):
-    products = Product.objects.all()
+    products = Product.objects.all().order_by('-created_date')
     
     context ={
         'products':products,

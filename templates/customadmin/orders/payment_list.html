@@ -2,17 +2,17 @@
 {% load static %}
 
 
-<h2>Orders list</h2>
+<h2>Payment details</h2>
 
 {% block title %}
-Orders List
+Payment details
 {% endblock title %}
 
 {% block custom_css %}
 {% endblock custom_css %}
 
 {% block page_title %}
-Orders List
+Payment details
 {% endblock page_title %}
 
 {% block page_content %}
@@ -20,8 +20,8 @@ Orders List
 
     <div class="card col-lg-12">
         <div class="card-header">
-            <h4>Orders List</h4>
-        <div class="card-header-form">
+            <h4>Payment details</h4>
+        <!--<div class="card-header-form">
             <form>
             <div class="input-group">
                 <input type="text" class="form-control" placeholder="Search">
@@ -30,7 +30,7 @@ Orders List
                 </div>
             </div>
             </form>
-        </div>
+        </div>-->
         </div>
         
         <div class="card-body p-0">
@@ -42,7 +42,7 @@ Orders List
                     <th>User Name</th>
                     <th>Method</th>
                     <th>Total</th>
-                    <th>Date</th>
+                    <th>Status</th>
                     <th>Update</th>
                     
                 </tr>
@@ -51,12 +51,12 @@ Orders List
                     <td> {{payment.payment_id}} </td>
                     <td> {{payment.user}} </td>
                     <td>
-                        {{payment.status}}
+                        {{payment.payment_method}}
                     </td>
                     <td>₹ {{payment.amount_paid}} </td>
-                    <td> {{payment.created_at|date:"F j, Y" }} </td>
-
-                    <td><a href="{% url 'order_update' payment.id %}" class="btn btn-warning">Update</a></td>
+                    <!--<td> {{payment.created_at|date:"F j, Y" }} </td>-->
+                    <td> {{payment.status}} </td>
+                    <td><a href="{% url 'payment_update' payment.id %}" class="btn btn-warning">Update</a></td>
                 </tr>
                 {% endfor %}
                 

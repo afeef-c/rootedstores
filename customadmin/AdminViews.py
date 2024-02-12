@@ -17,31 +17,47 @@ from django.http import Http404
 
 @login_required(login_url='admin_login')
 def admin_home(request):
-    return render(request,'customadmin/admin_home.html', {'user': request.user})
+
+    orders_count = Order.objects.all().count()
+    completed_orders = Order.objects.filter(status='Completed')
+    confimed_orders = Order.objects.filter(status='Confirmed')
+    delivered_orders = Order.objects.filter(status='Delivered')
+    
+
+    context ={
+        'user': request.user,
+        'orders_count':orders_count,
+        'completed_orders':completed_orders,
+        'confimed_orders':confimed_orders,
+        'delivered_orders':delivered_orders,
+
+    }
+
+    return render(request,'customadmin/admin_home.html', context)
 #============================Categories =======================================================================
 
 class CategoriesListView(ListView):
     model = Category
-    template_name = "customadmin/category_list.html"
+    template_name = "customadmin/categories/category_list.html"
     context_object_name = "categories"
 
 class CategoriesCreate(SuccessMessageMixin, CreateView):
     model = Category
     success_message = "New category added!"
     fields = "__all__"
-    template_name = "customadmin/category_create.html"
+    template_name = "customadmin/categories/category_create.html"
 
 
 class CategoriesUpdate(SuccessMessageMixin, UpdateView):
     model = Category
     success_message = " Category updated!"
     fields = "__all__"
-    template_name = "customadmin/category_update.html"
+    template_name = "customadmin/categories/category_update.html"
 
 @method_decorator(login_required, name='dispatch')
 class CategoryDeleteView(SuccessMessageMixin,DeleteView):
     model = Category
-    template_name = 'customadmin/category_delete.html'  
+    template_name = 'customadmin/categories/category_delete.html'  
     success_message = " User {{category.cat_name}} deleted!"
     success_url = reverse_lazy('category_list') 
 
@@ -67,7 +83,7 @@ class UsersListView(ListView):
 class UserCreateView(SuccessMessageMixin, CreateView):
     model = Account
     template_name = "customadmin/user_create.html"
-    fields = ['first_name','last_name','username','email','password','profile_pic','is_admin','is_active','is_merchant','is_staff','is_blocked']
+    fields = ['first_name','last_name','username','email','password','is_admin','is_active','is_merchant','is_staff','is_blocked']
     success_message = "New user added!"
     success_url = reverse_lazy('users_list') 
 
@@ -85,7 +101,7 @@ class UserCreateView(SuccessMessageMixin, CreateView):
 class UserUpdate(SuccessMessageMixin, UpdateView):
     model = Account
     template_name = "customadmin/user_update.html"
-    fields = ['first_name','last_name','username','email','password','profile_pic','is_admin','is_active','is_merchant','is_staff','is_blocked']
+    fields = ['first_name','last_name','username','email','password','is_admin','is_active','is_merchant','is_staff','is_blocked']
     success_message = "New user added!"
     success_url = reverse_lazy('users_list') 
 
@@ -120,13 +136,13 @@ class UserDeleteView(SuccessMessageMixin,DeleteView):
 #============================================Products=======================================================================
 class ProductListView(ListView):
     model = Product
-    template_name = "customadmin/product_list.html"
+    template_name = "customadmin/products/product_list.html"
     context_object_name = "products"
 
 @method_decorator(login_required, name='dispatch')
 class ProductCreateView(SuccessMessageMixin, CreateView):
     model = Product
-    template_name = "customadmin/add_product.html"
+    template_name = "customadmin/products/add_product.html"
     fields = '__all__'
     success_message = "New product added!"
     success_url = reverse_lazy('products_list') 
@@ -134,7 +150,7 @@ class ProductCreateView(SuccessMessageMixin, CreateView):
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
         form.fields['category'].queryset = Category.objects.all().order_by('cat_name')
-        form.fields['merchant'].queryset = Account.objects.filter(is_merchant=True)
+        #form.fields['merchant'].queryset = Account.objects.filter(is_merchant=True)
         return form
 
     def form_valid(self, form):
@@ -152,7 +168,7 @@ class ProductCreateView(SuccessMessageMixin, CreateView):
 @method_decorator(login_required, name='dispatch')
 class ProductUpdate(SuccessMessageMixin, UpdateView):
     model = Product
-    template_name = "customadmin/product_update.html"
+    template_name = "customadmin/products/product_update.html"
     fields = '__all__'
     success_message = "The Product added!"
     success_url = reverse_lazy('products_list') 
@@ -168,7 +184,7 @@ class ProductUpdate(SuccessMessageMixin, UpdateView):
 @method_decorator(login_required, name='dispatch')
 class ProductDeleteView(SuccessMessageMixin, DeleteView):
     model = Product
-    template_name = 'customadmin/product_delete.html'
+    template_name = 'customadmin/products/product_delete.html'
     success_message = "Product {{ product.product_name }} deleted successfully!"
     success_url = reverse_lazy('products_list')
 
@@ -182,14 +198,21 @@ class ProductDeleteView(SuccessMessageMixin, DeleteView):
         return context
 #========================Product Images=============================================================================
 class ProductImagesListView(ListView):
-    model = ProductImages
-    template_name = "customadmin/product_images.html"
+    template_name = "customadmin/products/product_images.html"
     context_object_name = "images"
+
+    def get_queryset(self):
+        # Get the product ID from the URL parameter or from the view's kwargs
+        product_id = self.kwargs.get('product_id')  # Assuming the URL pattern includes 'product_id'
+        # Fetch the queryset of ProductImages filtered by the product ID
+        queryset = ProductImages.objects.filter(product_id=product_id)
+        return queryset
+    
 
 @method_decorator(login_required, name='dispatch')
 class ProductImagesCreateView(SuccessMessageMixin, CreateView):
     model = ProductImages
-    template_name = "customadmin/add_product_images.html"
+    template_name = "customadmin/products/add_product_images.html"
     fields = '__all__'
     success_message = "New Images added!"
     success_url = reverse_lazy('products_list') 
@@ -197,7 +220,7 @@ class ProductImagesCreateView(SuccessMessageMixin, CreateView):
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
         form.fields['payment'].queryset = Payment.objects.all().order_by('cat_name')
-        form.fields['merchant'].queryset = Account.objects.filter(is_merchant=True)
+        #form.fields['merchant'].queryset = Account.objects.filter(is_merchant=True)
         return form
 
     def form_valid(self, form):
@@ -216,13 +239,13 @@ class ProductImagesCreateView(SuccessMessageMixin, CreateView):
 #========================Variations=============================================================================
 class VariationtListView(ListView):
     model = Variation
-    template_name = "customadmin/variation_list.html"
+    template_name = "customadmin/products/variation_list.html"
     context_object_name = "variations"
 
 @method_decorator(login_required, name='dispatch')
 class VariationCreateView(SuccessMessageMixin, CreateView):
     model = Variation
-    template_name = "customadmin/add_variations.html"
+    template_name = "customadmin/products/add_variations.html"
     fields = '__all__'
     success_message = "New variations added!"
     success_url = reverse_lazy('variations_list') 
@@ -247,7 +270,7 @@ class VariationCreateView(SuccessMessageMixin, CreateView):
 @method_decorator(login_required, name='dispatch')
 class VariationUpdate(SuccessMessageMixin, UpdateView):
     model = Variation
-    template_name = "customadmin/variation_update.html"
+    template_name = "customadmin/products/variation_update.html"
     fields = '__all__'
     success_message = "The Variation updated!"
     success_url = reverse_lazy('variations_list') 
@@ -264,7 +287,7 @@ class VariationUpdate(SuccessMessageMixin, UpdateView):
 @method_decorator(login_required, name='dispatch')
 class VariationDeleteView(SuccessMessageMixin, DeleteView):
     model = Variation
-    template_name = 'customadmin/variation_delete.html'
+    template_name = 'customadmin/products/variation_delete.html'
     success_message = "Variation  deleted successfully!"
     success_url = reverse_lazy('variations_list')
 
@@ -284,38 +307,42 @@ class VariationDeleteView(SuccessMessageMixin, DeleteView):
 #============================================Order Management=======================================================================
 class OrderListView(ListView):
     model = Order
-    template_name = "customadmin/order_list.html"
+    template_name = "customadmin/orders/order_list.html"
     context_object_name = "orders"
+
 
 
 @method_decorator(login_required, name='dispatch')
 class OrderUpdate(SuccessMessageMixin, UpdateView):
     model = Order
-    template_name = "customadmin/order_update.html"
+    template_name = "customadmin/orders/order_update.html"
     fields = '__all__'
-    success_message = "The order updated!"
-    success_url = reverse_lazy('order_list') 
+    success_message = "The order status updated!"
+    success_url = reverse_lazy('orders_list') 
 
     def form_valid(self, form):
 
         responce = super().form_valid(form)
 
         return responce
+
     def get_success_message(self, cleaned_data):
-        return f"Order: {cleaned_data['order.name']}-{{order.order_number}} updated successfully."
+        order_number = cleaned_data.get('order_number')  # Assuming 'order_number' is a field of the form
+        name = cleaned_data.get('full_name')  # Assuming 'name' is a field of the form
+        return f"Order: {name}-{order_number} updated successfully."
 
 
 #============================================ Paymment =======================================================================
 class PaymentListView(ListView):
     model = Payment
-    template_name = "customadmin/payment_list.html"
+    template_name = "customadmin/orders/payment_list.html"
     context_object_name = "payments"
 
 
 @method_decorator(login_required, name='dispatch')
 class PaymentUpdate(SuccessMessageMixin, UpdateView):
     model = Payment
-    template_name = "customadmin/payment_update.html"
+    template_name = "customadmin/orders/payment_update.html"
     fields = '__all__'
     success_message = "The order updated!"
     success_url = reverse_lazy('payment_list') 
@@ -325,5 +352,7 @@ class PaymentUpdate(SuccessMessageMixin, UpdateView):
         responce = super().form_valid(form)
 
         return responce
+    
     def get_success_message(self, cleaned_data):
-        return f"Payment: {cleaned_data['payment_id']} updated successfully."
+        payment_id = self.object.id  # Access the payment's unique identifier
+        return f"Payment {payment_id} updated successfully."

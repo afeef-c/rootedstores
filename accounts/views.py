@@ -6,9 +6,10 @@ from django.urls import reverse
 from cart.models import Cart, CartItem
 from cart.views import _cart_id
 from orders.models import Order, OrderProduct
+from store.models import Product
 
 from .forms import *
-from .models import Account
+from .models import Account, AddressBook, WishList,WishlistItem
 from django.contrib import messages,auth
 from django.contrib.auth.decorators import login_required
 
@@ -188,24 +189,39 @@ def otp_verify(request, uid):
 
 
 @login_required(login_url='login')
-def  dashboard(request):
-    orders = Order.objects.order_by('created_at').filter(user_id=request.user.id, is_ordered=True)
+def dashboard(request):
+    user = request.user
+    orders = Order.objects.order_by('-created_at').filter(user_id=request.user.id, is_ordered=True)
     orders_count = orders.count()
+
+    if UserProfile.objects.filter(user=request.user).exists():
+        address = AddressBook.objects.filter(user_id=request.user.id)
+        userprofile = get_object_or_404(UserProfile, user=request.user)
+
+        user_form = UserForm(instance=request.user)
+        profile_form = UserProfileForm(instance=userprofile)
+
+        context={
+            'orders_count': orders_count,
+            'orders': orders,
+            'user_form': user_form,
+            'profile_form': profile_form,
+            'userprofile': userprofile,
+            'address': address,
+        }
+        return render(request, 'accounts/dashboard.html', context)
+    else:
+        user_form = UserForm(instance=request.user)
+        profile_form = UserProfileForm(instance=request.user)
+        context={
+            'user': user,
+            'user_form': user_form,
+            'profile_form': profile_form,
+            'orders':orders,
+            'orders_count':orders_count,
+        }
+        return render(request, 'accounts/dashboard.html', context)
     
-    userprofile = get_object_or_404(UserProfile,user=request.user)
-
-    user_form = UserForm(instance=request.user)
-    profile_form = UserProfileForm(instance=userprofile)
-
-    context={
-        'orders_count':orders_count,
-        'orders':orders,
-        'user_form':user_form,
-        'profile_form':profile_form,
-        'userprofile':userprofile,
-    }
-    return render(request, 'accounts/dashboard.html',context)
-
 
 def forgotPassword(request):
     if request.method == 'POST':
@@ -338,12 +354,19 @@ def reset_password(request,uid):
 
 def my_orders(request):
 
-    return render(request,'orders')
+
+    return render(request,'accounts/dashboard.html')
 
 @login_required(login_url='login')
 def edit_profile(request):
-    userprofile = get_object_or_404(UserProfile, user=request.user)
+    try:
+        userprofile = UserProfile.objects.get(user=request.user)
+    except UserProfile.DoesNotExist:
+        # If UserProfile doesn't exist for the user, create a new one
+        userprofile = UserProfile.objects.create(user=request.user)
 
+    #userprofile = get_object_or_404(UserProfile, user=request.user)
+    
     if request.method == 'POST':
         user_form = UserForm(request.POST, instance=request.user)
         profile_form = UserProfileForm(request.POST, request.FILES, instance=userprofile)
@@ -363,6 +386,8 @@ def edit_profile(request):
     context = {
         'user_form': user_form,
         'profile_form': profile_form,
+        'userprofile':userprofile,
+        
     }
 
     return render(request, 'accounts/dashboard.html', context)
@@ -423,11 +448,131 @@ def order_detail(request, order_id):
 
     return render(request, 'accounts/order_detail.html',context)
 
-
+@login_required(login_url='login')
 def cancel_order(request, order_id):
     order = get_object_or_404(Order, id=order_id)
+    user = request.user
+    email = user.email
 
     if request.method == "POST":
         order.status = 'Cancelled'
+        print(order)
         order.save()
-    return redirect('order_detail', order_id=order.order_number)
+        # Send cancellation mail
+        send_mail("Order cancellation: ", f"Your order:{order.order_number}- for {order.full_name} is cancelled", settings.EMAIL_HOST_USER, [email], fail_silently=False)
+        messages.success(request, 'Your order succesfully cancelled!!')
+    return redirect('dashbord')
+
+
+
+
+# =================================wishlists=============================================================================================
+
+#def _wishlist_id(request):
+#    wishlist = request.session.session_key
+#    if not wishlist:
+#        wishlist = request.session.create()
+    
+#    return wishlist
+
+
+
+
+#@login_required(login_url='login')
+#def wishlist(request):
+    
+#    try:
+#        if request.user.is_authenticated:
+#            wishlist_items = WishlistItem.objects.filter(user=request.user).all()
+        
+#    except ObjectDoesNotExist:
+#        wishlist_items =[]
+
+#    context = {
+#        'wishlist_items':wishlist_items
+#    }
+#    print(wishlist_items)   
+#    return render(request,'accounts/wishlist.html', context)
+
+#@login_required(login_url='login')
+#def add_to_wishlist(request, product_id):
+#    current_user = request.user
+#    product = Product.objects.get(id=product_id)
+#    is_item_exists = WishlistItem.objects.filter(product=product, user=current_user).exists()
+#    if is_item_exists:
+#        messages.error(request, 'This product is already added to wishlist')
+#    else:
+#        WishlistItem.objects.create(user=request.user, product=product)
+#        messages.success(request, "Product is added to wish list!!")
+    
+#    # Get the URL to redirect to (default to home page if HTTP_REFERER is not available)
+#    redirect_url = request.META.get('HTTP_REFERER', reverse('home'))
+#    return redirect(redirect_url)
+
+
+#@login_required(login_url='login')
+#def remove_from_wishlist(request,item_id):
+#    product = get_object_or_404(Product, id= item_id)
+
+#    item = WishlistItem.objects.get(product=product)
+#    item.delete()
+#    messages.error(request, 'The product is removed from wishlist!!')
+#    # Get the URL to redirect to (default to home page if HTTP_REFERER is not available)
+#    redirect_url = request.META.get('HTTP_REFERER', reverse('home'))
+#    return redirect(redirect_url)
+
+
+def get_or_create_wishlist(request):
+    wishlist_id = request.session.get('wishlist_id')
+    if not wishlist_id:
+        wishlist = WishList.objects.create()
+        wishlist_id = wishlist.id
+        request.session['wishlist_id'] = wishlist_id
+    else:
+        wishlist = get_object_or_404(WishList, id=wishlist_id)
+    return wishlist
+
+
+@login_required(login_url='login')
+def wishlist(request):
+    wishlist = get_or_create_wishlist(request)
+    wishlist_items = WishlistItem.objects.filter(wishlist=wishlist).all()
+    context = {
+        'wishlist_items': wishlist_items
+    }
+    return render(request, 'accounts/wishlist.html', context)
+
+
+@login_required(login_url='login')
+def add_to_wishlist(request, product_id):
+    current_user = request.user
+    product = get_object_or_404(Product, id=product_id)
+    wishlist = get_or_create_wishlist(request)
+    is_item_exists = WishlistItem.objects.filter(wishlist=wishlist, product=product, user=current_user).exists()
+    if is_item_exists:
+        messages.error(request, 'This product is already added to wishlist')
+    else:
+        WishlistItem.objects.create(user=current_user, wishlist=wishlist, product=product)
+        messages.success(request, "Product is added to wish list!!")
+        # Get the URL to redirect to (default to home page if HTTP_REFERER is not available)
+    redirect_url = request.META.get('HTTP_REFERER', reverse('home'))
+    return redirect(redirect_url)
+
+
+
+@login_required(login_url='login')
+def remove_from_wishlist(request, item_id):
+    product = get_object_or_404(Product, id= item_id)
+    item = WishlistItem.objects.get(product=product)
+    item.delete()
+    
+    messages.success(request, 'The product is removed from wishlist!!')
+    redirect_url = request.META.get('HTTP_REFERER', reverse('home'))
+    return redirect(redirect_url)
+
+
+
+
+
+
+# =================================End wishlists=============================================================================================

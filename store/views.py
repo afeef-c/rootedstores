@@ -29,7 +29,8 @@ def store(request, category_slug=None):
         product_count = products.count()
 
     new_products = Product.objects.all().order_by('-created_date')
-    top_new_products = Product.objects.all().order_by('-created_date')[:3]    
+    top_new_products = Product.objects.all().order_by('-created_date')[:3]
+        
     context ={
         'products':paged_products,
         'product_count':product_count,

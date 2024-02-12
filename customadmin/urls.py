@@ -27,6 +27,7 @@ urlpatterns = [
     path('product_update/<slug:pk>', AdminViews.ProductUpdate.as_view(), name='product_update'),
     path('product_delete/<int:pk>', AdminViews.ProductDeleteView.as_view(), name='product_delete'),
     
+    
     #variations
     path('variations_list/', AdminViews.VariationtListView.as_view(), name='variations_list'),
     path('add_variations/', AdminViews.VariationCreateView.as_view(), name='add_variations'),
@@ -35,11 +36,11 @@ urlpatterns = [
 
     # orders
     path('orders_list/', AdminViews.OrderListView.as_view(), name='orders_list'),
-    path('order_update/<int:pk>', AdminViews.OrderUpdate.as_view(), name='order_update'),
+    path('order_update/<slug:pk>', AdminViews.OrderUpdate.as_view(), name='order_update'),
 
     # payments
     path('payment_list/', AdminViews.PaymentListView.as_view(), name='payment_list'),
-    path('payment_update/<int:pk>', AdminViews.PaymentUpdate.as_view(), name='payment_update'),
+    path('payment_update/<slug:pk>', AdminViews.PaymentUpdate.as_view(), name='payment_update'),
 
 ]   
 

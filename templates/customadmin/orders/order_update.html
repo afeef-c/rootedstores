@@ -2,14 +2,14 @@
 {% load static %}
 
 {% block title %}
-Update Product 
+Update Order 
 {% endblock title %}
 
 {% block custom_css %}
 {% endblock custom_css %}
 
 {% block page_title %}
-Update Product
+Update Order
 {% endblock page_title %}
 
 {% block page_content %}
@@ -41,7 +41,7 @@ Update Product
                                     {{ field.label }}
                                 </label>
                             </div>
-                        {% elif field.name == 'category' %}
+                        {% elif field.name == 'status' %}
                             <div class="form-group">
                                 <label>{{ field.label }}</label>
                                 <select name="{{ field.name }}" id="{{ field.name }}" class="form-control">
@@ -51,19 +51,11 @@ Update Product
                                 </select>
                             </div>
                         
-                        {% elif field.name == 'merchant' %}
-                        <div class="form-group">
-                            <label>{{ field.label }}</label>
-                            <select name="{{ field.name }}" id="{{ field.name }}" class="form-control">
-                                {%  for choice_value, choice_label in field.field.choices %}
-                                    <option value="{{ choice_value }}" {% if choice_value == field.value %}selected{% endif %}>{{ choice_label }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
+                        
                         {% else %}
                             <div class="form-group">
                                 <label> {{ field.label }} </label>
-                                <input type="{{field.field.widget.input_type}}" name="{{field.name}}" id="{{field.name}}" class="form-control" value="{{ field.value }}">
+                                <input type="{{field.field.widget.input_type}}" name="{{field.name}}" id="{{field.name}}" class="form-control" value="{{ field.value }}" readonly>
                                 {% if field.errors %}
                                 <div class="alert alert-danger" style="margin: 10px; padding:0px">
                                     {{field.errors}}

@@ -192,7 +192,7 @@
                     {% csrf_token %}
                         <input type="hidden" value="{{order.id}}" name="order_id" >
                         <div class="d-flex justify-content-center">					
-                            <button type="submit" id="cancelButton" class="btn btn-danger">Cancel Order</button>
+                            <button type="submit" id="cancelButton" class="btn btn-danger" onclick="return confirm('Are you sure to cancele the order!!')">Cancel Order</button>
                         </div>
 
                     </form>

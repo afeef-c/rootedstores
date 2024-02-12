@@ -87,11 +87,19 @@
 
 
 											<div class="shop-product-rightside-icons">
+												{% if single_product.id in wishlist_product_ids %}
 												<span class="wishlist-icon">
-													<a href="#" data-tippy="Add to wishlist" data-tippy-placement="left" data-tippy-inertia="true"
+													<a href="{% url 'add_to_wishlist' single_product.id %}" data-tippy="Add to wishlist" data-tippy-placement="left" data-tippy-inertia="true"
 														data-tippy-animation="shift-away" data-tippy-delay="50" data-tippy-arrow="true"
-														data-tippy-theme="sharpborder"><i class="ion-android-favorite-outline"></i></a>
+														data-tippy-theme="sharpborder"><i class="ion-android-favorite-outline" style="color: red;"></i></a>
 												</span>
+												{% else %}
+												<span class="wishlist-icon">
+													<a href="{% url 'add_to_wishlist' single_product.id %}" data-tippy="Add to wishlist" data-tippy-placement="left" data-tippy-inertia="true"
+														data-tippy-animation="shift-away" data-tippy-delay="50" data-tippy-arrow="true"
+														data-tippy-theme="sharpborder"><i class="ion-android-favorite-outline" ></i></a>
+												</span>
+												{% endif %}
 												<span class="enlarge-icon">
 													<a class="btn-zoom-popup" href="#" data-tippy="Click to enlarge" data-tippy-placement="left"
 														data-tippy-inertia="true" data-tippy-animation="shift-away" data-tippy-delay="50"

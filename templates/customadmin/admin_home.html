@@ -36,16 +36,16 @@
           </div>
           <div class="card-stats-items">
             <div class="card-stats-item">
-              <div class="card-stats-item-count">24</div>
-              <div class="card-stats-item-label">Pending</div>
+              <div class="card-stats-item-count"> {{confimed_orders.count}} </div>
+              <div class="card-stats-item-label">Confirmed</div>
             </div>
             <div class="card-stats-item">
-              <div class="card-stats-item-count">12</div>
-              <div class="card-stats-item-label">Shipping</div>
-            </div>
-            <div class="card-stats-item">
-              <div class="card-stats-item-count">23</div>
+              <div class="card-stats-item-count"> {{completed_orders.count}} </div>
               <div class="card-stats-item-label">Completed</div>
+            </div>
+            <div class="card-stats-item">
+              <div class="card-stats-item-count"> {{delivered_orders.count}} </div>
+              <div class="card-stats-item-label">Delivered</div>
             </div>
           </div>
         </div>
@@ -57,7 +57,7 @@
             <h4>Total Orders</h4>
           </div>
           <div class="card-body">
-            59
+            {{orders_count}}
           </div>
         </div>
       </div>

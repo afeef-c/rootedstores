@@ -23,6 +23,13 @@ urlpatterns = [
     path('change_password/',views.change_password, name='change_password'),
     path('order_detail/<int:order_id>',views.order_detail, name='order_detail'),
     path('cancel_order/<int:order_id>',views.cancel_order, name='cancel_order'),
+
+    #===========wishlist===============
+    
+    path('wishlist', views.wishlist, name='wishlist'),
+    path('add_to_wishlist/<int:product_id>', views.add_to_wishlist, name='add_to_wishlist'),
+    path('remove_from_wishlist/<int:item_id>', views.remove_from_wishlist, name='remove_from_wishlist'),
+
     
 ]
 

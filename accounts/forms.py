@@ -88,6 +88,7 @@ class RegistrationForm(forms.ModelForm):
 class OTPVerificationForm(forms.Form):
     otp = forms.CharField(label='Enter OTP', max_length=6, min_length=6, widget=forms.TextInput(attrs={'autocomplete': 'off'}))
 
+
 class UserForm(forms.ModelForm):
     
     class Meta:

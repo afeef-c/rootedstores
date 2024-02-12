@@ -22,14 +22,20 @@ Orders List
         <div class="card-header">
             <h4>Orders List</h4>
         <div class="card-header-form">
-            <form>
+            <form action="{% url 'search' %}" method="GET" >
             <div class="input-group">
-                <input type="text" class="form-control" placeholder="Search">
+                <input type="search" class="form-control" placeholder="Search for orders details..">
                 <div class="input-group-btn">
-                <button class="btn btn-primary"><i class="fas fa-search"></i></button>
+                <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i></button>
                 </div>
             </div>
             </form>
+            <!--<div class="search-widget">
+                <form action="{% url 'search' %}" method="GET">
+                    <input type="search" name="keyword" placeholder="Search products ...">
+                    <button type="submit"><i class="ion-android-search"></i></button>
+                </form>
+            </div>-->
         </div>
         </div>
         
@@ -51,7 +57,14 @@ Orders List
                     <td> {{order.order_number}} </td>
                     <td> {{order.full_name}} </td>
                     <td>
-                        {{order.status}}
+                        {% if order.status == 'Completed' %}<span class="badge badge-success">Completed</span>{% endif %}
+                        {% if order.status == 'Confirmed' %} <span class="badge badge-secondary">Confirmed</span>{% endif %}
+                        {% if order.status == 'Shipped' %} <span class="badge badge-primary">Shipped</span>{% endif %}
+                        {% if order.status == 'Cancelled' %}<span class="badge badge-danger">Cancelled</span> {% endif %}
+                        {% if order.status == 'Delivered' %}<span class="badge badge-light">Delivered</span> {% endif %}
+                        <!--{% if not user.is_admin and not user.is_staff and not user.is_active and not user.is_merchant and not user.is_superadmin %}<span class="badge badge-warning">Just register</span>{% endif %}-->
+                        
+                    
                     </td>
                     <td>₹ {{order.order_total}} </td>
                     <td> {{order.created_at|date:"F j, Y" }} </td>

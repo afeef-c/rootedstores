@@ -80,7 +80,8 @@ TEMPLATES = [
                 'category.context_processors.menu_links',
                 'cart.context_processors.counter',
                 'cart.context_processors.cart',
-                
+                'accounts.context_processors.w_counter',
+                'accounts.context_processors.wishlist',
             ],
         },
     },

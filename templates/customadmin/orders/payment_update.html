@@ -2,14 +2,14 @@
 {% load static %}
 
 {% block title %}
-Update Order 
+Update Payment 
 {% endblock title %}
 
 {% block custom_css %}
 {% endblock custom_css %}
 
 {% block page_title %}
-Update Order
+Update Payment
 {% endblock page_title %}
 
 {% block page_content %}
@@ -17,7 +17,7 @@ Update Order
     <div class="col-12 col-md-12 col-lg-12">
         <div class="card">
             <div class="card-header">
-                <h4>Update Order </h4>
+                <h4>Update Product </h4>
             </div>
             <div class="card-body">
                 <form action="" method="POST" enctype="multipart/form-data">
@@ -36,7 +36,7 @@ Update Order
                         
                         {% elif field.field.widget.input_type == 'checkbox' %}
                             <div class="form-check">
-                                <input type="{{field.field.widget.input_type}}" name="{{field.name}}" id="{{field.name}}" class="form-control" {% if field.value %}checked{% endif %} readonly>
+                                <input type="{{field.field.widget.input_type}}" name="{{field.name}}" id="{{field.name}}" class="form-control" {% if field.value %}checked{% endif %}>
                                 <label class="form-check-label" for="{{ field.name }}" >
                                     {{ field.label }}
                                 </label>
@@ -51,16 +51,7 @@ Update Order
                                 </select>
                             </div>
                         
-                        {% elif field.name == 'payment' %}
-                        <div class="form-group">
-                            <label>{{ field.label }}</label>
-                            <input type="text" name="{{field.name}}" id="{{field.name}}" class="form-control" value="{{order.payment}}" readonly>
-                        </div>
-                        {% elif field.name == 'user' %}
-                        <div class="form-group">
-                            <label> Account user </label>
-                            <input type="text" name="{{field.name}}" id="{{field.name}}" class="form-control" value="{{order.user}}" readonly>
-                        </div>
+                        
                         {% else %}
                             <div class="form-group">
                                 <label> {{ field.label }} </label>
@@ -75,7 +66,7 @@ Update Order
                     {% endfor %}                
                     
 
-                    <button class="btn btn-primary btn-block" type="submit">UPDATE ORDER</button>
+                    <button class="btn btn-primary btn-block" type="submit">UPDATE PRODUCT</button>
                 </form>
 
             </div>

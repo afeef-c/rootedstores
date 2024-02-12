@@ -25,3 +25,6 @@ class UserProfilAdmin(admin.ModelAdmin):
     list_display = ('thumbnail','user','city','state','country')
 
 admin.site.register(UserProfile,UserProfilAdmin)
+admin.site.register(AddressBook)
+admin.site.register(WishlistItem)
+admin.site.register(WishList)

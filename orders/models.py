@@ -26,11 +26,12 @@ class Payment(models.Model):
 class Order(models.Model):
     
     STATUS = (
-        ('process','In processing'),
-        ('confirmed','Confirmed'),
-        ('shipped','Shipped'),
-        ('cancelled','Cancelled'),
-        ('completed','Delivered'),
+        ('Processing','Processing'),
+        ('Confirmed','Confirmed'),
+        ('Shipped','Shipped'),
+        ('Cancelled','Cancelled'),
+        ('Completed','Completed'),
+        ('Delivered','Delivered')
     )
 
     user = models.ForeignKey(Account, on_delete=models.SET_NULL, null=True)
@@ -50,7 +51,7 @@ class Order(models.Model):
     order_total = models.FloatField()
     tax = models.FloatField()
     shipping_fee = models.FloatField(blank=True, null=True)
-    status = models.CharField(max_length=10, choices=STATUS, default='process')
+    status = models.CharField(max_length=10, choices=STATUS, default='Processing')
     ip = models.CharField(blank=True, max_length=20)
     is_ordered = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)

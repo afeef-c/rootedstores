@@ -36,10 +36,10 @@
       <div class="main-sidebar sidebar-style-2">
         <aside id="sidebar-wrapper">
           <div class="sidebar-brand">
-            <a href="index.html"><img src="{% static 'assets/images/rooted_icon.png'%}" alt="" style=" height: 60px;"> Rooted</a>
+            <a href="{% url 'admin_home' %}"><img src="{% static 'assets/images/rooted_icon.png'%}" alt="" style=" height: 60px;"> Rooted</a>
           </div>
           <div class="sidebar-brand sidebar-brand-sm">
-            <a href="#"><img src="{% static 'assets/images/rooted_icon.png'%}" alt="" style=" height: 60px;"></a>
+            <a href="{% url 'admin_home' %}"><img src="{% static 'assets/images/rooted_icon.png'%}" alt="" style=" height: 60px;"></a>
           </div>
           <ul class="sidebar-menu">
             
@@ -93,6 +93,7 @@
               <ul class="dropdown-menu">
                 <li class="{% if request.path == add_variations %} active {% endif %}" ><a class="nav-link" href=" {% url 'add_variations' %} ">Add Products variations</a></li>
               </ul>
+              
             </li>
             
             <!--  order manu payment_list-->

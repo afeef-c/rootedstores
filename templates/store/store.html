@@ -411,10 +411,20 @@
 										</div>
 
 										<div class="single-product__floating-icons">
-											<span class="wishlist"><a href="#" data-tippy="Add to wishlist" data-tippy-inertia="true"
+											
+											{% if p.id in wishlist_product_ids %}
+												<span class="wishlist"><a href="{% url 'remove_from_wishlist' p.id %}" data-tippy="Add to wishlist" data-tippy-inertia="true"
 													data-tippy-animation="shift-away" data-tippy-delay="50" data-tippy-arrow="true"
-													data-tippy-theme="sharpborder" data-tippy-placement="left"><i
-														class="ion-android-favorite-outline"></i></a></span>
+													data-tippy-theme="sharpborder" data-tippy-placement="left">
+													<i class="ion-android-favorite-outline" style="color: red;"></i></a>
+												</span>
+											{% else %}
+												<span class="wishlist"><a href="{% url 'add_to_wishlist' p.id %}" data-tippy="Add to wishlist" data-tippy-inertia="true"
+													data-tippy-animation="shift-away" data-tippy-delay="50" data-tippy-arrow="true"
+													data-tippy-theme="sharpborder" data-tippy-placement="left">
+													<i class="ion-android-favorite-outline" ></i></a>
+												</span>
+											{% endif %}	
 
 											
 										</div>

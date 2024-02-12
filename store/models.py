@@ -18,7 +18,8 @@ class Product(models.Model):
     stock           = models.IntegerField()
     is_available    = models.BooleanField(default=True)
     category        = models.ForeignKey(Category, on_delete=models.CASCADE)
-    merchant        = models.ForeignKey(MerchantUser, on_delete=models.SET_NULL, blank=True, null=True)  # Foreign key reference to Merchant model
+    #merchant        = models.ForeignKey(MerchantUser, on_delete=models.SET_NULL, blank=True, null=True) 
+     # Foreign key reference to Merchant model
     created_date    = models.DateTimeField(auto_now_add =True)
     modified_date   = models.DateTimeField(auto_now=True)
 

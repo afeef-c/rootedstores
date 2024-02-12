@@ -39,26 +39,26 @@ Products List
                 <tbody>
                 <tr>
                     <th>
-                    <div class="custom-checkbox custom-control">
-                        <input type="checkbox" data-checkboxes="mygroup" data-checkbox-role="dad" class="custom-control-input" id="checkbox-all">
-                        <label for="checkbox-all" class="custom-control-label">&nbsp;</label>
-                    </div>
+                        <!--<div class="custom-checkbox custom-control">
+                            <input type="checkbox" data-checkboxes="mygroup" data-checkbox-role="dad" class="custom-control-input" id="checkbox-all">
+                            <label for="checkbox-all" class="custom-control-label">&nbsp;</label>
+                        </div>-->
                     </th>
                     <th>Product Name</th>
                     <th>Image</th>
                     <th>Category</th>
                     <th>Availble</th>
-                    <th>Merchant</th>
+                    <th>Stock</th>
                     <th>Update</th>
                     <th>Delete</th>
                 </tr>
                 {% for product in products %}
                 <tr>
                     <td class="p-0 text-center">
-                        <div class="custom-checkbox custom-control">
+                        <!--<div class="custom-checkbox custom-control">
                             <input type="checkbox" data-checkboxes="mygroup" class="custom-control-input" id="checkbox-1">
                             <label for="checkbox-1" class="custom-control-label">&nbsp;</label>
-                        </div>
+                        </div>-->
                     </td>
                     <td> {{product.product_name}} </td>
                     <td>
@@ -74,12 +74,14 @@ Products List
                         {{product.category}}
                     </td>
                     <td class="align-middle">
-                        {% if product.is_available %}<a href="#" class="btn btn-icon btn-success"><i class="fas fa-check"></i></a> {% else %}<a href="#" class="btn btn-icon btn-danger"><i class="fas fa-times"></i></a> {% endif %}
+                        {% if product.is_available %}<a href="#" class="btn btn-icon btn-success"><i class="fas fa-check"></i></a>
+                        {% elif product.stock == 0 %} <p class="text-danger">Out of stock</p> 
+                        {% else %}<a href="#" class="btn btn-icon btn-danger"><i class="fas fa-times"></i></a> {% endif %}
                         
                     </td>
                     
 
-                    <td> {{product.merchant }} </td>
+                    <td> {{product.stock }} </td>
                     <td><a href="{% url 'product_update' product.id %}" class="btn btn-warning">Update</a></td>
                     <td><a href="{% url 'product_delete' product.id %}" class="btn btn-danger">Delete</a></td>
                 </tr>

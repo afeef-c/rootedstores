@@ -1,0 +1,45 @@
+{% extends 'customadmin/admin_base.html' %}
+{% load static %}
+
+
+<h2>Products Images</h2>
+
+{% block title %}
+Products Images
+{% endblock title %}
+
+{% block custom_css %}
+{% endblock custom_css %}
+
+{% block page_title %}
+Products Images
+{% endblock page_title %}
+
+{% block page_content %}
+
+<div class="col-12 col-sm-6 col-lg-4">
+    
+    <div class="card">
+        <div class="card-header">
+        <h4>{{{{ product.name }}}}</h4>
+        </div>
+        <div class="card-body">
+        <div class="gallery gallery-fw" data-item-height="100">
+            {% for i in images %}
+            <div class="gallery-item" data-image="assets/img/news/img09.jpg" data-title="Image 1" href="assets/img/news/img09.jpg" title="Image 1" style="height: 100px; background-image: url(&quot;assets/img/news/img09.jpg&quot;);"></div>
+            {% endfor %}
+                <div style="line-height: 100px;">+2</div>
+            </div>
+            <div class="gallery-item gallery-hide" data-image="assets/img/news/img01.jpg" data-title="Image 4" href="assets/img/news/img01.jpg" title="Image 4" style="height: 100px; background-image: url(&quot;assets/img/news/img01.jpg&quot;);"></div>
+        </div>
+        </div>
+    </div>
+    
+
+</div>
+
+{% endblock page_content %}
+
+{% block custom_js %}
+
+{% endblock custom_js %}

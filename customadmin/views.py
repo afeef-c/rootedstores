@@ -6,6 +6,8 @@ from accounts.models import Account
 from django.contrib.auth import authenticate,login,logout
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+
+
 # Create your views here.
 
 def admin_login(request):
@@ -46,7 +48,5 @@ def admin_logout(request):
     logout(request)
     messages.success(request, 'The admin logout successfully')
     return HttpResponseRedirect(reverse('admin_login'))
-
-
 
 

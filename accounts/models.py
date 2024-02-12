@@ -2,6 +2,8 @@ import uuid
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser,BaseUserManager
 
+from store.models import Product
+
 # Create your models here.
 class MyAccountManager(BaseUserManager):
 
@@ -80,9 +82,7 @@ class Account(AbstractBaseUser):
     last_name       = models.CharField(max_length=50)
     username        = models.CharField(max_length=50, unique=True)
     email           = models.EmailField(max_length=100, unique=True)
-    phone_number    = models.CharField(max_length=15)
-    profile_pic = models.ImageField(upload_to='profile_pics/', null=True, blank=True, default='')
-    
+    phone_number    = models.CharField(max_length=15)    
     date_joined     = models.DateTimeField(auto_now_add=True)
     last_login      = models.DateTimeField(auto_now_add=True)
     is_admin        = models.BooleanField(default=False)
@@ -145,12 +145,30 @@ class AddressBook(models.Model):
     last_name = models.CharField(max_length=50)
     phone = models.CharField(max_length=15)
     email = models.EmailField(max_length=50)
-    address_line1 = models.CharField(max_length=100)
-    address_line2 = models.CharField(max_length=100)
+    address_line_1 = models.CharField(max_length=100)
+    address_line_2 = models.CharField(max_length=100)
     city = models.CharField(max_length=50)
     state = models.CharField(max_length=50)
     pin_code = models.CharField(max_length=20)
     country = models.CharField(max_length=50)
 
+    def full_name(self):
+        return f"{self.first_name} {self.last_name}"
+
     def __str__(self):
         return f"{self.user.username}'s Address"
+    
+class WishList(models.Model):
+
+    wishlist_id = models.CharField(max_length=250, blank=True)
+    date_added = models.DateTimeField(auto_now_add=True)
+    def __str__(self) -> str:
+        return f" {self.wishlist_id}"
+
+
+
+class WishlistItem(models.Model):
+    user = models.ForeignKey(Account, on_delete=models.CASCADE)
+    wishlist = models.ForeignKey(WishList, on_delete=models.CASCADE, null=True)
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    added_at = models.DateTimeField(auto_now_add=True)
