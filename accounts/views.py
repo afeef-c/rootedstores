@@ -351,7 +351,7 @@ def reset_password(request,uid):
         return render(request, "accounts/reset_password.html",{'uid': uid})
     
 
-
+# =================================orders=============================================================================================
 def my_orders(request):
 
 
@@ -378,6 +378,7 @@ def edit_profile(request):
             return redirect('dashboard')  # Redirect to the dashboard or profile page after successful update
         else:
             messages.error(request, "There was an error updating your profile. Please correct the errors below.")
+            return redirect('dashboard')  # Redirect to the dashboard or profile page after successful update
 
     else:
         user_form = UserForm(instance=request.user)
@@ -456,87 +457,32 @@ def cancel_order(request, order_id):
 
     if request.method == "POST":
         order.status = 'Cancelled'
-        print(order)
         order.save()
         # Send cancellation mail
         send_mail("Order cancellation: ", f"Your order:{order.order_number}- for {order.full_name} is cancelled", settings.EMAIL_HOST_USER, [email], fail_silently=False)
         messages.success(request, 'Your order succesfully cancelled!!')
-    return redirect('dashbord')
+    
+    return redirect('dashboard')
 
 
 
 
 # =================================wishlists=============================================================================================
 
-#def _wishlist_id(request):
-#    wishlist = request.session.session_key
-#    if not wishlist:
-#        wishlist = request.session.create()
-    
-#    return wishlist
-
-
-
-
-#@login_required(login_url='login')
-#def wishlist(request):
-    
-#    try:
-#        if request.user.is_authenticated:
-#            wishlist_items = WishlistItem.objects.filter(user=request.user).all()
-        
-#    except ObjectDoesNotExist:
-#        wishlist_items =[]
-
-#    context = {
-#        'wishlist_items':wishlist_items
-#    }
-#    print(wishlist_items)   
-#    return render(request,'accounts/wishlist.html', context)
-
-#@login_required(login_url='login')
-#def add_to_wishlist(request, product_id):
-#    current_user = request.user
-#    product = Product.objects.get(id=product_id)
-#    is_item_exists = WishlistItem.objects.filter(product=product, user=current_user).exists()
-#    if is_item_exists:
-#        messages.error(request, 'This product is already added to wishlist')
-#    else:
-#        WishlistItem.objects.create(user=request.user, product=product)
-#        messages.success(request, "Product is added to wish list!!")
-    
-#    # Get the URL to redirect to (default to home page if HTTP_REFERER is not available)
-#    redirect_url = request.META.get('HTTP_REFERER', reverse('home'))
-#    return redirect(redirect_url)
-
-
-#@login_required(login_url='login')
-#def remove_from_wishlist(request,item_id):
-#    product = get_object_or_404(Product, id= item_id)
-
-#    item = WishlistItem.objects.get(product=product)
-#    item.delete()
-#    messages.error(request, 'The product is removed from wishlist!!')
-#    # Get the URL to redirect to (default to home page if HTTP_REFERER is not available)
-#    redirect_url = request.META.get('HTTP_REFERER', reverse('home'))
-#    return redirect(redirect_url)
-
-
 def get_or_create_wishlist(request):
     wishlist_id = request.session.get('wishlist_id')
     if not wishlist_id:
         wishlist = WishList.objects.create()
-        wishlist_id = wishlist.id
+        wishlist_id = wishlist.wishlist_id
         request.session['wishlist_id'] = wishlist_id
     else:
-        wishlist = get_object_or_404(WishList, id=wishlist_id)
+        wishlist = get_object_or_404(WishList, wishlist_id=wishlist_id)
     return wishlist
-
 
 @login_required(login_url='login')
 def wishlist(request):
     wishlist = get_or_create_wishlist(request)
-    wishlist_items = WishlistItem.objects.filter(wishlist=wishlist).all()
+    wishlist_items = WishlistItem.objects.filter(user=request.user).all()
     context = {
         'wishlist_items': wishlist_items
     }
@@ -548,6 +494,7 @@ def add_to_wishlist(request, product_id):
     current_user = request.user
     product = get_object_or_404(Product, id=product_id)
     wishlist = get_or_create_wishlist(request)
+    print(wishlist)
     is_item_exists = WishlistItem.objects.filter(wishlist=wishlist, product=product, user=current_user).exists()
     if is_item_exists:
         messages.error(request, 'This product is already added to wishlist')
@@ -562,17 +509,19 @@ def add_to_wishlist(request, product_id):
 
 @login_required(login_url='login')
 def remove_from_wishlist(request, item_id):
-    product = get_object_or_404(Product, id= item_id)
-    item = WishlistItem.objects.get(product=product)
-    item.delete()
+    product = get_object_or_404(Product, id=item_id)
+    current_user = request.user
+    # Filter wishlist items by product and user
+    items = WishlistItem.objects.filter(product=product, user=current_user)
+    if items.exists():
+        # If multiple items are found, delete all of them
+        items.delete()
+        messages.success(request, 'The product is removed from wishlist!!')
+    else:
+        messages.error(request, 'The product is not found in the wishlist!!')
     
-    messages.success(request, 'The product is removed from wishlist!!')
     redirect_url = request.META.get('HTTP_REFERER', reverse('home'))
     return redirect(redirect_url)
-
-
-
-
 
 
 # =================================End wishlists=============================================================================================

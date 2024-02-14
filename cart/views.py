@@ -51,13 +51,14 @@ def add_cart(request, product_id):
             if product_variation in ex_var_list:
                 #increase the cart item quantity
                 index = ex_var_list.index(product_variation)
-                item_id  =id[index]
+                item_id = id[index]
                 item = CartItem.objects.get(product=product, id = item_id)
                 if product.stock > 0:
-                    product.stock -= 1
                     item.quantity += 1 
-                    product.save() 
                     item.save()
+                    product.stock -= 1
+                    product.save() 
+                    
                 else:
                     messages.error(request, 'quantity limit exceeded!!, please try afeter some times')    
                     return redirect('cart')
@@ -154,10 +155,10 @@ def cart(request, total=0, quantity=0, cart_item=None):
         for cart_item in cart_items:
             item_variations = Variation.objects.filter(product=cart_item.product)
             variations[cart_item.id] = item_variations  # Store variations for each cart item
-
-            cart_item.item_total = cart_item.quantity * cart_item.product.price
+            cart_item.item_total = cart_item.quantity * cart_item.product.get_offer_price()
             quantity += cart_item.quantity
             total += cart_item.item_total
+        
         
         if total>=1000:
             shipping_fee = 0
@@ -201,7 +202,7 @@ def checkout(request,total=0, quantity=0, cart_item=None):
             item_variations = Variation.objects.filter(product=cart_item.product)
             variations[cart_item.id] = item_variations  # Store variations for each cart item
 
-            cart_item.item_total = cart_item.quantity * cart_item.product.price
+            cart_item.item_total = cart_item.quantity * cart_item.product.get_offer_price()
             quantity += cart_item.quantity
             total += cart_item.item_total
         

@@ -109,7 +109,7 @@
                                                         {% endif %}
                                                         
                                                     </td>
-                                                    <td class="product-price"><span class="price">₹ {{ item.product.price }} </span></td>
+                                                    <td class="product-price"><span class="price">₹ {{ item.product.get_offer_price }} </span></td>
                                                     <td class="product-quantity">
                                                         <p>{{ item.quantity }}</p>
                                                         
@@ -173,9 +173,11 @@
                     </div>
                     {% if payment_method == 'paypal' %}
 
-                        <div id="paypal-button-container">
-                            <!-- paypal payment button  -->
+                    
+                        <div class="">
+                            {{paypal.render}}
                         </div>
+                        
                     {% else %}
                         <form action="{% url 'payments' %}" method="POST">
                             {% csrf_token %}
@@ -208,7 +210,7 @@
 {% block js %}
 
 <!-- paypal payment js -->
-    <script>
+    <!--<script>
         // Render the PayPal button into #paypal-button-container
         paypal.Buttons({
 
@@ -242,6 +244,8 @@
 
         }).render('#paypal-button-container');
 
+
+
 // ======================== paypal end! ================================
 
  
@@ -255,5 +259,5 @@
                 }
             });
         });
-    </script>
+    </script>-->
 {% endblock js %}

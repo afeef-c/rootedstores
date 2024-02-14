@@ -1,8 +1,9 @@
+from datetime import datetime
 from django.db import models
 from django.dispatch import receiver
 from django.urls import reverse
 from accounts.models import *
-from category.models import Category
+from category.models import Category, CategoryOffer
 from django.utils.text import slugify
 from django.db.models.signals import pre_save
 
@@ -13,7 +14,6 @@ class Product(models.Model):
     slug            = models.SlugField(max_length=225,unique=True, editable=False)
     description     = models.TextField(max_length=255,blank=True)
     price           = models.IntegerField()
-    old_price       = models.IntegerField(null=True,blank=True, default=500)
     images          = models.ImageField(upload_to='photos/product')
     stock           = models.IntegerField()
     is_available    = models.BooleanField(default=True)
@@ -27,15 +27,69 @@ class Product(models.Model):
 
         return reverse('product_detail',args=[self.category.slug, self.slug])
     
+    #def discount(self):
+    #    return int((self.old_price-self.price)*100/self.old_price)
     
     def __str__(self) -> str:
         return self.product_name
     
+    def get_discounted_price(self):
+        offer = self.offer_set.filter(start_date__lte=datetime.now(), end_date__gte=datetime.now()).first()
+        if offer:
+            discount = offer.discount_percentage
+            discounted_price = self.price - (self.price * discount / 100)
+            return discounted_price
+        return self.price
+    
+    def get_category_offer(self):
+        return CategoryOffer.objects.filter(category=self.category, start_date__lte=datetime.now(), end_date__gte=datetime.now()).first()
+    
+    def get_category_discounted_price(self):
+        category_offer = CategoryOffer.objects.filter(category=self.category, start_date__lte=datetime.now(), end_date__gte=datetime.now()).first()
+        if category_offer:
+            discount = category_offer.discount_percentage
+            discounted_price = self.price - (self.price * discount / 100)
+            return discounted_price
+        return self.price
+    
+    def get_offer_price(self):
+        category_offer = CategoryOffer.objects.filter(category=self.category, start_date__lte=datetime.now(), end_date__gte=datetime.now()).first()
+        offer = self.offer_set.filter(start_date__lte=datetime.now(), end_date__gte=datetime.now()).first()
+        if category_offer and offer:
+            discount = category_offer.discount_percentage+offer.discount_percentage
+            discounted_price = self.price - (self.price * discount / 100)
+            return discounted_price
+        elif offer and not category_offer:
+            discount = offer.discount_percentage
+            discounted_price = self.price - (self.price * discount / 100)
+            return discounted_price
+        elif category_offer and not offer:
+            discount = category_offer.discount_percentage
+            discounted_price = self.price - (self.price * discount / 100)
+            return discounted_price
+        
+        return self.price
+
+    def get_offer_percent(self):
+        category_offer = CategoryOffer.objects.filter(category=self.category, start_date__lte=datetime.now(), end_date__gte=datetime.now()).first()
+        offer = self.offer_set.filter(start_date__lte=datetime.now(), end_date__gte=datetime.now()).first()
+
+        if category_offer and offer:
+            discount = category_offer.discount_percentage+offer.discount_percentage
+            return discount
+        elif offer and not category_offer:
+            discount = offer.discount_percentage
+            return discount
+        elif category_offer and not offer:
+            discount = category_offer.discount_percentage
+            return discount
+
 @receiver(pre_save, sender=Product)
 def create_product_slug(sender, instance, **kwargs):
     # Auto-populate slug only if it's not provided
     if not instance.slug:
         instance.slug = slugify(instance.product_name)
+
 
 class ProductImages(models.Model):
     images = models.ImageField(upload_to="product-images", default="product.jpg")
@@ -72,3 +126,27 @@ class Variation(models.Model):
 
     def __str__(self) -> str:
         return f"{self.product.product_name} - {self.variation_value}"
+
+
+class Offer(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    discount_percentage = models.DecimalField(max_digits=5, decimal_places=2)
+    start_date = models.DateTimeField()
+    end_date = models.DateTimeField()
+
+    def is_valid(self):
+        now = datetime.now()
+        return self.start_date <= now <= self.end_date
+
+
+#class ProductOffer(models.Model):
+#    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+#    discount_percentage = models.DecimalField(max_digits=5, decimal_places=2)
+#    start_date = models.DateTimeField(default=timezone.now)
+#    end_date = models.DateTimeField()
+
+
+#class Referral(models.Model):
+#    user = models.ForeignKey(Account, on_delete=models.CASCADE)
+#    referral_code = models.CharField(max_length=20, unique=True)
+#    discount_amount = models.DecimalField(max_digits=10, decimal_places=2)

@@ -44,7 +44,9 @@ INSTALLED_APPS = [
     'cart',
     'orders',
     
-    'customadmin'
+    'customadmin',
+    #paypal integration
+    'paypal.standard.ipn'
 
 ]
 
@@ -176,3 +178,14 @@ EMAIL_HOST_USER = 'afeefc123@gmail.com'
 EMAIL_HOST_PASSWORD = 'kgaa gfwy rfzj nhtx'
 EMAIL_USE_TLS = True
 EMAIL_USE_SSL = False
+
+
+
+#paypal
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+PAYPAL_RECEIVER_EMAIL = 'rootedstores@gmail.com'
+
+PAYPAL_TEST = True
+PAYPAL_CLIENT_ID = 'ARLdfpzOqELoE5R215LgTNMzUJZChL30XTh_IUmUaAfuE0FdwNsj3FcWQUQzNOtfCAee4fsOqUUchHhz'
+PAYPAL_SECRET_KEY = 'EHYhYLHGLC8SK4Fq4Ogr_SMznypA_CtuuvtVvA3T8OgRpW7mHS390zeJeiJoqUONt_udKiqB12EXHKng'

@@ -81,11 +81,18 @@
 
 											<!--=======  shop product gallery icons  =======-->
 
-											<div class="single-product__floating-badges single-product__floating-badges--shop-product">
+											<!--<div class="single-product__floating-badges single-product__floating-badges--shop-product">
 												<span class="hot">hot</span>
+											</div>-->
+											<div class="single-product__floating-badges">
+												{% if single_product.get_offer_percent %}
+													<span class="onsale" > {{single_product.get_offer_percent|floatformat:"0"}}% </span>
+												{% endif %}
+												<!--<span class="hot">hot</span>-->
 											</div>
 
-
+											
+											<!-- Wishlist -->
 											<div class="shop-product-rightside-icons">
 												{% if single_product.id in wishlist_product_ids %}
 												<span class="wishlist-icon">
@@ -172,10 +179,14 @@
 									<!--=======  shop product price  =======-->
 
 									<div class="shop-product__price mb-30">
-										<span> ₹ </span><span class="main-price discounted">{{single_product.old_price}} </span>
+										{% if single_product.get_offer_percent %}
+										<span> ₹ </span><span class="discounted-price" id="product-price" >{{single_product.get_offer_price|floatformat:"0"}}</span><br>
+										<span> ₹ </span><span class="main-price discounted">{{single_product.price}} </span>
+										
+										{% else %}
 										<span> ₹ </span><span class="discounted-price" id="product-price" >{{single_product.price}}</span>
+										{% endif %}
 									</div>
-
 									<!--=======  End of shop product price  =======-->
 
 									<!--=======  shop product short description  =======-->

@@ -163,7 +163,7 @@ class WishList(models.Model):
     wishlist_id = models.CharField(max_length=250, blank=True)
     date_added = models.DateTimeField(auto_now_add=True)
     def __str__(self) -> str:
-        return f" {self.wishlist_id}"
+        return f"WishList {self.wishlist_id} (Added on: {self.date_added})"
 
 
 
@@ -172,3 +172,4 @@ class WishlistItem(models.Model):
     wishlist = models.ForeignKey(WishList, on_delete=models.CASCADE, null=True)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     added_at = models.DateTimeField(auto_now_add=True)
+

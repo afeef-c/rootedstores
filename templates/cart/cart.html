@@ -69,7 +69,10 @@
 									<th class="product-price">Price</th>
 									<th class="product-quantity">Quantity</th>
 									<th class="product-subtotal">Total</th>
+									<th class="product-whishlist">&nbsp;</th>
 									<th class="product-remove">&nbsp;</th>
+									
+									
 								</tr>
 							</thead>
 							
@@ -91,7 +94,13 @@
 											{% endif %}
 											
 										</td>
-										<td class="product-price"><span class="price">₹ {{ item.product.price }} </span></td>
+										
+										<td class="product-price price">
+											<span class="price">₹ {{ item.product.get_offer_price }} 
+											
+										</span></td>
+
+
 										<td class="product-quantity">
 
 											<div class="d-inline-block mx-0">
@@ -114,7 +123,25 @@
 										<td class="total-price">
 									    	<span class="price">₹ {{item.item_total}} </span>
 										</td>
+										
+										<td>
 
+											{% if item.product_id in wishlist_product_ids %}
+											<span class="wishlist"><a href="{% url 'remove_from_wishlist' item.product_id %}" data-tippy="Add to wishlist" data-tippy-inertia="true"
+												data-tippy-animation="shift-away" data-tippy-delay="50" data-tippy-arrow="true"
+												data-tippy-theme="sharpborder" data-tippy-placement="left">
+												<i class="ion-android-favorite-outline" style="color: red;"></i></a>
+											</span>
+											{% else %}
+												<span class="wishlist"><a href="{% url 'add_to_wishlist' item.product_id %}" data-tippy="Add to wishlist" data-tippy-inertia="true"
+													data-tippy-animation="shift-away" data-tippy-delay="50" data-tippy-arrow="true"
+													data-tippy-theme="sharpborder" data-tippy-placement="left">
+													<i class="ion-android-favorite-outline" ></i></a>
+												</span>
+											{% endif %}	
+
+										</td>
+										
 										<td class="product-remove">
 
 											<a href="{% url 'remove_cart_item' item.product_id item.id %}" onclick="return confirm('Are you sure to remove the item from cart!')">

@@ -8,3 +8,4 @@ class CategoryAdmin(admin.ModelAdmin):
     list_display = ('cat_name', 'slug')
 
 admin.site.register(Category, CategoryAdmin)
+admin.site.register(CategoryOffer)

@@ -116,13 +116,13 @@
                                                         {% endif %}
                                                         
                                                     </td>
-                                                    <td class="product-price"><span class="price">₹ {{ item.product.price }} </span></td>
+                                                    <td class="product-price" style="white-space: nowrap;"><span class="price">₹ {{ item.product.price|floatformat:"1" }} </span></td>
                                                     <td class="product-quantity">
-                                                        <p>{{ item.quantity }}</p>
+                                                        <p class="text-center">{{ item.quantity }}</p>
                                                         
                                                     </td>
-                                                    <td class="total-price">
-                                                        <span class="price">₹ {{item.item_total}} </span>
+                                                    <td class="total-price" style="white-space: nowrap;">
+                                                        <span class="price">₹ {{item.item_total|floatformat:"1"}} </span>
                                                     </td>
 
                                                 </tr>
@@ -158,15 +158,15 @@
                         {% for item in order_detail %}
                         <ul>
                             
-                            <li>{{item.product.product_name}}  X {% if item.quantity < 10 %}0{{ item.quantity }}{% else %}{{ item.quantity }}{% endif %} <span>₹ {{item.item_total}} </span></li>
+                            <li>{{item.product.product_name}}  X {% if item.quantity < 10 %}0{{ item.quantity }}{% else %}{{ item.quantity }}{% endif %} <span>₹ {{item.item_total|floatformat:"2"}} </span></li>
                             
                         </ul>
                         {% endfor %}
-                        <p>Sub Total <span>₹ {{subtotal}} </span></p>
+                        <p>Sub Total <span>₹ {{subtotal|floatformat:"1"}} </span></p>
                         <p>Shipping Fee <span>₹ {{shipping_fee}} </span></p>
-                        <p>GST <span>₹ {{tax}} </span></p>
+                        <p>GST <span>₹ {{tax|floatformat:"1"}} </span></p>
 
-                        <h4>Grand Total <span>₹ {{grand_total}} </span></h4>
+                        <h4>Grand Total <span>₹ {{grand_total|floatformat:"2"}} </span></h4>
 
                     </div>
 

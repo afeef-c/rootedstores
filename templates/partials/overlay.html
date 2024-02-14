@@ -116,8 +116,14 @@
 							</div>
 							<div class="content">
 								<h5><a href="{{item.product.get_url}}"> {{item.product.product_name}} </a></h5>
-								<p><span class="main-price discounted">₹ {{item.product.old_price}} </span> <span class="discounted-price">₹ {{item.product.price}} </span></p>
-
+								<p>
+									{% if item.product.get_offer_percent %}
+									<span class="main-price discounted">₹ {{item.product.price}} </span>
+									<span class="discounted-price">₹ {{item.product.get_offer_price|floatformat:"0" }} </span>
+									{% else %}
+									<span class="discounted-price">₹ {{item.product.price}} </span>
+									{% endif %}
+								</p>
 							</div>
 						</div>
 
@@ -189,7 +195,14 @@
 							</div>
 							<div class="content">
 								<h5><a href="{{item.product.get_url}}"> {{ item.product.product_name }}  </a></h5>
-								<p><span class="cart-count">{{item.quantity}} x </span> <span class="discounted-price">₹ {{ item.product.price }} </span></p>
+								<p>
+									{% if item.product.get_offer_percent %}
+									<span class="main-price discounted">₹ {{item.product.price}} </span>
+									<span class="discounted-price">₹ {{item.product.get_offer_price|floatformat:"0" }} </span>
+									{% else %}
+									<span class="discounted-price">₹ {{item.product.price}} </span>
+									{% endif %}
+								</p>
 
 							</div>
 						</div>

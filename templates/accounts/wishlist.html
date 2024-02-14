@@ -18,7 +18,7 @@
 					<!--=======  breadcrumb list  =======-->
 
 					<ul class="breadcrumb-list">
-						<li class="breadcrumb-list__item"><a href="index-2.html">HOME</a></li>
+						<li class="breadcrumb-list__item"><a href="{% url 'home' %}">HOME</a></li>
 						<li class="breadcrumb-list__item breadcrumb-list__item--active">wishlist</li>
 					</ul>
 
@@ -53,27 +53,27 @@
 							</thead>
 
 							<tbody>
-								{% for i in wishlist_items %}
+								{% for item in wishlist_items %}
                                 <tr>
 									<td class="product-thumbnail">
 										<a href="">
-											<img src="{{i.product.images.url}}" class="img-fluid" alt="">
+											<img src="{{item.product.images.url}}" class="img-fluid" alt="">
 										</a>
 									</td>
 									<td class="product-name">
-										<a href=""> {{i.product.product_name}} </a>
+										<a href=""> {{item.product.product_name}} </a>
 										
 									</td>
 
-									<td class="product-price"><span class="price">₹ {{i.product.price}} </span></td>
+									<td class="product-price"><span class="price">₹ {{item.product.price}} </span></td>
 
 									
 
 									<td class="add-to-cart"><button  class="lezada-button lezada-button--small lezada-button--icon--left">
-											<i class="ion-ios-cart-outline"></i> <a href="{{i.product.get_url}}">View details</a> </button></td>
+											<i class="ion-ios-cart-outline"></i> <a href="{{item.product.get_url}}">View details</a> </button></td>
 
 									<td class="product-remove">
-										<a href="{% url 'remove_from_wishlist' i.product.id %}">
+										<a href="{% url 'remove_from_wishlist' item.product.id %}">
 											<i class="ion-android-close"></i>
 										</a>
 									</td>

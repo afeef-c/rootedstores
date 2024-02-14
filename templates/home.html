@@ -186,12 +186,15 @@
 												<img src="{{ p.images.url }}" class="img-fluid w-10" alt="">
 											</a>
 
-											<div class="single-product__floating-badges">
-												<span class="onsale">-25%</span>
-											</div>
+										<div class="single-product__floating-badges">
+											{% if p.get_offer_percent %}
+												<span class="onsale" > {{p.get_offer_percent|floatformat:"0"}}% </span>
+											{% endif %}
+											<!--<span class="hot">hot</span>-->
+										</div>
 
 											<div class="single-product__floating-icons">
-
+  
 												{% if p.id in wishlist_product_ids %}
 												<span class="wishlist"><a href="{% url 'remove_from_wishlist' p.id %}" data-tippy="Add to wishlist" data-tippy-inertia="true"
 													data-tippy-animation="shift-away" data-tippy-delay="50" data-tippy-arrow="true"
@@ -220,8 +223,12 @@
 												
 											</div>
 											<div class="price">
-												<span class="main-price discounted">₹ {{p.old_price}} </span>
-												<span class="discounted-price"> {{p.price}} </span>
+												{% if p.get_offer_percent %}
+												<span class="main-price discounted">₹ {{p.price}} </span>
+												<span class="discounted-price">₹ {{p.get_offer_price|floatformat:"0" }} </span>
+												{% else %}
+												<span class="discounted-price">₹ {{p.price}} </span>
+												{% endif %}
 											</div>
 										</div>
 

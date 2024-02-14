@@ -20,6 +20,10 @@ from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.core.mail import EmailMultiAlternatives
 from django.utils.html import strip_tags
+from paypal.standard.forms import PayPalPaymentsForm
+from django.conf import settings
+import uuid
+from django.urls import reverse
 
 # Create your views here.
 
@@ -27,73 +31,95 @@ def payments(request):
     order = Order.objects.get(user=request.user, is_ordered=False, order_number = request.session['order_number'])
     payment_method=request.session['payment_method']
 
-    if payment_method == 'cash':
+    
+    if request.method == "POST":
+
         paymentid = request.user.first_name + str(random.randint(111111,999999))
         while Payment.objects.filter(payment_id=paymentid) is None:
             paymentid = request.user + str(random.randint(111111,999999))
         
-        payment = Payment(
-            user = request.user,
-            payment_id = paymentid,
-            payment_method = "Cash on delivery",
-            amount_paid = order.order_total,
-            status = 'processing',
-            
-        )
-        payment.save()
+        #move cart items to order product table , 
+        cart_items = CartItem.objects.filter(user=request.user)
+
+        
+        if payment_method == 'cash':
+                        
+            payment = Payment(
+                user = request.user,
+                payment_id = paymentid,
+                payment_method = "Cash on delivery",
+                amount_paid = order.order_total,
+                status = 'processing',                
+            )
+            payment.save()
+
+        elif payment_method == 'paypal':
+            payment = Payment(
+                user = request.user,
+                payment_id = paymentid,
+                payment_method = "Paypal",
+                amount_paid = order.order_total,
+                status = 'processing',                
+            )
+            payment.save()
+        else:
+            pass
+        for item in cart_items:
+            orderproduct = OrderProduct()
+            orderproduct.order_id = order.id
+            orderproduct.payment = payment
+            orderproduct.user_id = request.user.id
+            orderproduct.product_id = item.product_id
+            orderproduct.quantity = item.quantity
+            orderproduct.product_price = item.product.get_offer_price()
+            orderproduct.ordered = True
+            orderproduct.save()
+        
+            cart_item = CartItem.objects.get(id=item.id)
+            product_variations = cart_item.variations.all()
+            orderproduct = OrderProduct.objects.get(id=orderproduct.id)
+            orderproduct.variations.set(product_variations)
+            orderproduct.save()
 
         order.payment = payment
         order.status = 'Confirmed'
         order.is_ordered = True
         order.save()
 
-        if request.method == "POST":
+        # clear cart and send mail to customer 
+        CartItem.objects.filter(user=request.user).delete()
+    
+        #conformation mail to user
+        send_mail("Order Confirmation:", f"Thank you for your order, Order confirmed with ORDER NO : {order.order_number}", settings.EMAIL_HOST_USER, [request.user.email], fail_silently=False)
+        data = {
+            'order_number': order.order_number,
+            'transID':payment.payment_id
+            }
+        url = reverse('order_complete') + f'?order_number={data["order_number"]}&payment_id={data["transID"]}'
+        return redirect(url)
+    
 
-            #move cart items to order product table , 
-            cart_items = CartItem.objects.filter(user=request.user)
+    
 
-            for item in cart_items:
-                orderproduct = OrderProduct()
-                orderproduct.order_id = order.id
-                orderproduct.payment = payment
-                orderproduct.user_id = request.user.id
-                orderproduct.product_id = item.product_id
-                orderproduct.quantity = item.quantity
-                orderproduct.product_price = item.product.price
-                orderproduct.ordered = True
-                orderproduct.save()
+
+
             
-                cart_item = CartItem.objects.get(id=item.id)
-                product_variations = cart_item.variations.all()
-                orderproduct = OrderProduct.objects.get(id=orderproduct.id)
-                orderproduct.variations.set(product_variations)
-                orderproduct.save()
 
                 ##reduce product quantiry from product table
                 #product = Product.objects.get(id=item.product_id)
                 #product.stock -= item.quantity
                 #product.save()
             
-            # clear cart and send mail to customer 
-            CartItem.objects.filter(user=request.user).delete()
 
-            #conformation mail to user
-            send_mail("Order Confirmation:", f"Thank you for your order, Order confirmed with ORDER NO : {order.order_number}", settings.EMAIL_HOST_USER, [request.user.email], fail_silently=False)
-            data = {
-                'order_number': order.order_number,
-                'transID':payment.payment_id
-                }
-            url = reverse('order_complete') + f'?order_number={data["order_number"]}&payment_id={data["transID"]}'
-            return redirect(url)
             
-        return render(request,'orders/order_complete.html')
+        #return render(request,'orders/order_complete.html')
         
+
 
 
 
 @login_required
 def place_order(request,total=0,quantity=0):
-
     current_user = request.user
     cart_items = CartItem.objects.filter(user=current_user) 
     cart_count = cart_items.count()
@@ -104,7 +130,7 @@ def place_order(request,total=0,quantity=0):
     tax = 0
     shipping_fee = 0
     for cart_item in cart_items:
-        total += (cart_item.product.price * cart_item.quantity)
+        total += (cart_item.product.get_offer_price() * cart_item.quantity)
         quantity += cart_item.quantity
     tax = (2*total)/100
 
@@ -137,6 +163,7 @@ def place_order(request,total=0,quantity=0):
                 data.country = form.cleaned_data['country']
                 data.state = form.cleaned_data['state']
                 data.city = form.cleaned_data['city']
+                data.save()
                     # If the "save_address" checkbox is checked, save the address to the address book
                 if request.POST.get('save_address') == 'on':
                     address = AddressBook()
@@ -167,6 +194,7 @@ def place_order(request,total=0,quantity=0):
             data.country = address.country
             data.state = address.state
             data.city = address.city
+            data.save()
 
         if selected_address!='new_address':
             data.order_note = request.POST.get('order_note')    
@@ -192,26 +220,48 @@ def place_order(request,total=0,quantity=0):
         payment_method = request.POST.get('payment-method')  # Selected payment method
         request.session['payment_method'] = payment_method
         request.session['order_number'] = order_number
-
-        
-        
         order = Order.objects.get(user=current_user, is_ordered=False, order_number=order_number)
-        context = {
-            
-            'order': order,
-            'cart_item':cart_item,
-            'total':total,
-            'tax':tax,
-            'shipping_fee':shipping_fee,
-            'grand_total':grand_total,
-            'payment_method':payment_method
-        }
+
+        if payment_method == 'paypal':
+            host = request.get_host()
+            paypal_checkout = {
+                'business': settings.PAYPAL_RECEIVER_EMAIL,
+                'amount': order.order_total,
+                'item_name': cart_item ,
+                'currency_code': "INR",
+                'notify_url': request.build_absolute_uri(reverse('paypal-ipn')),
+                'return_url': request.build_absolute_uri(reverse('order_complete')),
+                'cancel_return': request.build_absolute_uri(reverse('payment_cancel')),
+            }
+            paypal_payment = PayPalPaymentsForm(initial=paypal_checkout)
+            context={
+                'paypal':paypal_payment,
+                'order': order,
+                'cart_item':cart_item,
+                'total':total,
+                'tax':tax,
+                'shipping_fee':shipping_fee,
+                'grand_total':grand_total,
+                'payment_method':payment_method
+            }
+        
+        else:
+            context = {
+                
+                'order': order,
+                'cart_item':cart_item,
+                'total':total,
+                'tax':tax,
+                'shipping_fee':shipping_fee,
+                'grand_total':grand_total,
+                'payment_method':payment_method
+            }
         return render(request, 'orders/payments.html', context)
 
 
     #return HttpResponse("An error occurred.")  # Default return statement
     
-
+@login_required(login_url='login')
 def order_complete(request,):
     order_number = request.session['order_number']
     transID  = request.GET.get('payment_id')
@@ -226,7 +276,7 @@ def order_complete(request,):
         tax=0
         payment = Payment.objects.get(payment_id = transID)
         for item in order_products:
-            item.total = item.quantity * item.product.price
+            item.total = item.quantity * item.product.product_price
             subtotal += item.total
 
         if subtotal>=1000:
@@ -270,3 +320,8 @@ def order_complete(request,):
     except (Payment.DoesNotExist,Order.DoesNotExist):
         return redirect('home')
 
+
+
+def payment_cancel(request):
+
+    return render(request,'orders/payment_cancel.html')

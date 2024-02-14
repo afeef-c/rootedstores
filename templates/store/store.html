@@ -406,8 +406,10 @@
 										</a>
 
 										<div class="single-product__floating-badges">
-											<span class="onsale">-10%</span>
-											<span class="hot">hot</span>
+											{% if p.get_offer_percent %}
+												<span class="onsale" > {{p.get_offer_percent|floatformat:"0"}}% </span>
+											{% endif %}
+											<!--<span class="hot">hot</span>-->
 										</div>
 
 										<div class="single-product__floating-icons">
@@ -441,9 +443,14 @@
 											<h3> <a href=""> {{ p.product_name }} </a></h3>
 											<a href="{{p.get_url}}">Select options</a>
 										</div>
+										
 										<div class="price">
-											<span class="main-price discounted">₹ {{p.old_price}} </span>
+											{% if p.get_offer_percent %}
+											<span class="main-price discounted">₹ {{p.price}} </span>
+											<span class="discounted-price">₹ {{p.get_offer_price|floatformat:"0"}} </span>
+											{% else %}
 											<span class="discounted-price">₹ {{p.price}} </span>
+											{% endif %}
 										</div>
 									</div>
 
@@ -459,8 +466,10 @@
 										</a>
 
 										<div class="single-product__floating-badges">
-											<span class="onsale">-10%</span>
-											<span class="hot">hot</span>
+											{% if p.discount > 0 %}
+												<span class="onsale"> {{p.discount}}% </span>
+											{% endif %}
+											<!--<span class="hot">hot</span>-->
 										</div>
 
 										<div class="single-product__floating-icons">
