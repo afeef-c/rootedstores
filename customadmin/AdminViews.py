@@ -356,3 +356,16 @@ class PaymentUpdate(SuccessMessageMixin, UpdateView):
     def get_success_message(self, cleaned_data):
         payment_id = self.object.id  # Access the payment's unique identifier
         return f"Payment {payment_id} updated successfully."
+    
+
+#============================================ Offers =======================================================================
+class CategoryOffers(ListView):
+    model = CategoryOffer
+    template_name = "customadmin/offers/category_offers.html"
+    context_object_name = "offers"
+
+class ProductOffers(ListView):
+    model = Offer
+    template_name = "customadmin/offers/product_offers.html"
+    context_object_name = "offers"
+

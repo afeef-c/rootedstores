@@ -423,6 +423,7 @@ def change_password(request):
 def order_detail(request, order_id):
     order_detail = OrderProduct.objects.filter(order__order_number=order_id)
     order = Order.objects.get(order_number=order_id)
+    payment = order.payment
     subtotal = 0
     tax=0
     shipping_fee=0
@@ -444,7 +445,8 @@ def order_detail(request, order_id):
         'shipping_fee':shipping_fee,
         'tax':tax,
         'shipping_fee':shipping_fee,
-        'grand_total':grand_total
+        'grand_total':grand_total,
+        'payment': payment
     }
 
     return render(request, 'accounts/order_detail.html',context)

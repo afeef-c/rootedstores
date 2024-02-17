@@ -59,7 +59,9 @@
 
 	<!-- paypal scripts -->
 	<!--<script src="https://www.paypal.com/sdk/js?client-id=ARLdfpzOqELoE5R215LgTNMzUJZChL30XTh_IUmUaAfuE0FdwNsj3FcWQUQzNOtfCAee4fsOqUUchHhz&currency=INR"></script>-->
-    
+	<!-- Razorpay -->
+	<!--<script src="https://checkout.razorpay.com/v1/checkout.js"></script>-->
+
 
 
 </head>
@@ -185,8 +187,13 @@
 	<!-- Main JS -->
 	<script src="{% static 'assets/js/main.js' %}"></script>
 
+
 	{% block js %}
 	{% endblock js %}	
+
+		<!-- Rayzor pay -->
+	<!--<script src="{% static 'js/chekout.js' %}"></script>-->
+
 </body>
 
 </html>

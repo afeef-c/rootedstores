@@ -29,6 +29,7 @@
 	<!--=======  End of breadcrumb area =======-->
 
 <div class="container">
+<form action="">
     <div class="row">
         
         <div class="col-12 col-md-7 col-lg-7 ">
@@ -43,12 +44,80 @@
                                 <h4><b>Billing Address</b></h4>
                             </div>
                             <div class="accordion-body collapse show" id="panel-body-1" data-parent="#accordion">
-                                <p>{{data.first_name}} {{data.last_name}} </p>
-                                <p>{{data.address_line_1}}</p>
+
+                                <div  class="row">
+
+                                    <div class="col-md-6 col-12 mb-20">
+                                        <label>First Name*</label>
+                                        <input type="text" placeholder="First Name" name="first_name" value="{{data.first_name}}" readonly>
+                                    </div>
+
+                                    <div class="col-md-6 col-12 mb-20">
+                                        <label>Last Name*</label>
+                                        <input type="text" placeholder="Last Name" name="last_name" value="{{data.last_name}}" readonly>
+                                    </div>
+
+                                    <div class="col-md-6 col-12 mb-20">
+                                        <label>Email Address*</label>
+                                        <input type="email" placeholder="Email Address" name="email" value="{{data.email}}" readonly>
+                                    </div>
+
+                                    <div class="col-md-6 col-12 mb-20">
+                                        <label>Phone no*</label>
+                                        <input type="text" placeholder="Phone number" name="phone" value="{{data.phone}}" readonly>
+                                    </div>
+
+                                    <!--<div class="col-12 mb-20">
+                                        <label>Company Name</label>
+                                        <input type="text" placeholder="Company Name">
+                                    </div>-->
+
+                                    <div class="col-12 mb-20">
+                                        <label>Address*</label>
+                                        <input type="text" placeholder="Address line 1" name="address_line_1" value="{{data.address_line_1}}" readonly>
+                                        <input type="text" placeholder="Address line 2" name="address_line_2" value="{{data.address_line_1}}" readonly>
+                                    </div>
+
+                                    <div class="col-md-6 col-12 mb-20">
+                                        <label>Country*</label>
+                                        <input type="text" name="country" value="{{data.country}}" readonly>
+                                    </div>
+
+                                    <div class="col-md-6 col-12 mb-20">
+                                        <label>Town/City*</label>
+                                        <input name="city" type="text" placeholder="Town/City"  value="{{data.country}}" readonly >
+                                    </div>
+
+                                    <div class="col-md-6 col-12 mb-20">
+                                        <label>State*</label>
+                                        <input name="state" type="text" placeholder="State" >
+                                    </div>
+
+                                    <div class="col-md-6 col-12 mb-20">
+                                        <label>pin Code*</label>
+                                        <input name="pin_code" type="text" placeholder="pin Code" >
+                                    </div>
+                                    <div class="col-12 mb-20">
+                                        <label>Order Note</label>
+                                        <input type="text" placeholder="Order note (optional)" name="order_note">
+                                        
+                                    </div>
+                                    <div class="col-12 mb-20">
+                                        <div class="check-box">
+                                            <input type="checkbox" id="save_address" name="save_address">
+                                            <label for="save_address">Save Address?</label>
+                                        </div>
+                                        
+                                    </div>
+
+                                </div>
+
+                                <p>  </p>
+                                <p></p>
                                 <p>{{data.address_line_1}}</p>
                                 <p>{{data.city}}</p>
                                 <p>{{data.state}}</p>
-                                <p>{{data.country}}</p>
+                                <p></p>
                                 {% if data.pin_code %}
                                 <p>PIN: {{data.pin_code}}</p>
                                 {% endif %}
@@ -172,9 +241,7 @@
                     <div class="payment-icon mb-60 d-flex justify-content-center">
                         <img src="/static/assets/images/icons/pay.png" class="img-fluid" alt="">
                     </div>
-                    {% if payment_method == 'razorpay' %}
-                     <form action="{% url 'rozer_payments' %}" method="POST">
-                        {% csrf_token %}
+                    
                         <div class="check-box d-flex justify-content-center">
                             <input type="checkbox" id="cod" name="cod" required>
                             <label for="cod">Confirm Payment</label>
@@ -183,32 +250,41 @@
                                     
                             <button type="submit" id="pay-btn" name="submit" class="lezada-button lezada-button--medium mt-30 payWithRazor">Pay with Razorpay</button>
                         </div>
-                     </form>
-                    {% else %}
-                        <form action="{% url 'payments' %}" method="POST">
-                            {% csrf_token %}
-                            <div class="check-box">
-                                <input type="checkbox" id="cod" name="cod" required>
-                                <label for="cod">Confirm COD</label>
-                            </div>
-                            <div class="d-flex justify-content-center">
-                                
-                                <button type="submit" name="submit" class="lezada-button lezada-button--medium mt-30 ">Confirm Checkout</button>
-                            </div>
-                        </form>
                         
-                    {% endif %}
-                                        
+                                                                    
                 </div>
 
             </div>
         </div>
 
     </div>
+
+</form>
+
 </div>
     
 
 
+{% if rozer_order_id %}
+<form action="success" method="POST">
+
+    <script src="https://checkout.razorpay.com/v1/checkout.js"
+        data-key =  "{{razorpay_key}}"
+        data-amount="{{ amount }}"
+        data-currency="INR"
+        data-name="{{name}}"
+        data-description="Test Transaction"
+        data-image="{% static 'images/root_logo.png' %}"
+        data-order_id="{{ rozer_order_id }}"
+        data-prefill.name="Afeef"
+        data-prefill.email="rooted.stores@example.com",
+        data-prefill.contact="9999999999"
+        data-theme-color="#F37254"
+    
+    ></script>
+    <input type="hidden" custom="Hidden Element" name="hidden">
+</form>
+{% endif %}
 
 {% endblock content %}
 

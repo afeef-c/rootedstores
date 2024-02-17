@@ -46,7 +46,8 @@ INSTALLED_APPS = [
     
     'customadmin',
     #paypal integration
-    'paypal.standard.ipn'
+    #'paypal.standard.ipn',
+
 
 ]
 
@@ -64,6 +65,10 @@ MIDDLEWARE = [
     #restrict blocked user
     #'yourapp.middleware.BlockedUserMiddleware',
     'rooted.middleware.BlockedUserMiddleware',
+
+
+     'corsheaders.middleware.CorsMiddleware', 
+    
 ]
 
 ROOT_URLCONF = 'rooted.urls'
@@ -129,7 +134,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Kolkata'
 
 USE_I18N = True
 
@@ -161,6 +166,7 @@ MESSAGE_TAGS = {
     messages.ERROR: 'danger',
 }
 
+
 #ACCOUNT_SID='AC0722d83bf85ed2310a99c6a179b132b1'
 #AUTH_TOKEN='ae919a604c2e32f27f139e368656e671'
 #COUNTRY_CODE='+91'
@@ -181,11 +187,13 @@ EMAIL_USE_SSL = False
 
 
 
-#paypal
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+#PAYPAL_RECEIVER_EMAIL = 'rootedstores@gmail.com'
+#PAYPAL_TEST = True
 
-PAYPAL_RECEIVER_EMAIL = 'rootedstores@gmail.com'
+RAZOR_KEY_ID = 'rzp_test_VlrhibhaWWTpKb'
+RAZOR_KEY_SECRET = 'bSbPSE4eWm0lZdf6PgsijdEW'
 
-PAYPAL_TEST = True
-PAYPAL_CLIENT_ID = 'ARLdfpzOqELoE5R215LgTNMzUJZChL30XTh_IUmUaAfuE0FdwNsj3FcWQUQzNOtfCAee4fsOqUUchHhz'
-PAYPAL_SECRET_KEY = 'EHYhYLHGLC8SK4Fq4Ogr_SMznypA_CtuuvtVvA3T8OgRpW7mHS390zeJeiJoqUONt_udKiqB12EXHKng'
+# To Enable Popus in Django or else it will block the payment popup
+SECURE_CROSS_ORIGIN_OPENER_POLICY = "same-origin-allow-popups"
+
+CORS_ORIGIN_ALLOW_ALL = True  

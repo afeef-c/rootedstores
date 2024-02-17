@@ -181,7 +181,7 @@ def cart(request, total=0, quantity=0, cart_item=None):
     return render(request, 'cart/cart.html', context)
 
 @login_required(login_url='login')
-def checkout(request,total=0, quantity=0, cart_item=None):
+def placeorder(request,total=0, quantity=0, cart_item=None):
     grand_total = 0
     tax = 0
     variations = {}
@@ -228,4 +228,4 @@ def checkout(request,total=0, quantity=0, cart_item=None):
         'address':address,
     }
 
-    return render(request, 'orders/checkout.html', context)
+    return render(request, 'orders/placeorder.html', context)

@@ -11,8 +11,8 @@
         <ul class="navbar-nav navbar-right">
           
           <li class="dropdown"><a href="#" data-toggle="dropdown" class="nav-link dropdown-toggle nav-link-lg nav-link-user">
-            <img alt="image" src="{{user.profile_pic.url}}" class="rounded-circle mr-1">
-            <div class="d-sm-none d-lg-inline-block">Hi, {{ user.username }} </div></a>
+            <img alt="image" src="{{user.userprofile.profile_pic.url}}" class="rounded-circle mr-1">
+            <div class="d-sm-none d-lg-inline-block"> {{ user.username }} </div></a>
             <div class="dropdown-menu dropdown-menu-right">
               <div class="dropdown-title">Logged in 5 min ago</div>
               <a href="features-profile.html" class="dropdown-item has-icon">
@@ -112,8 +112,21 @@
               </ul>
             </li>
             
+            <!--  offers -->
             
-            
+            {% url 'category_offers' as category_offers %}
+            {% url 'product_offers' as product_offers %}
+            {% url 'payment_list' as payment_list %}
+            {% url 'payment_update' as payment_update %}
+            <li class="dropdown {% if request.path == category_offers %} active {% endif %}{% if request.path == product_offers %} active {% endif %} {% if request.path == payment_list %} active {% endif %} {% if request.path == payment_update %} active {% endif %}">
+              <a href="#" class="nav-link has-dropdown"><i class="fas fa-bicycle"></i><span>Offers</span></a>
+              <ul class="dropdown-menu">
+                <li class="{% if request.path == category_offers %} active {% endif %} {% if request.path == order_update %} active {% endif %}"><a class="nav-link" href=" {% url 'category_offers' %} "> Category Offers </a></li>
+              </ul>
+              <ul class="dropdown-menu">
+                <li class="{% if request.path == product_offers %} active {% endif %} {% if request.path == payment_update %} active {% endif %}"><a class="nav-link" href=" {% url 'product_offers' %} "> Product Offers </a></li>
+              </ul>
+            </li>
           </ul>
 
           <div class="mt-4 mb-4 p-3 hide-sidebar-mini">

@@ -11,14 +11,14 @@
 		<div class="container">
 			<div class="row">
 				<div class="col-lg-12">
-					<h1 class="breadcrumb-title">Checkout</h1>
+					<h1 class="breadcrumb-title">Place Order</h1>
 
 					<!--=======  breadcrumb list  =======-->
 
 					<ul class="breadcrumb-list">
 						<li class="breadcrumb-list__item"><a href="{% url 'home'}">HOME</a></li>
 						<li class="breadcrumb-list__item"><a href="{% url 'cart' %}">cart</a></li>
-						<li class="breadcrumb-list__item breadcrumb-list__item--active">checkout</li>
+						<li class="breadcrumb-list__item breadcrumb-list__item--active">Place Order</li>
 					</ul>
 
 					<!--=======  End of breadcrumb list  =======-->
@@ -54,7 +54,7 @@
 													<div class="card-header">
 														<div class="single-method">
 															<input type="radio" id="{{i.id}}" name="address_method" value="{{i.id}}" required>
-															<label for="{{i.id}}">Select</label>
+															<label for="{{i.id}}">Delever Here</label>
 															<p data-method="{i.id}">To ship to this address, please select it!</p>
 														</div>
 														<h4>{{i.full_name}}</h4>
@@ -241,13 +241,13 @@
 												<div class="single-method">
 													<input type="radio" id="payment_cash" name="payment-method" value="cash" required>
 													<label for="payment_cash">Cash on Delivery</label>
-													<p data-method="cash">Currently, the only acceptable payment method is PayPal and Cash on Delivered. Please cooperate with us.</p>
+													<p data-method="cash">Currently, the only acceptable payment method is RazorPay and Cash on Delivered. Please cooperate with us.</p>
 												</div>
 
 												<div class="single-method">
-													<input type="radio" id="payment_paypal" name="payment-method" value="paypal" required>
-													<label for="payment_paypal">Paypal</label>
-													<p data-method="paypal">Currently, the only acceptable payment method is PayPal and Cash on Delivered. Please cooperate with us.</p>
+													<input type="radio" id="payment_razorpay" name="payment-method" value="razorpay" required>
+													<label for="payment_razorpay">RazorPay</label>
+													<p data-method="paypal">Currently, the only acceptable payment method is RazorPay and Cash on Delivered. Please cooperate with us.</p>
 												</div>
 
 												
@@ -263,7 +263,15 @@
 
 									
 									</div>
-									<button type="submit" name="submit" class="lezada-button lezada-button--medium mt-30">Place order</button>
+									<div class="container">
+										<div class="row justify-content-center">
+											<div class="col-12 col-md-6">
+												<button type="submit" name="submit" class="lezada-button lezada-button--medium mt-30 btn btn-primary btn-block">Confirm order</button>
+											</div>
+										</div>
+									</div>
+
+									
 								</div>
 								
 							</div>
@@ -277,12 +285,6 @@
 	</div>
 
 	<!--=====  End of checkout page content  ======-->
-
-
-
-
-
-
 
 {% endblock %}
 

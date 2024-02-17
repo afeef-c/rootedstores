@@ -42,6 +42,11 @@ urlpatterns = [
     path('payment_list/', AdminViews.PaymentListView.as_view(), name='payment_list'),
     path('payment_update/<slug:pk>', AdminViews.PaymentUpdate.as_view(), name='payment_update'),
 
+    #offers
+    path('category_offers/', AdminViews.CategoryOffers.as_view(), name='category_offers'),
+    path('product_offers/', AdminViews.ProductOffers.as_view(), name='product_offers'),
+
+
 ]   
 
 
