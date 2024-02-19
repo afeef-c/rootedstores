@@ -1,9 +1,10 @@
+from django.conf import settings
 from django.http.response import HttpResponse
 from django.shortcuts import redirect, render
 from django.contrib.auth.decorators import login_required
 from django.views.generic import ListView,CreateView,UpdateView,DetailView,DeleteView
 from accounts.models import *
-from orders.models import Order, Payment
+from orders.models import Order, OrderProduct, Payment
 from store.models import *
 from category.models import Category
 from django.contrib.messages.views import SuccessMessageMixin
@@ -14,6 +15,12 @@ from django.http import HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.http import Http404
+from django.core.mail import send_mail
+import logging
+
+
+#============================Home =======================================================================
+
 
 @login_required(login_url='admin_login')
 def admin_home(request):
@@ -22,25 +29,42 @@ def admin_home(request):
     completed_orders = Order.objects.filter(status='Completed')
     confimed_orders = Order.objects.filter(status='Confirmed')
     delivered_orders = Order.objects.filter(status='Delivered')
-    
+    sales_count = OrderProduct.objects.all().count()
 
+#-----------------------------------------------------
+    total_revenue = 0
+    payment = Payment.objects.filter(status='SUCCESS')
+    for i in payment:
+        total_revenue += float(i.amount_paid) 
+#-----------------------------------------------------
+    orders = Order.objects.all()
+
+
+#-----------------------------------------------------
     context ={
         'user': request.user,
         'orders_count':orders_count,
         'completed_orders':completed_orders,
         'confimed_orders':confimed_orders,
         'delivered_orders':delivered_orders,
+        'sales_count':sales_count,
+        'total_revenue':int(total_revenue),
+        'orders':orders,
 
     }
 
     return render(request,'customadmin/admin_home.html', context)
+
+
+
+
 #============================Categories =======================================================================
 
 class CategoriesListView(ListView):
     model = Category
     template_name = "customadmin/categories/category_list.html"
     context_object_name = "categories"
-
+@method_decorator(login_required, name='dispatch')
 class CategoriesCreate(SuccessMessageMixin, CreateView):
     model = Category
     success_message = "New category added!"
@@ -255,14 +279,6 @@ class VariationCreateView(SuccessMessageMixin, CreateView):
         form.fields['product'].queryset = Product.objects.all().order_by('product_name')
         return form
 
-    #def form_valid(self, form):
-    #    # Handle the creation of associated ProductImages
-    #    images = self.request.FILES.getlist('images')
-    #    for image in images:
-    #        product_image = ProductImages(images=image, product=self.object)
-    #        product_image.save()
-
-    #    return super().form_valid(form)
 
     def get_success_message(self, cleaned_data):
         return f"Variattion created successfully."
@@ -320,11 +336,35 @@ class OrderUpdate(SuccessMessageMixin, UpdateView):
     success_message = "The order status updated!"
     success_url = reverse_lazy('orders_list') 
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        order = self.get_object()
+        # Assuming there can be multiple orders associated with a payment
+        orders_emails = order.email 
+        context['orders_emails'] = orders_emails
+        return context
+
+    
+    
     def form_valid(self, form):
+        # Call the parent class's form_valid method
+        response = super().form_valid(form)
 
-        responce = super().form_valid(form)
+        # Check if there's an update in order status
+        if form.has_changed() and 'status' in form.changed_data:
+            # Get the updated payment object
+            order = self.object
+            customer_email = order.email
+            # Compose the email message
+            subject = 'Order Status Update'
+            message = f'Your Order status has been updated to: {order.status}'
+            sender_email = settings.DEFAULT_FROM_EMAIL
+            recipient_list = [order.email]
+            # Send the email
+            send_mail(subject, message, sender_email, recipient_list)
 
-        return responce
+        return response
+    
 
     def get_success_message(self, cleaned_data):
         order_number = cleaned_data.get('order_number')  # Assuming 'order_number' is a field of the form
@@ -347,11 +387,34 @@ class PaymentUpdate(SuccessMessageMixin, UpdateView):
     success_message = "The order updated!"
     success_url = reverse_lazy('payment_list') 
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        payment = self.get_object()
+        # Assuming there can be multiple orders associated with a payment
+        orders_emails = [order.email for order in payment.order_set.all()]
+        context['orders_emails'] = orders_emails
+        return context
+
     def form_valid(self, form):
+        # Call the parent class's form_valid method
+        response = super().form_valid(form)
 
-        responce = super().form_valid(form)
+        # Check if there's an update in payment status
+        if form.has_changed() and 'status' in form.changed_data:
+            # Get the updated payment object
+            payment = self.object
+            # Access the related customer's email (assuming Payment model has a foreign key to Customer)
+            customer_email = [order.email for order in payment.order_set.all()]
+            # Compose the email message
+            subject = 'Payment Status Update'
+            message = f'Your payment status has been updated to: {payment.status}'
+            sender_email = settings.DEFAULT_FROM_EMAIL
+            recipient_list = [order.email for order in payment.order_set.all()]
+            # Send the email
+            send_mail(subject, message, sender_email, recipient_list)
 
-        return responce
+        return response
+
     
     def get_success_message(self, cleaned_data):
         payment_id = self.object.id  # Access the payment's unique identifier
@@ -369,3 +432,132 @@ class ProductOffers(ListView):
     template_name = "customadmin/offers/product_offers.html"
     context_object_name = "offers"
 
+
+@method_decorator(login_required, name='dispatch')
+class CategoryOffersUpdate(SuccessMessageMixin, UpdateView):
+    model = CategoryOffer
+    template_name = "customadmin/offers/category_offers_update.html"
+    fields = '__all__'
+    success_message = "The Offers status updated!"
+    success_url = reverse_lazy('category_offers') 
+
+    def form_valid(self, form):
+            start_date = form.cleaned_data.get('start_date')
+            end_date = form.cleaned_data.get('end_date')
+
+            if start_date > end_date:
+                messages.error(self.request, "Start date cannot be greater than end date.")
+                return self.form_invalid(form)  # Return form invalid if start date is greater than end date
+            
+            return super().form_valid(form)
+    
+    def get_success_message(self, cleaned_data):
+        name = cleaned_data.get('product')  # Assuming 'order_number' is a field of the form
+        
+        return f"Product:{name} offer  updated successfully."
+    
+@method_decorator(login_required, name='dispatch')
+class OrderUpdate(SuccessMessageMixin, UpdateView):
+    model = Order
+    template_name = "customadmin/orders/order_update.html"
+    fields = '__all__'
+    success_message = "The order status updated!"
+    success_url = reverse_lazy('orders_list') 
+
+    def form_valid(self, form):
+
+        responce = super().form_valid(form)
+
+        return responce
+
+    def get_success_message(self, cleaned_data):
+        order_number = cleaned_data.get('order_number')  # Assuming 'order_number' is a field of the form
+        name = cleaned_data.get('full_name')  # Assuming 'name' is a field of the form
+        return f"Order: {name}-{order_number} updated successfully."
+
+
+@method_decorator(login_required, name='dispatch')
+class ProductOffersUpdate(SuccessMessageMixin, UpdateView):
+    model = Offer
+    template_name = "customadmin/offers/product_offers_update.html"
+    fields = '__all__'
+    success_message = "The Offers status updated!"
+    success_url = reverse_lazy('product_offers') 
+
+    def form_valid(self, form):
+        start_date = form.cleaned_data.get('start_date')  # Assuming start_date is a field in your form
+        end_date = form.cleaned_data.get('end_date')  # Assuming end_date is a field in your form
+
+        if self.start_date > self.end_date:
+            messages.error(self.request, "Start date cannot be greater than end date.")
+            return redirect('product_offers')  # Redirect to a different page or adjust as needed
+  
+        
+        response = super().form_valid(form)
+        return response
+
+
+@method_decorator(login_required, name='dispatch')
+class ProductOfferCreateView(SuccessMessageMixin, CreateView):
+    model = Offer
+    success_message = "New product offer added!"
+    fields = "__all__"
+    template_name = "customadmin/offers/add_product_offers.html"
+    success_url = reverse_lazy('product_offers') 
+
+    def form_valid(self, form):
+        
+        #category_id = form.cleaned_data.get('category').id
+        #product_id = form.cleaned_data.get('product').id
+        start_date = form.cleaned_data.get('start_date')  # Assuming start_date is a field in your form
+        end_date = form.cleaned_data.get('end_date')  # Assuming end_date is a field in your form
+
+
+        if start_date > end_date:
+            messages.error(self.request, "Start date cannot be greater than end date.")
+            return redirect('product_offers')  # Redirect to a different page or adjust as needed
+
+        
+        return super().form_valid(form)
+
+@method_decorator(login_required, name='dispatch')
+class CategoryOfferCreateView(SuccessMessageMixin, CreateView):
+    model = CategoryOffer
+    success_message = "New category offer added!"
+    fields = "__all__"
+    template_name = "customadmin/offers/add_category_offers.html"
+    success_url = reverse_lazy('category_offers') 
+
+    def form_valid(self, form):
+        start_date = form.cleaned_data.get('start_date')
+        end_date = form.cleaned_data.get('end_date')
+
+        if start_date > end_date:
+            messages.error(self.request, "Start date cannot be greater than end date.")
+            return redirect('category_offers')  # Redirect to a different page or adjust as needed
+
+        category_id = form.cleaned_data.get('category').id
+        existing_offer = CategoryOffer.objects.filter(category_id=category_id).exists()
+
+        if existing_offer:
+            messages.error(self.request, "An offer already exists for this category.")
+            return redirect('category_offers')  # Redirect to a different page or adjust as needed
+        
+        return super().form_valid(form)
+
+    def save(self, *args, **kwargs):
+        # Ensure discount_percentage is within certain limits
+        max_discount_percentage = 90  # Example: Maximum allowed discount percentage
+        min_discount_percentage = 0   # Example: Minimum allowed discount percentage
+        if self.discount_percentage > max_discount_percentage:
+            self.discount_percentage = max_discount_percentage
+        elif self.discount_percentage < min_discount_percentage:
+            self.discount_percentage = min_discount_percentage
+        
+        # Check if the end_date is greater than the start_date
+        if self.end_date <= self.start_date:
+            raise ValidationError("End date must be after start date")
+
+        # Your existing save logic...
+        
+        super().save(*args, **kwargs)

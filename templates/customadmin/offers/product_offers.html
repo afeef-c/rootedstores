@@ -20,7 +20,7 @@ Product Offers
 
     <div class="card col-lg-12">
         <div class="card-header">
-            <h4>Product Offers</h4>
+            <h4>Product Offers </h4>
         <div class="card-header-form">
             <!--<form action="{% url 'search' %}" method="GET" >-->
             <!--<div class="input-group">
@@ -36,6 +36,7 @@ Product Offers
                     <button type="submit"><i class="ion-android-search"></i></button>
                 </form>
             </div>-->
+            <a href="{% url 'add_product_offers' %}" class="btn btn-primary mt-4">Add New Offer</a>
         </div>
         </div>
         
@@ -55,20 +56,46 @@ Product Offers
                 {% for offer in offers %}
                 <tr>
                     <td> {{offer.product}} </td>
-                    <td> {{offer.discount_percentage}} </td>
+                    <td> {{offer.discount_percentage|floatformat:"1"}} % </td>
                     <td> {{offer.start_date}} </td>
                     <td>{{offer.end_date}} </td>
                     <td>
-                        {% if offer.end_date > timezone.now and offer.start_date < timezone.now %}
+                        <!-- Not working well fix it before -->
+                        <!--{% now "M. d, Y, g:i a" as current_time %}
+                        {% if offer.end_date < current_time and offer.start_date > current_time %}
                             <div class="badge badge-success">Active</div>
-                        {% elif offer.end_date > timezone.now and offer.start_date > timezone.now %}
+                        {% elif offer.end_date > current_time and offer.start_date > current_time %}
                             <div class="badge badge-secondary">Upcoming</div>
                         {% else %}
                             <div class="badge badge-danger"> Not Active</div>
+                        {% endif %}-->
+                        {% if offer.is_upcoming %}
+                        
+                        <div class="badge badge-secondary">Upcoming</div><br>
+                        {% elif offer.is_expired %}
+                        <div class="badge badge-warning">Expired</div><br>
+                        {% else %}
+                            
+                            {% with time_remaining=offer.time_remaining %}
+                            <div class="badge badge-success">Active</div><br>
+                                <p class="d-inline">
+                                    {% if time_remaining.days > 0 %} 
+                                    {{ time_remaining.days }} days:
+                                    {{ time_remaining.hours }} hrs
+                                    {% elif time_remaining.hours > 0 %} 
+                                    {{ time_remaining.hours }}. 
+                                    {{ time_remaining.minutes }}hrs
+                                    {% else %}
+                                    {{ time_remaining.minutes }}. 
+                                    {{ time_remaining.seconds }} min
+                                    {% endif %}
+                                </p>
+                            {% endwith %}
                         {% endif %}
+
                     </td>
                     
-                    <td><a href="" class="btn btn-warning">Update</a></td>
+                    <td><a href="{% url 'product_offers_update' offer.id %}" class="btn btn-warning">Update</a></td>
                 </tr>
                 {% endfor %}
                 

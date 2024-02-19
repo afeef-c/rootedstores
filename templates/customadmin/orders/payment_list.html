@@ -39,7 +39,7 @@ Payment details
                 <tbody>
                 <tr>
                     <th>TransID </th>
-                    <th>User Name</th>
+                    <th>Billing Name</th>
                     <th>Method</th>
                     <th>Total</th>
                     <th>Status</th>
@@ -48,14 +48,19 @@ Payment details
                 </tr>
                 {% for payment in payments %}
                 <tr>
-                    <td> {{payment.payment_id}} </td>
-                    <td> {{payment.user}} </td>
+                    <td> {{payment.payment_id|slice:5}}... </td>
+                    <td> {{payment.order_set.first.full_name}} </td>
                     <td>
                         {{payment.payment_method}}
                     </td>
-                    <td>₹ {{payment.amount_paid}} </td>
+                    <td>₹ {{payment.amount_paid|floatformat:"2"}} </td>
                     <!--<td> {{payment.created_at|date:"F j, Y" }} </td>-->
-                    <td> {{payment.status}} </td>
+                    <td> 
+                        {% if payment.status == 'SUCCESS' %}<span class="badge badge-success">SUCCESS</span>{% endif %}
+                        {% if payment.status == 'REFUND' %} <span class="badge badge-secondary">REFUND</span>{% endif %}
+                        {% if payment.status == 'PENDING' %} <span class="badge badge-primary">PENDING</span>{% endif %}
+                        {% if payment.status == 'FAILURE' %} <span class="badge badge-danger">FAILURE</span>{% endif %}
+                    </td>
                     <td><a href="{% url 'payment_update' payment.id %}" class="btn btn-warning">Update</a></td>
                 </tr>
                 {% endfor %}

@@ -1,5 +1,6 @@
 import datetime
 import json
+import os
 import random
 from django.shortcuts import redirect, render
 from django.urls import reverse
@@ -27,6 +28,10 @@ from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 import razorpay
 
+#from weasyprint import HTML
+import pdfkit
+
+
 # Create your views here.
 
 client = razorpay.Client(auth=(settings.RAZOR_KEY_ID, settings.RAZOR_KEY_SECRET))
@@ -47,7 +52,7 @@ def place_order(request, total=0, quantity=0):
     tax = 0
     shipping_fee = 0
     for cart_item in cart_items:
-        total += (cart_item.product.price * cart_item.quantity)
+        total += (float(cart_item.product.get_offer_price()) * cart_item.quantity)
         quantity += cart_item.quantity
     tax = (2 * total) / 100
 
@@ -131,7 +136,7 @@ def place_order(request, total=0, quantity=0):
 
         payment_method = request.POST.get('payment-method')
         request.session['payment_method'] = payment_method
-        request.session['amount'] = total
+        request.session['amount'] = grand_total
         request.session['order_number'] = order_number
 
         context = {
@@ -236,7 +241,7 @@ def rozer_payments(request):
 
     if request.method == "POST":
         name = order.full_name
-        amount = order.order_total
+        amount = int(order.order_total)
         client = razorpay.Client(auth=(settings.RAZOR_KEY_ID, settings.RAZOR_KEY_SECRET))
         
         rozer_order_id = initiate_payment(amount)
@@ -307,8 +312,8 @@ def callback(request):
             send_mail("Order Confirmation:", f"Thank you for your order, Order confirmed with ORDER NO : {order.order_number}", settings.EMAIL_HOST_USER, [order.user.email], fail_silently=False)
 
             # Redirect to order completion page
-            data = {'order_number': order.order_number, 'transID': payment.payment_id}
-            url = reverse('order_complete') + f'?order_number={data["order_number"]}&payment_id={data["transID"]}'
+            data = {'order_number': order.order_number, 'transID': payment.payment_id, 'user':order.user}
+            url = reverse('order_complete') + f'?order_number={data["order_number"]}&payment_id={data["transID"]}&user={data["user"]}'
             return redirect(url)
 
             
@@ -316,97 +321,115 @@ def callback(request):
             return render(request, "orders/payment_failure.html", context={"status": order.status})
     else:
         return HttpResponseBadRequest("Invalid request")    #else:
-    #    payment_id = json.loads(request.POST.get("error[metadata]")).get("payment_id")
-    #    provider_order_id = json.loads(request.POST.get("error[metadata]")).get(
-    #        "order_id"
-    #    )
-    #    order = Order.objects.get(provider_order_id=provider_order_id)
-    #    order.payment_id = payment_id
-    #    order.status = 'Cancelled'
-    #    order.save()
-    #    return render(request, 'orders/order_complete.html')
 
 
-
-#@login_required
-#def razorpaycheck(request):
-#    cart_items = CartItem.objects.filter(user = request.user)
-#    total_price = 0
-#    for item in cart_items:
-#        total_price  += (item.product.price * item.quantity)
-
-#    return JsonResponse({
-#        'total_price': total_price
-#    })
-
-def success(request):
-    if request.method == 'POST':
-        a = request.POST
-        print(a)
-
-    return(request, 'orders/order_complete.html')
 
 def order_complete(request,):
-    order_number = request.session['order_number']
-    transID  = request.GET.get('payment_id')
     
+    order_number = request.GET.get('order_number')
+    transID  = request.GET.get('payment_id')
+    user = request.GET.get('user')
             
-    try:
+    if request.user:
+        print(order_number)
+    
         order = Order.objects.get(user=request.user, order_number=order_number, is_ordered=True)
-        order_products = OrderProduct.objects.filter(order_id=order.id)
-        order_products = OrderProduct.objects.filter(order=order)  # Assuming 'order' is the Order instance you want to fetch products for
-        order.status = 'Completed'
-        subtotal = 0
+    else:
+        order = Order.objects.get(user=user, order_number=order_number, is_ordered=True)
+    order_products = OrderProduct.objects.filter(order_id=order.id)
+    order_products = OrderProduct.objects.filter(order=order)  # Assuming 'order' is the Order instance you want to fetch products for
+    order.status = 'Completed'
+    subtotal = 0
+    shipping_fee = 100
+    tax=0
+    payment = Payment.objects.get(payment_id = transID)
+    for item in order_products:
+        item.total = item.quantity * item.product_price
+        subtotal += item.total
+
+    if subtotal>=1000:
+        shipping_fee = 0
+    else:
         shipping_fee = 100
-        tax=0
-        payment = Payment.objects.get(payment_id = transID)
-        for item in order_products:
-            item.total = item.quantity * item.product_price
-            subtotal += item.total
-
-        if subtotal>=1000:
-            shipping_fee = 0
-        else:
-            shipping_fee = 100
-        tax = (2 * subtotal) / 100
-        grand_total = subtotal + tax +shipping_fee
+    tax = (2 * subtotal) / 100
+    grand_total = round(subtotal + tax +shipping_fee, 2)
 
 
 
 
-        context = {
-            'order':order,
-            'payment':payment,
-            'order_number':order.order_number,
-            'payment_id': payment.payment_id,
-            'order_products':order_products, 
-            'subtotal':subtotal,
-            'grand_total':grand_total,
-            'tax':tax,
-            'shipping_fee':shipping_fee
-        }
+    context = {
+        'order':order,
+        'payment':payment,
+        'order_number':order.order_number,
+        'payment_id': payment.payment_id,
+        'order_products':order_products, 
+        'subtotal':subtotal,
+        'grand_total':grand_total,
+        'tax':tax,
+        'shipping_fee':shipping_fee
+    }
 
-        html_content = render_to_string('orders/order_complete.html',context)
+    html_content = render_to_string('orders/order_complete.html',context)
 
-        # Create an EmailMultiAlternatives object
-        email = EmailMultiAlternatives(
-            subject="Order Confirmation",
-            body=strip_tags(html_content),  # Use plain text version of HTML content as the email body
-            from_email=settings.EMAIL_HOST_USER,
-            to=[request.user.email],
-        )
+    # Create an EmailMultiAlternatives object
+    email = EmailMultiAlternatives(
+        subject="Order Confirmation",
+        body=strip_tags(html_content),  # Use plain text version of HTML content as the email body
+        from_email=settings.EMAIL_HOST_USER,
+        to=[request.user.email],
+    )
 
-        # Attach the HTML content as an alternative
-        email.attach_alternative(html_content, "text/html")
+    # Attach the HTML content as an alternative
+    email.attach_alternative(html_content, "text/html")
 
-        # Send the email
-        email.send(fail_silently=False)
-        return render(request,'orders/order_complete.html',context)
-    except (Payment.DoesNotExist,Order.DoesNotExist):
-        return redirect('home')
+    # Send the email
+    email.send(fail_silently=False)
+    return render(request,'orders/order_complete.html',context)
 
 
 
 def payment_cancel(request):
 
     return render(request,'orders/payment_cancel.html')
+
+
+
+def download_invoice(request):
+    # Retrieve parameters from request.GET
+    order_number = request.GET.get('order_number')
+    payment_id = request.GET.get('payment_id')
+    order_products = request.GET.get('order_products')
+    subtotal = request.GET.get('subtotal')
+    grand_total = request.GET.get('grand_total')
+    tax = request.GET.get('tax')
+    shipping_fee = request.GET.get('shipping_fee')
+
+    # Render HTML template with context data
+    context = {
+        'order_number': order_number,
+        'payment_id': payment_id,
+        'order_products': order_products,
+        'subtotal': subtotal,
+        'grand_total': grand_total,
+        'tax': tax,
+        'shipping_fee': shipping_fee
+        # Add other context data as needed
+    }
+    html_content = render_to_string('invoice_template.html', context)
+
+    # Generate PDF from HTML content using pdfkit
+    pdf_file_path = f'invoice_{order_number}.pdf'
+    pdfkit.from_string(html_content, pdf_file_path)
+
+    # Read the generated PDF file
+    with open(pdf_file_path, 'rb') as f:
+        pdf_file = f.read()
+
+    # Create a response with the PDF file as a file attachment
+    response = HttpResponse(pdf_file, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="{pdf_file_path}"'
+
+    # Delete the temporary PDF file
+    os.remove(pdf_file_path)
+
+    return response

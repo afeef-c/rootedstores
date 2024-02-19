@@ -1,4 +1,8 @@
-from datetime import datetime
+from datetime import datetime, timedelta
+from django.forms import ValidationError
+from django.shortcuts import get_object_or_404
+from django.utils import timezone
+
 from django.db import models
 from django.dispatch import receiver
 from django.urls import reverse
@@ -58,15 +62,15 @@ class Product(models.Model):
         if category_offer and offer:
             discount = category_offer.discount_percentage+offer.discount_percentage
             discounted_price = self.price - (self.price * discount / 100)
-            return discounted_price
+            return round(discounted_price,2)
         elif offer and not category_offer:
             discount = offer.discount_percentage
             discounted_price = self.price - (self.price * discount / 100)
-            return discounted_price
+            return round(discounted_price,2)
         elif category_offer and not offer:
             discount = category_offer.discount_percentage
             discounted_price = self.price - (self.price * discount / 100)
-            return discounted_price
+            return round(discounted_price,2)
         
         return self.price
 
@@ -134,11 +138,53 @@ class Offer(models.Model):
     start_date = models.DateTimeField()
     end_date = models.DateTimeField()
 
-    def is_valid(self):
-        now = datetime.now()
+    def is_upcoming(self):
+        now = timezone.now()
+        return self.start_date > now
+    
+    def is_active(self):
+        now = timezone.now()
         return self.start_date <= now <= self.end_date
+    
+    def is_expired(self):
+        now = timezone.now()
+        return now > self.end_date
 
+    def time_remaining(self):
+        now = timezone.now()
+        if self.is_active():
+            time_difference = self.end_date - now
+            total_seconds = int(time_difference.total_seconds())
+            days, remainder = divmod(total_seconds, 86400)
+            hours, remainder = divmod(remainder, 3600)
+            minutes, seconds = divmod(remainder, 60)
+            return {'days': days, 'hours': hours, 'minutes': minutes, 'seconds': seconds}
+        else:
+            return {'days': 0, 'hours': 0, 'minutes': 0, 'seconds': 0}
+    
+    def save(self, *args, **kwargs):
+        # Ensure discount_percentage is within certain limits
+        max_discount_percentage = 90  # Example: Maximum allowed discount percentage
+        min_discount_percentage = 0   # Example: Minimum allowed discount percentage
+        if self.discount_percentage > max_discount_percentage:
+            self.discount_percentage = max_discount_percentage
+        elif self.discount_percentage < min_discount_percentage:
+            self.discount_percentage = min_discount_percentage
+        
+        # Check if the product has more than 95% discount and add a separate offer
+        if self.discount_percentage > 95:
+            # Create a new offer with the same product but with a capped discount percentage
+            Offer.objects.create(
+                product=self.product,
+                discount_percentage=max_discount_percentage,  # Cap the discount percentage
+                start_date=self.start_date,
+                end_date=self.end_date
+            )
+        # # Check if end_date is greater than start_date
+        #if self.end_date <= self.start_date:
+        #    raise ValidationError("End date must be after start date")
 
+        super().save(*args, **kwargs)
 #class ProductOffer(models.Model):
 #    product = models.ForeignKey(Product, on_delete=models.CASCADE)
 #    discount_percentage = models.DecimalField(max_digits=5, decimal_places=2)

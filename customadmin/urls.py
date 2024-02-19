@@ -45,8 +45,10 @@ urlpatterns = [
     #offers
     path('category_offers/', AdminViews.CategoryOffers.as_view(), name='category_offers'),
     path('product_offers/', AdminViews.ProductOffers.as_view(), name='product_offers'),
-
-
+    path('category_offers_update/<slug:pk>', AdminViews.CategoryOffersUpdate.as_view(), name='category_offers_update'),
+    path('product_offers_update/<slug:pk>', AdminViews.ProductOffersUpdate.as_view(), name='product_offers_update'),
+    path('add_product_offers/', AdminViews.ProductOfferCreateView.as_view(), name='add_product_offers'),
+    path('add_category_offers/', AdminViews.CategoryOfferCreateView.as_view(), name='add_category_offers'),
 ]   
 
 

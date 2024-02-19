@@ -42,7 +42,7 @@
                 <a href="#dashboad" class="active" data-toggle="tab">
                   Dashboard</a>
                 <a href="#orders" data-toggle="tab">My Orders</a>
-                <a href="#download" data-toggle="tab"> Download</a>
+                <a href="#download" data-toggle="tab"> My Wallet</a>
                 <a href="#payment-method" data-toggle="tab"> Edit Password</a>
                 <a href="#address-edit" data-toggle="tab"> address</a>
                 <a href="#account-info" data-toggle="tab"> Account Details</a>
@@ -115,17 +115,19 @@
                             <th>Date</th>
                             <th>Status</th>
                             <th>Total</th>
+                            <th>Invoice</th>
                             <th>Action</th>
                           </tr>
                         </thead>
                         <tbody>
                           {% for order in orders %}
                           <tr>
-                            <td> {{order.order_number}} </td>
+                            <td> {{order.id}} </td>
                             <td> {{order.full_name}} </td>
                             <td> {{order.created_at}} </td>
                             <td> {% if order.status == 'Cancelled' %} <span class="text-danger">{{order.status}} </span> {% else %} <span class="text-success">{{order.status}} </span>{% endif %}</td>
-                            <td>₹ {{order.order_total}} </td>
+                            <td>₹ {{order.order_total|floatformat:"2"}} </td>
+                            <td><a href="{% url 'order_invoice' order.order_number %}"> {{order.payment.payment_id}} </a> </td>
                             <td><a href="{% url 'order_detail' order.order_number %}" class="check-btn sqr-btn ">View</a></td>
                           </tr>
                           {% endfor %}
@@ -137,41 +139,71 @@
                 </div>
                 <!-- Single My Orders Content End -->
 
-                <!-- Single Downloads Content Start -->
+                <!-- My Wallet Content Start -->
                 <div class="tab-pane fade" id="download" role="tabpanel">
                   <div class="myaccount-content">
-                    <h3>Downloads</h3>
-                    <div class="myaccount-table table-responsive text-center">
-                      <table class="table table-bordered">
-                        <thead class="thead-light">
-                          <tr>
-                            <th>Product</th>
-                            <th>Date</th>
-                            <th>Expire</th>
-                            <th>Download</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr>
-                            <td>Haven - Free Real Estate PSD Template</td>
-                            <td>Aug 22, 2018</td>
-                            <td>Yes</td>
-                            <td><a href="#" class="check-btn sqr-btn "><i class="fa fa-cloud-download"></i> Download
-                                File</a></td>
-                          </tr>
-                          <tr>
-                            <td>HasTech - Profolio Business Template</td>
-                            <td>Sep 12, 2018</td>
-                            <td>Never</td>
-                            <td><a href="#" class="check-btn sqr-btn "><i class="fa fa-cloud-download"></i> Download
-                                File</a></td>
-                          </tr>
-                        </tbody>
-                      </table>
+                    <h3>My Wallet</h3>
+                    <div class=" text-center">
+                      <div class="row">
+                        <div class="card text-center col-lg-4 col-md-4 col-sm-12 ">
+                          <div class="card-header">
+                            Featured
+                          </div>
+                          <div class="card-body">
+                            {%if wallet%}
+                            <h4 class="card-title">Total Balence</h4>
+                            <div class="card-body">
+                                  ₹ {{wallet.balance}}
+                            </div>
+                            {% else %}
+                            <h4 class="card-title">No Wallets for you</h4>
+                            <div class="card-body">
+                                   {{wallet_message}}
+                            </div>
+                            {% endif %}
+                            <a href="#" class="btn btn-primary">Go somewhere</a>
+                          </div>
+                          <div class="card-footer text-muted">
+                            2 days ago
+                          </div>
+                        </div>
+                        <div class="col-lg-4 col-md-4 col-sm-12">
+                            <div class="card card-statistic-2">
+                              <div class="card-chart"><div class="chartjs-size-monitor" style="position: absolute; inset: 0px; overflow: hidden; pointer-events: none; visibility: hidden; z-index: -1;"><div class="chartjs-size-monitor-expand" style="position:absolute;left:0;top:0;right:0;bottom:0;overflow:hidden;pointer-events:none;visibility:hidden;z-index:-1;"><div style="position:absolute;width:1000000px;height:1000000px;left:0;top:0"></div></div><div class="chartjs-size-monitor-shrink" style="position:absolute;left:0;top:0;right:0;bottom:0;overflow:hidden;pointer-events:none;visibility:hidden;z-index:-1;"><div style="position:absolute;width:200%;height:200%;left:0; top:0"></div></div></div>
+                                <canvas id="balance-chart" height="188" width="796" style="display: block; height: 94px; width: 398px;" class="chartjs-render-monitor"></canvas>
+                              </div>
+                              <div class="card-icon shadow-primary bg-primary">
+                                <i class="fas fa-rupee-sign"></i>
+                              </div>
+                              <div class="card-wrap">
+                                <div class="card-header">
+                                  <h4>Total Revenue</h4>
+                                </div>
+                                <div class="card-body">
+                                  ₹ {{total_revenue}}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        <div class="card text-center col-lg-4 col-md-4 col-sm-12 ">
+                          <div class="card-header">
+                            Featured
+                          </div>
+                          <div class="card-body">
+                            <h5 class="card-title">Special title treatment</h5>
+                            <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+                            <a href="#" class="btn btn-primary">Go somewhere</a>
+                          </div>
+                          <div class="card-footer text-muted">
+                            2 days ago
+                          </div>
+                        </div>
+                      </div>
+                      
                     </div>
                   </div>
                 </div>
-                <!-- Single Downloads Content End -->
+                <!--  My Wallet Content End -->
                 
                 <!-- Single Edit Password Content Start -->
                 <div class="tab-pane fade" id="payment-method" role="tabpanel">

@@ -1,3 +1,4 @@
+from django.http import HttpResponse
 from django.utils import timezone
 import random
 from django.shortcuts import get_object_or_404, redirect, render
@@ -5,11 +6,11 @@ from django.urls import reverse
 
 from cart.models import Cart, CartItem
 from cart.views import _cart_id
-from orders.models import Order, OrderProduct
+from orders.models import Order, OrderProduct, Payment
 from store.models import Product
 
 from .forms import *
-from .models import Account, AddressBook, WishList,WishlistItem
+from .models import Account, AddressBook, Transaction, Wallet, WishList,WishlistItem
 from django.contrib import messages,auth
 from django.contrib.auth.decorators import login_required
 
@@ -187,6 +188,7 @@ def otp_verify(request, uid):
 
     return render(request, "accounts/otp.html", {'id': uid})
 
+# =========================================================Starts dashboard =======================================
 
 @login_required(login_url='login')
 def dashboard(request):
@@ -197,6 +199,12 @@ def dashboard(request):
     if UserProfile.objects.filter(user=request.user).exists():
         address = AddressBook.objects.filter(user_id=request.user.id)
         userprofile = get_object_or_404(UserProfile, user=request.user)
+        
+        try:
+            wallet = Wallet.objects.get(user=request.user)
+        except Wallet.DoesNotExist:
+            wallet = None
+            wallet_message = "Wallet not yet activated"
 
         user_form = UserForm(instance=request.user)
         profile_form = UserProfileForm(instance=userprofile)
@@ -208,6 +216,8 @@ def dashboard(request):
             'profile_form': profile_form,
             'userprofile': userprofile,
             'address': address,
+            'wallet':wallet,
+            'wallet_message': wallet_message if wallet is None else None,
         }
         return render(request, 'accounts/dashboard.html', context)
     else:
@@ -221,7 +231,9 @@ def dashboard(request):
             'orders_count':orders_count,
         }
         return render(request, 'accounts/dashboard.html', context)
-    
+
+# =========================================================End dashboard =======================================
+
 
 def forgotPassword(request):
     if request.method == 'POST':
@@ -452,6 +464,40 @@ def order_detail(request, order_id):
     return render(request, 'accounts/order_detail.html',context)
 
 @login_required(login_url='login')
+def order_invoice(request,order_id):
+
+    order_detail = OrderProduct.objects.filter(order__order_number=order_id)
+    order = Order.objects.get(order_number=order_id)
+    payment = order.payment
+    subtotal = 0
+    tax=0
+    shipping_fee=0
+    for item in order_detail:
+        item.item_total = item.product_price*item.quantity
+        subtotal += item.item_total
+    
+    tax = (2*subtotal)/100
+    if subtotal>= 1000:
+        shipping_fee=0
+    else:
+        shipping_fee=100
+    grand_total = subtotal+tax+ shipping_fee
+
+    context = {
+        'order_detail':order_detail,
+        'order':order,
+        'subtotal':subtotal,
+        'shipping_fee':shipping_fee,
+        'tax':tax,
+        'shipping_fee':shipping_fee,
+        'grand_total':grand_total,
+        'payment': payment
+    }
+
+    return render(request, 'orders/invoice_template.html',context)
+
+
+@login_required(login_url='login')
 def cancel_order(request, order_id):
     order = get_object_or_404(Order, id=order_id)
     user = request.user
@@ -462,6 +508,21 @@ def cancel_order(request, order_id):
         order.save()
         # Send cancellation mail
         send_mail("Order cancellation: ", f"Your order:{order.order_number}- for {order.full_name} is cancelled", settings.EMAIL_HOST_USER, [email], fail_silently=False)
+        messages.success(request, 'Your order succesfully cancelled!!')
+    
+    return redirect('dashboard')
+
+@login_required(login_url='login')
+def return_order(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    user = request.user
+    email = user.email
+
+    if request.method == "POST":
+        order.status = 'Return'
+        order.save()
+        # Send cancellation mail
+        send_mail("Order Return: ", f"Your order:{order.order_number}- for {order.full_name} is returned", settings.EMAIL_HOST_USER, [email], fail_silently=False)
         messages.success(request, 'Your order succesfully cancelled!!')
     
     return redirect('dashboard')
@@ -527,3 +588,43 @@ def remove_from_wishlist(request, item_id):
 
 
 # =================================End wishlists=============================================================================================
+
+# =================================Start Wallet===================================================================================================
+
+
+def handle_refund(request):
+    if request.method == 'POST':
+        # Assuming you receive data about payment status change in the request
+        payment_id = request.POST.get('payment_id')
+        new_status = request.POST.get('new_status')
+
+        # Check if the payment status has changed to "Refund"
+        if new_status == 'Refund':
+            try:
+                payment = Payment.objects.get(pk=payment_id)
+                user = payment.user
+                amount_refunded = payment.amount_paid
+
+                # Retrieve or create the user's wallet
+                wallet, created = Wallet.objects.get_or_create(user=user)
+
+                # Update wallet balance by adding the refunded amount
+                wallet.balance += amount_refunded
+                wallet.save()
+
+                # Create a transaction record for the refund
+                transaction = Transaction.objects.create(
+                    wallet=wallet,
+                    amount=amount_refunded,
+                    type='credit'  # Assuming 'credit' means money is added to the wallet
+                )
+
+                return HttpResponse("Refund processed successfully")
+            except Payment.DoesNotExist:
+                return HttpResponse("Payment does not exist")
+            except Exception as e:
+                return HttpResponse(f"Error processing refund: {str(e)}")
+
+    return HttpResponse("Invalid request")
+
+# =================================End Wallet===================================================================================================

@@ -166,6 +166,8 @@ MESSAGE_TAGS = {
     messages.ERROR: 'danger',
 }
 
+MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
+
 
 #ACCOUNT_SID='AC0722d83bf85ed2310a99c6a179b132b1'
 #AUTH_TOKEN='ae919a604c2e32f27f139e368656e671'

@@ -116,7 +116,7 @@
                                                         
                                                     </td>
                                                     <td class="total-price">
-                                                        <span class="price">₹ {{item.item_total}} </span>
+                                                        <span class="price">₹ {{item.sub_total}} </span>
                                                     </td>
 
                                                 </tr>
@@ -152,7 +152,7 @@
                         {% for item in cart_items %}
                         <ul>
                             
-                            <li>{{item.product.product_name}}  X {% if item.quantity < 10 %}0{{ item.quantity }}{% else %}{{ item.quantity }}{% endif %} <span>₹ {{item.item_total}} </span></li>
+                            <li>{{item.product.product_name}}  X {% if item.quantity < 10 %}0{{ item.quantity }}{% else %}{{ item.quantity }}{% endif %} <span>₹ {{item.sub_total}} </span></li>
                             
                         </ul>
                         {% endfor %}

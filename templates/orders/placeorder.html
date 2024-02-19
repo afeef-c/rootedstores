@@ -1,6 +1,7 @@
 {% extends 'partials/base.html' %}
 {% load static %}
 
+
 {% block content %}
 
 
@@ -44,49 +45,52 @@
 						<form action="{% url 'place_order' %}" method="POST"  class="checkout-form">
 						{% csrf_token %}
 							<div class="row row-40">
-
+								
 								<div class="col-lg-7 mb-20">
-									<div class="container">
-										<div class="row">
-											{% for i in address %}
-											<div class="col-12 col-md-6 col-lg-6 mb-4">
-												<div class="card">
-													<div class="card-header">
-														<div class="single-method">
-															<input type="radio" id="{{i.id}}" name="address_method" value="{{i.id}}" required>
-															<label for="{{i.id}}">Delever Here</label>
-															<p data-method="{i.id}">To ship to this address, please select it!</p>
+									<div class="scrollable-container" style=" height: 400px; overflow-x: auto;white-space: nowrap;">
+										<div class="container ">
+											<div class="row">
+												{% for i in address %}
+												<div class="col-12 col-md-6 col-lg-6 mb-4"  style="display: inline;">
+													<div class="card">
+														<div class="card-header">
+															<div class="single-method">
+																<input type="radio" id="{{i.id}}" name="address_method" value="{{i.id}}" required>
+																<label for="{{i.id}}">Delever Here</label>
+																<p data-method="{i.id}">To ship to this address, please select it!</p>
+															</div>
+															<h4>{{i.full_name}}</h4>
 														</div>
-														<h4>{{i.full_name}}</h4>
-													</div>
 
-													<div class="card-body">
-														<p>{{i.address_line_1}}</p>
-														<p>{{i.address_line_2}}</p>
-														
-													</div>
-													<div class="card-footer">
-														<a href="#" class="check-btn sqr-btn" data-toggle="collapse" data-target="#collapse{{i.id}}" aria-expanded="false" aria-controls="collapse{{i.id}}"><i class="fa fa-add"></i> Show more</a>
-													</div>
-													<div id="collapse{{i.id}}" class="collapse">
-														<!-- Collapsible content here -->
-														<div class="mb-3">
-															<p><b>City: </b> {{i.city}}</p>
-															<p><b>State: </b> {{i.state}} </p> 
-															<p><b>Country: </b> {{i.country}} </p>
+														<div class="card-body">
+															<p>{{i.address_line_1}}</p>
+															<p>{{i.address_line_2}}</p>
+															
 														</div>
-														<div class="mb-3">
-															<p><b>Email: </b> {{i.email}} </p>
-															<p><b>Mobile: </b>{{i.phone}}</p>  
+														<div class="card-footer">
+															<a href="#" class="check-btn sqr-btn" data-toggle="collapse" data-target="#collapse{{i.id}}" aria-expanded="false" aria-controls="collapse{{i.id}}"><i class="fa fa-add"></i> Show more</a>
 														</div>
-														<p><b>PIN: </b> {{i.pin_code}}</p>
-														<!-- You can put any content you want to be collapsed here -->
+														<div id="collapse{{i.id}}" class="collapse">
+															<!-- Collapsible content here -->
+															<div class="mb-3">
+																<p><b>City: </b> {{i.city}}</p>
+																<p><b>State: </b> {{i.state}} </p> 
+																<p><b>Country: </b> {{i.country}} </p>
+															</div>
+															<div class="mb-3">
+																<p><b>Email: </b> {{i.email}} </p>
+																<p><b>Mobile: </b>{{i.phone}}</p>  
+															</div>
+															<p><b>PIN: </b> {{i.pin_code}}</p>
+															<!-- You can put any content you want to be collapsed here -->
+														</div>
 													</div>
 												</div>
+												{% endfor %}
 											</div>
-											{% endfor %}
 										</div>
 									</div>
+									
 
 
 									<!-- Billing Address -->
@@ -247,7 +251,7 @@
 												<div class="single-method">
 													<input type="radio" id="payment_razorpay" name="payment-method" value="razorpay" required>
 													<label for="payment_razorpay">RazorPay</label>
-													<p data-method="paypal">Currently, the only acceptable payment method is RazorPay and Cash on Delivered. Please cooperate with us.</p>
+													<p data-method="cash">Currently, the only acceptable payment method is RazorPay and Cash on Delivered. Please cooperate with us.</p>
 												</div>
 
 												

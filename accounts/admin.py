@@ -28,3 +28,6 @@ admin.site.register(UserProfile,UserProfilAdmin)
 admin.site.register(AddressBook)
 admin.site.register(WishlistItem)
 admin.site.register(WishList)
+admin.site.register(Wallet)
+admin.site.register(Transaction)
+

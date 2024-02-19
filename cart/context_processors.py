@@ -40,7 +40,7 @@ def cart(request):
             item_variations = Variation.objects.filter(product=item.product)
             variations[item.id] = item_variations  # Store variations for each cart item
 
-            item.item_total = item.quantity * item.product.price
+            item.item_total = item.quantity * item.product.get_offer_price()
             quantity += item.quantity
             total += item.item_total
 

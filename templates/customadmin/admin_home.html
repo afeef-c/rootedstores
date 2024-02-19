@@ -11,6 +11,7 @@
 
 {% block page_content %}
   <div class="row">
+
     <div class="col-lg-4 col-md-4 col-sm-12">
       <div class="card card-statistic-2">
         <div class="card-stats">
@@ -62,24 +63,26 @@
         </div>
       </div>
     </div>
+
     <div class="col-lg-4 col-md-4 col-sm-12">
       <div class="card card-statistic-2">
         <div class="card-chart"><div class="chartjs-size-monitor" style="position: absolute; inset: 0px; overflow: hidden; pointer-events: none; visibility: hidden; z-index: -1;"><div class="chartjs-size-monitor-expand" style="position:absolute;left:0;top:0;right:0;bottom:0;overflow:hidden;pointer-events:none;visibility:hidden;z-index:-1;"><div style="position:absolute;width:1000000px;height:1000000px;left:0;top:0"></div></div><div class="chartjs-size-monitor-shrink" style="position:absolute;left:0;top:0;right:0;bottom:0;overflow:hidden;pointer-events:none;visibility:hidden;z-index:-1;"><div style="position:absolute;width:200%;height:200%;left:0; top:0"></div></div></div>
           <canvas id="balance-chart" height="188" width="796" style="display: block; height: 94px; width: 398px;" class="chartjs-render-monitor"></canvas>
         </div>
         <div class="card-icon shadow-primary bg-primary">
-          <i class="fas fa-dollar-sign"></i>
+          <i class="fas fa-rupee-sign"></i>
         </div>
         <div class="card-wrap">
           <div class="card-header">
-            <h4>Balance</h4>
+            <h4>Total Revenue</h4>
           </div>
           <div class="card-body">
-            $187,13
+            ₹ {{total_revenue}}
           </div>
         </div>
       </div>
     </div>
+
     <div class="col-lg-4 col-md-4 col-sm-12">
       <div class="card card-statistic-2">
         <div class="card-chart"><div class="chartjs-size-monitor" style="position: absolute; inset: 0px; overflow: hidden; pointer-events: none; visibility: hidden; z-index: -1;"><div class="chartjs-size-monitor-expand" style="position:absolute;left:0;top:0;right:0;bottom:0;overflow:hidden;pointer-events:none;visibility:hidden;z-index:-1;"><div style="position:absolute;width:1000000px;height:1000000px;left:0;top:0"></div></div><div class="chartjs-size-monitor-shrink" style="position:absolute;left:0;top:0;right:0;bottom:0;overflow:hidden;pointer-events:none;visibility:hidden;z-index:-1;"><div style="position:absolute;width:200%;height:200%;left:0; top:0"></div></div></div>
@@ -93,11 +96,12 @@
             <h4>Sales</h4>
           </div>
           <div class="card-body">
-            4,732
+            {{sales_count}}
           </div>
         </div>
       </div>
     </div>
+
   </div>
 
 
@@ -120,56 +124,31 @@
                 <th>Due Date</th>
                 <th>Action</th>
               </tr>
+              {% for order in orders %}
               <tr>
-                <td><a href="#">INV-87239</a></td>
-                <td class="font-weight-600">Kusnadi</td>
-                <td><div class="badge badge-warning">Unpaid</div></td>
-                <td>July 19, 2018</td>
+                
+                <td><a href="#"> {{order.payment.payment_id|slice:"-4:"}} </a></td>
+                <td class="font-weight-600"> {{order.full_name}} </td>
                 <td>
-                  <a href="#" class="btn btn-primary">Detail</a>
+                  {% if order.payment.status == 'SUCCESS' %}
+                  <div class="badge badge-success">Paid</div>
+                  {% else %}
+                  <div class="badge badge-warning">Unpaid</div>
+                  {% endif %}
+                </td>
+                <td> {{order.created_at}} </td>
+                <td>
+                  <a href="{% url 'order_update' order.id %}" class="btn btn-primary">Detail</a>
                 </td>
               </tr>
-              <tr>
-                <td><a href="#">INV-48574</a></td>
-                <td class="font-weight-600">Hasan Basri</td>
-                <td><div class="badge badge-success">Paid</div></td>
-                <td>July 21, 2018</td>
-                <td>
-                  <a href="#" class="btn btn-primary">Detail</a>
-                </td>
-              </tr>
-              <tr>
-                <td><a href="#">INV-76824</a></td>
-                <td class="font-weight-600">Muhamad Nuruzzaki</td>
-                <td><div class="badge badge-warning">Unpaid</div></td>
-                <td>July 22, 2018</td>
-                <td>
-                  <a href="#" class="btn btn-primary">Detail</a>
-                </td>
-              </tr>
-              <tr>
-                <td><a href="#">INV-84990</a></td>
-                <td class="font-weight-600">Agung Ardiansyah</td>
-                <td><div class="badge badge-warning">Unpaid</div></td>
-                <td>July 22, 2018</td>
-                <td>
-                  <a href="#" class="btn btn-primary">Detail</a>
-                </td>
-              </tr>
-              <tr>
-                <td><a href="#">INV-87320</a></td>
-                <td class="font-weight-600">Ardian Rahardiansyah</td>
-                <td><div class="badge badge-success">Paid</div></td>
-                <td>July 28, 2018</td>
-                <td>
-                  <a href="#" class="btn btn-primary">Detail</a>
-                </td>
-              </tr>
+              {% endfor %}
+              
             </tbody></table>
           </div>
         </div>
       </div>
     </div>
+
     <div class="col-md-4">
       <div class="card card-hero">
         <div class="card-header">
@@ -179,6 +158,7 @@
           <h4>14</h4>
           <div class="card-description">Customers need help</div>
         </div>
+
         <div class="card-body p-0">
           <div class="tickets-list">
             <a href="#" class="ticket-item">
@@ -216,8 +196,10 @@
             </a>
           </div>
         </div>
+
       </div>
     </div>
+  
   </div>
 {% endblock page_content %}
 

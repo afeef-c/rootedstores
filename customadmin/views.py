@@ -6,6 +6,11 @@ from accounts.models import Account
 from django.contrib.auth import authenticate,login,logout
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from accounts.models import *
+from orders.models import Order, OrderProduct, Payment
+from store.models import *
+from category.models import Category
+
 
 
 # Create your views here.
@@ -39,7 +44,6 @@ def admin_login(request):
 
         return render(request, 'customadmin/admin_login.html')
      except Exception as e:
-        print(e)
         messages.danger(request,'error'+e)    
         return render(request, 'customadmin/admin_login.html', {'messages': 'An error occurred'})
 
@@ -49,4 +53,4 @@ def admin_logout(request):
     messages.success(request, 'The admin logout successfully')
     return HttpResponseRedirect(reverse('admin_login'))
 
-
+#==========================================================================================================

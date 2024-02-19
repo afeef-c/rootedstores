@@ -119,7 +119,7 @@
 								<p>
 									{% if item.product.get_offer_percent %}
 									<span class="main-price discounted">₹ {{item.product.price}} </span>
-									<span class="discounted-price">₹ {{item.product.get_offer_price|floatformat:"0" }} </span>
+									<span class="discounted-price">₹ {{item.product.get_offer_price|floatformat:"2" }} </span>
 									{% else %}
 									<span class="discounted-price">₹ {{item.product.price}} </span>
 									{% endif %}
@@ -198,7 +198,7 @@
 								<p>
 									{% if item.product.get_offer_percent %}
 									<span class="main-price discounted">₹ {{item.product.price}} </span>
-									<span class="discounted-price">₹ {{item.product.get_offer_price|floatformat:"0" }} </span>
+									<span class="discounted-price">₹ {{item.product.get_offer_price|floatformat:"2" }} </span>
 									{% else %}
 									<span class="discounted-price">₹ {{item.product.price}} </span>
 									{% endif %}

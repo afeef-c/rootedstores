@@ -117,7 +117,7 @@
                                                         {% endif %}
                                                         
                                                     </td>
-                                                    <td class="product-price" style="white-space: nowrap;"><span class="price">₹ {{ item.product.price|floatformat:"1" }} </span></td>
+                                                    <td class="product-price" style="white-space: nowrap;"><span class="price">₹ {{ item.product_price|floatformat:"1" }} </span></td>
                                                     <td class="product-quantity">
                                                         <p class="text-center">{{ item.quantity }}</p>
                                                         
@@ -176,24 +176,42 @@
                 <div class="col-12 checkout-cart-total">
                     {% if order.status == 'Cancelled' %}
                         <h4 class="text-warning">The order already cancelled !! </h4>
-                        <div class="d-flex justify-content-center">					
+                        <div class="d-flex justify-content-center">
                             <button type="button" id="cancelButton" class="btn btn-warning ">Continue Shopping</button>
                         </div>
                     {% elif order.status == 'Completed' %}
                         <h4 class="text-warning">The order delivered ..</h4>
-                        <div class="d-flex justify-content-center">					
+                        <div class="d-flex justify-content-center">
                             <a type="button" href="" class="btn btn-secondary">Rate us</a>
                         </div>
                         
-                        <div class="d-flex justify-content-center">					
+                        <div class="d-flex justify-content-center">
                             <a type="button" href="{% url 'home' %}" class="btn btn-warning ">Continue Shopping</a>
                         </div>
+                    {% elif order.status == 'Delivered' %}
+                    <form action="{% url 'return_order' order.id %}" method="POST">
+                    {% csrf_token %}
+                        <input type="hidden" value="{{order.id}}" name="order_id" >
+                        <div class="d-flex justify-content-center">					
+                            <button type="submit" id="cancelButton" class="btn btn-outline-secondary" onclick="return confirm('Are you sure to return the order!!')">Return Order</button>
+                        </div>
+                    </form>
+                    {% elif order.status == 'Return' %}
+                        <h4 class="text-warning">The order returned ..</h4>
+                        <div class="d-flex justify-content-center b-5 m-5">
+                            <a type="button" href="" class="btn btn-secondary">Check your wallet for update on refund</a>
+                        </div>
+                        
+                        <div class="d-flex justify-content-center b-5 m-5">
+                            <a type="button" href="{% url 'home' %}" class="btn btn-warning btn-sm">Continue Shopping</a>
+                        </div>
+
                     {% else %}
                     <form action="{% url 'cancel_order' order.id %}" method="POST">
                     {% csrf_token %}
                         <input type="hidden" value="{{order.id}}" name="order_id" >
-                        <div class="d-flex justify-content-center">					
-                            <button type="submit" id="cancelButton" class="btn btn-danger" onclick="return confirm('Are you sure to cancele the order!!')">Cancel Order</button>
+                        <div class="d-flex justify-content-center">
+                            <button type="submit" id="cancelButton" class="btn btn-outline-danger" onclick="return confirm('Are you sure to cancele the order!!')">Cancel Order</button>
                         </div>
 
                     </form>

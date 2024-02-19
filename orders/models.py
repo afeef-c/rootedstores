@@ -1,7 +1,13 @@
+from decimal import Decimal
 from django.db import models
 
-from accounts.models import Account
+from accounts.models import Account, Wallet
 from store.models import Product, Variation
+from django.core.mail import send_mail
+from django.conf import settings
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+
 
 # Create your models here.
 
@@ -11,6 +17,7 @@ class Payment(models.Model):
     ('SUCCESS', 'Success'),
     ('FAILURE', 'Failure'),
     ('PENDING', 'Pending'),
+    ('REFUND', 'Refund'),
     )
 
     user = models.ForeignKey(Account, on_delete=models.CASCADE)
@@ -22,7 +29,20 @@ class Payment(models.Model):
 
     def __str__(self) -> str:
         return f"{self.user}-{self.payment_method}"
-    
+
+@receiver(post_save, sender=Payment)
+def update_wallet_balance(sender, instance, **kwargs):
+    if instance.status == 'REFUND':
+        # Get or create the wallet instance for the user
+        wallet, created = Wallet.objects.get_or_create(user=instance.user)
+        refund_amount = Decimal(instance.amount_paid)
+
+        # Update wallet balance
+        wallet.balance += refund_amount
+        wallet.save()
+
+
+
 class Order(models.Model):
     
     STATUS = (
@@ -31,7 +51,8 @@ class Order(models.Model):
         ('Shipped','Shipped'),
         ('Cancelled','Cancelled'),
         ('Completed','Completed'),
-        ('Delivered','Delivered')
+        ('Delivered','Delivered'),
+        ('Return','Return')
     )
 
     user = models.ForeignKey(Account, on_delete=models.SET_NULL, null=True)
@@ -68,6 +89,34 @@ class Order(models.Model):
     def __str__(self) -> str:
         return self.first_name
     
+    def save(self, *args, **kwargs):
+        # Check if the status is changed to Cancelled or Return
+        if self.status in ['Cancelled', 'Return']:
+            # Check if the payment status is not already set to Refund
+            if self.payment and self.payment.status != 'REFUND':
+                self.payment.status = 'REFUND'
+                self.payment.save()
+                self.send_status_email()
+
+        # Check if the status is changed to Completed or Delivered
+        elif self.status in ['Completed', 'Delivered']:
+            # Check if the payment status is not already set to Success
+            if self.payment and self.payment.status != 'SUCCESS':
+                self.payment.status = 'SUCCESS'
+                self.payment.save()
+                self.send_status_email()
+
+        super().save(*args, **kwargs)
+
+    def send_status_email(self):
+        subject = 'Order Status Update'
+        message = f'Your order status has been updated to: {self.status}. Payment status: {self.payment.status}'
+        sender_email = settings.DEFAULT_FROM_EMAIL
+        recipient_email = self.user.email
+
+        send_mail(subject, message, sender_email, [recipient_email])
+    
+
 class OrderProduct(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
     payment = models.ForeignKey(Payment, on_delete=models.SET_NULL, blank=True, null=True)

@@ -62,11 +62,12 @@ Orders List
                         {% if order.status == 'Shipped' %} <span class="badge badge-primary">Shipped</span>{% endif %}
                         {% if order.status == 'Cancelled' %}<span class="badge badge-danger">Cancelled</span> {% endif %}
                         {% if order.status == 'Delivered' %}<span class="badge badge-light">Delivered</span> {% endif %}
+                        {% if order.status == 'Return' %}<span class="badge badge-dark">Return</span> {% endif %}
                         <!--{% if not user.is_admin and not user.is_staff and not user.is_active and not user.is_merchant and not user.is_superadmin %}<span class="badge badge-warning">Just register</span>{% endif %}-->
                         
                     
                     </td>
-                    <td>₹ {{order.order_total}} </td>
+                    <td>₹ {{order.order_total|floatformat:'2'}} </td>
                     <td> {{order.created_at|date:"F j, Y" }} </td>
 
                     <td><a href="{% url 'order_update' order.id %}" class="btn btn-warning">Update</a></td>
