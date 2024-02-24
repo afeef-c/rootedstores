@@ -41,6 +41,8 @@
 				<div class="col-12">
 					<h4 class="checkout-title">Billing Address</h4>
 					<div class="lezada-form">
+
+
 						<!-- Checkout Form s-->
 						<form action="{% url 'place_order' %}" method="POST"  class="checkout-form">
 						{% csrf_token %}
@@ -210,12 +212,15 @@
 												<p>Sub Total <span>₹ {{total}} </span></p>
 												<p>Shipping Fee <span>₹ {{shipping_fee}} </span></p>
 												<p>GST <span>₹ {{tax}} </span></p>
-
+												{% if 'coupon' in request.session or discount_amount > 0 %}
+												<p>Referal/Coupon Discounts <span>₹ {{discount_amount}} </span></p>
+												{% endif %}
 												<h4>Grand Total <span>₹ {{grand_total}} </span></h4>
 
 											</div>
 
 										</div>
+												
 
 										<!-- Payment Method -->
 										<div class="col-12">
@@ -252,6 +257,12 @@
 													<input type="radio" id="payment_razorpay" name="payment-method" value="razorpay" required>
 													<label for="payment_razorpay">RazorPay</label>
 													<p data-method="cash">Currently, the only acceptable payment method is RazorPay and Cash on Delivered. Please cooperate with us.</p>
+												</div>
+
+												<div class="single-method">
+													<input type="radio" id="wallet" name="payment-method" value="wallet" required>
+													<label for="wallet">Wallets</label>
+													<p data-method="cash">If you have any balance in wallet you can pay usigng wallet.</p>
 												</div>
 
 												

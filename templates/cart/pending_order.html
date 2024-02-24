@@ -1,34 +1,5 @@
-{% extends 'partials/base.html' %}
-{% load static %}
-
-{% block content %}
-	<!--=======  breadcrumb area =======-->
-
-	<div class="breadcrumb-area breadcrumb-bg-1 pt-50 pb-70 mb-130">
-		<div class="container">
-			<div class="row">
-				<div class="col-lg-12">
-					<h1 class="breadcrumb-title">Payments</h1>
-
-					<!--=======  breadcrumb list  =======-->
-                    <p>Review your order and make payment</p>
-					<ul class="breadcrumb-list">
-						<li class="breadcrumb-list__item"><a href="{% url 'home' %}">HOME</a></li>
-						<li class="breadcrumb-list__item"> <a href="{% url 'place_order' %}"> Place Order</a></li>
-                        
-						<li class="breadcrumb-list__item breadcrumb-list__item--active">Payments</li>
-					</ul>
-
-					<!--=======  End of breadcrumb list  =======-->
-
-				</div>
-			</div>
-		</div>
-	</div>
-
-	<!--=======  End of breadcrumb area =======-->
-
-<div class="container">
+<div class="container border border-dark">
+    <h2 class="title text-center m-5">Complete your pending order</h2>
     <div class="row">
         
         <div class="col-12 col-md-7 col-lg-7 ">
@@ -68,7 +39,7 @@
                                 <h4><b>Payment Method</b></h4>
                             </div>
                             <div class="accordion-body collapse show" id="panel-body-1" data-parent="#accordion">
-                                <p> PayPal </p>
+                                <p> {{payment_method}} </p>
                             </div>
                         </div>
                     </div>
@@ -81,7 +52,7 @@
                             </div>
                             <div class="accordion-body collapse show" id="panel-body-1" data-parent="#accordion">
                                 <div class="cart-table-container">
-						
+                        
                                     <table class="cart-table">
                                         <thead>
                                             <tr>
@@ -116,7 +87,7 @@
                                                         
                                                     </td>
                                                     <td class="total-price">
-                                                        <span class="price">₹ {{item.sub_total}} </span>
+                                                        <span class="price">₹ {{item.item_total}} </span>
                                                     </td>
 
                                                 </tr>
@@ -133,48 +104,42 @@
                         </div>
                     </div>
                 </div>
-                    
+                
             </div>
 
         </div>
 
-        <div class="col-lg-5">
-            <div class="row">
+        <div class="col-12 col-md-5 col-lg-5 mb-60">
 
-                <!-- Cart Total -->
-                <div class="col-12 mb-60">
+                <h4 class="checkout-title">Order Total</h4>
 
-                    <h4 class="checkout-title">Cart Total</h4>
+                <div class="checkout-cart-total">
 
-                    <div class="checkout-cart-total">
-
-                        <h4>Product <span>Total</span></h4>
-                        {% for item in cart_items %}
-                        <ul>
-                            
-                            <li>{{item.product.product_name}}  X {% if item.quantity < 10 %}0{{ item.quantity }}{% else %}{{ item.quantity }}{% endif %} <span>₹ {{item.sub_total}} </span></li>
-                            
-                        </ul>
-                        {% endfor %}
-                        <p>Sub Total <span>₹ {{total}} </span></p>
-                        <p>Shipping Fee <span>₹ {{shipping_fee}} </span></p>
-                        <p>GST <span>₹ {{tax}} </span></p>
-                        {% if 'coupon' in request.session and discount_amount > 0 %}
-                        <p>Referal/Coupon Discounts <span>₹ {{discount_amount}} </span></p>
-                        {% endif %}
-                        <h4>Grand Total <span>₹ {{grand_total}} </span></h4>
-
-                    </div>
+                    <h4>Product <span>Total</span></h4>
+                    {% for item in order_products %}
+                    <ul>
+                        
+                        <li>{{item.product.product_name}}  X {% if item.quantity < 10 %}0{{ item.quantity }}{% else %}{{ item.quantity }}{% endif %} <span>₹ {{item.item_total}} </span></li>
+                        
+                    </ul>
+                    {% endfor %}
+                    <p>Sub Total <span>₹ {{panding_total}} </span></p>
+                    <p>Shipping Fee <span>₹ {{order.shipping_fee}} </span></p>
+                    <p>GST <span>₹ {{order.tax}} </span></p>
+                    {% if 'coupon' in request.session and discount_amount > 0 %}
+                    <p>Referal/Coupon Discounts <span>₹ {{order.coupon.discount_amount}} </span></p>
+                    {% endif %}
+                    <h4>Grand Total <span>₹ {{order.order_total}} </span></h4>
 
                 </div>
-                <!-- Payment Method -->
+                                        <!-- Payment Method -->
                 <div class="col-12 checkout-cart-total">
                     
                         
                     <div class="payment-icon mb-60 d-flex justify-content-center">
                         <img src="/static/assets/images/icons/pay.png" class="img-fluid" alt="">
                     </div>
-                    {% if payment_method = 'razorpay' %}
+                    {% if payment_method == 'razorpay' or payment_method == 'RazorPay' %}
                      <form action="{% url 'rozer_payments' %}" method="POST">
                         {% csrf_token %}
                         <div class="check-box d-flex justify-content-center">
@@ -186,7 +151,7 @@
                             <button type="submit" id="pay-btn" name="submit" class="lezada-button lezada-button--medium mt-30 payWithRazor">Pay with Razorpay</button>
                         </div>
                      </form>
-                    {% else %}
+                    {% elif payment_method == 'cash' %}
                         <form action="{% url 'payments' %}" method="POST">
                             {% csrf_token %}
                             <div class="check-box">
@@ -198,25 +163,25 @@
                                 <button type="submit" name="submit" class="lezada-button lezada-button--medium mt-30 ">Confirm Checkout</button>
                             </div>
                         </form>
-                        
+                    {% else %}
+                        <form action="{% url 'payments' %}" method="POST">
+                            {% csrf_token %}
+                            <div class="check-box">
+                                <input type="checkbox" id="cod" name="cod" required>
+                                <label for="cod">Confirm Payment using wallet money</label>
+                            </div>
+                            <div class="d-flex justify-content-center">
+                                
+                                <button type="submit" name="submit" class="lezada-button lezada-button--medium mt-30 ">Confirm Checkout</button>
+                            </div>
+                        </form>
                     {% endif %}
+
                                         
                 </div>
 
-            </div>
         </div>
 
     </div>
 </div>
-    
-
-
-
-{% endblock content %}
-
-
-{% block js %}
-
-
-
-{% endblock js %}
+	

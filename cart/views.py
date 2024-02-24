@@ -1,3 +1,5 @@
+from django.utils import timezone
+
 from django.shortcuts import get_object_or_404, redirect, render
 
 from accounts.models import AddressBook
@@ -7,7 +9,9 @@ from django.http import HttpResponse, JsonResponse
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-
+from orders.forms import CouponForm
+from orders.models import Coupon, Order, OrderProduct
+from django.urls import reverse
 
 # Create your views here.
 
@@ -137,7 +141,7 @@ def remove_cart_item(request,product_id, cart_item_id):
     return redirect('cart')
 
 
-def cart(request, total=0, quantity=0, cart_item=None):
+def cart(request, total=0, quantity=0, cart_item=None,panding_total=0):
     grand_total = 0
     tax = 0
     variations = {}
@@ -158,17 +162,42 @@ def cart(request, total=0, quantity=0, cart_item=None):
             cart_item.item_total = cart_item.quantity * cart_item.product.get_offer_price()
             quantity += cart_item.quantity
             total += cart_item.item_total
-        
+    
+        if 'coupon' in request.session:
+            coupon = request.session['coupon']
+            discount_amount = coupon['discount_amount']
+        else:
+            discount_amount=0
+            coupon = None
+
         
         if total>=1000:
             shipping_fee = 0
         else:
             shipping_fee = 100
         tax = (2 * total) / 100
-        grand_total = total + tax +shipping_fee
-        
+        grand_total = total + tax +shipping_fee - discount_amount
+
+
+
+        orders_exist = Order.objects.filter(user=request.user, status='Pending').exists()
+        if orders_exist:
+            order = Order.objects.get(user=request.user, status='Pending')
+            payment_method = order.payment.payment_method
+
+            order_products = OrderProduct.objects.filter(order=order, ordered=False)
+            for pending_item in order_products:
+                pending_item.item_total = (float(pending_item.product_price) * pending_item.quantity)
+                panding_total += pending_item.item_total
+                quantity += pending_item.quantity
+
+        else:
+            order=None
+            payment_method=None
     except ObjectDoesNotExist:
         cart_items =[]
+
+    
 
     context = {
         'total': total,
@@ -177,8 +206,17 @@ def cart(request, total=0, quantity=0, cart_item=None):
         'cart_items': cart_items,
         'grand_total': grand_total,
         'tax': tax,
+        'couponform':CouponForm(),
+        'discount_amount':discount_amount,
+        'coupon':coupon,
+        'orders_exist': orders_exist,
+        'order':order,
+        #'order_products':order_products,
+        'panding_total':panding_total,
+        'payment_method':payment_method 
     }   
     return render(request, 'cart/cart.html', context)
+
 
 @login_required(login_url='login')
 def placeorder(request,total=0, quantity=0, cart_item=None):
@@ -206,13 +244,21 @@ def placeorder(request,total=0, quantity=0, cart_item=None):
             quantity += cart_item.quantity
             total += cart_item.item_total
         
+        if 'coupon' in request.session:
+            coupon = request.session['coupon']
+            discount_amount = coupon['discount_amount']
+        else:
+            discount_amount=0
+
+        
         if total<1000:
             shipping_fee = 100
         else:
             shipping_fee = 0
 
         tax = (2 * total) / 100
-        grand_total = total + tax + shipping_fee
+        grand_total = total + tax +shipping_fee-discount_amount
+
     except ObjectDoesNotExist:
         cart_items =[]
     
@@ -226,6 +272,39 @@ def placeorder(request,total=0, quantity=0, cart_item=None):
         'grand_total': grand_total,
         'tax': tax,
         'address':address,
+        'discount_amount':discount_amount
     }
 
     return render(request, 'orders/placeorder.html', context)
+
+
+def add_coupon(request):
+    if request.method == "POST":
+        form = CouponForm(request.POST)
+        if form.is_valid():
+            code = form.cleaned_data['code']
+            try:
+                coupon = Coupon.objects.get(code=code, is_active=True, valid_until__gte=timezone.now(), valid_from__lte = timezone.now() )
+                # Apply discount to cart total
+                request.session['coupon'] = {
+                    'code': coupon.code,
+                    'discount_amount': float(coupon.discount_amount)
+                }
+                if 'coupon' in request.session:
+                    coupon_id = request.session['coupon']
+                    coupon = Coupon.objects.get(pk=coupon_id)
+                    coupon_discount = coupon.discount
+
+
+                context = {
+                    'coupon_discount':coupon_discount
+                }
+                messages.success(request, 'Coupon applied successfully!')
+                url = reverse('cart') + f'?coupon_discount={context["coupon_discount"]}'
+                return redirect(url)
+                
+            except Coupon.DoesNotExist:
+                messages.error(request, "Invalid or expired coupon code")
+    return redirect('cart')
+
+

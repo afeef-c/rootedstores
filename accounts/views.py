@@ -23,6 +23,12 @@ from django.contrib.auth.hashers import make_password
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth import update_session_auth_hash
 import requests
+from io import BytesIO
+from django.template.loader import get_template
+import xhtml2pdf.pisa as pisa
+from django.template.loader import render_to_string
+from django.conf import settings
+
 
 User = get_user_model()  # Use the get_user_model() function to get the User model
 
@@ -202,13 +208,16 @@ def dashboard(request):
         
         try:
             wallet = Wallet.objects.get(user=request.user)
+            returned_order = Order.objects.order_by('-created_at').filter(user_id=request.user.id, status__in=['Return','Cancelled'],is_ordered=True)
+            refund_orders = Order.objects.filter(user_id=request.user.id, payment__status='REFUND').order_by('-created_at')
+
         except Wallet.DoesNotExist:
             wallet = None
             wallet_message = "Wallet not yet activated"
 
         user_form = UserForm(instance=request.user)
         profile_form = UserProfileForm(instance=userprofile)
-
+        
         context={
             'orders_count': orders_count,
             'orders': orders,
@@ -217,6 +226,8 @@ def dashboard(request):
             'userprofile': userprofile,
             'address': address,
             'wallet':wallet,
+            'returned_order':returned_order,
+            'refund_orders':refund_orders,
             'wallet_message': wallet_message if wallet is None else None,
         }
         return render(request, 'accounts/dashboard.html', context)
@@ -628,3 +639,60 @@ def handle_refund(request):
     return HttpResponse("Invalid request")
 
 # =================================End Wallet===================================================================================================
+
+def generate_pdf_from_template(template_name, context, filename):
+    # Render the template with the given context
+    html_content = render_to_string(template_name, context)
+
+    # Create a response object
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="{filename}.pdf"'
+
+    # Generate PDF from HTML content
+    pisa_status = pisa.CreatePDF(
+        html_content,
+        dest=response
+    )
+
+    # If PDF generation failed, return an error response
+    if pisa_status.err:
+        return HttpResponse('PDF generation failed.')
+
+    return response
+
+
+def generate_invoice_pdf(request,order_id):
+    
+    order_detail = OrderProduct.objects.filter(order__order_number=order_id)
+    order = Order.objects.get(order_number=order_id)
+    payment = order.payment
+    subtotal = 0
+    tax=0
+    shipping_fee=0
+    for item in order_detail:
+        item.item_total = item.product_price*item.quantity
+        subtotal += item.item_total
+    
+    tax = (2*subtotal)/100
+    if subtotal>= 1000:
+        shipping_fee=0
+    else:
+        shipping_fee=100
+    grand_total = subtotal+tax+ shipping_fee
+
+    context = {
+        'order_detail':order_detail,
+        'order':order,
+        'subtotal':subtotal,
+        'shipping_fee':shipping_fee,
+        'tax':tax,
+        'shipping_fee':shipping_fee,
+        'grand_total':grand_total,
+        'payment': payment
+    }
+
+
+    # Generate PDF from the invoice template
+    pdf_response = generate_pdf_from_template('orders/invoice_template.html', context, 'invoice')
+
+    return pdf_response

@@ -49,6 +49,7 @@ Products List
                     <th>Category</th>
                     <th>Availble</th>
                     <th>Stock</th>
+                    <th>Imanges</th>
                     <th>Update</th>
                     <th>Delete</th>
                 </tr>
@@ -74,7 +75,7 @@ Products List
                         {{product.category}}
                     </td>
                     <td class="align-middle">
-                        {% if product.is_available %}<a href="#" class="btn btn-icon btn-success"><i class="fas fa-check"></i></a>
+                        {% if product.is_available and product.stock != 0 %}<a href="#" class="btn btn-icon btn-success"><i class="fas fa-check"></i></a>
                         {% elif product.stock == 0 %} <p class="text-danger">Out of stock</p> 
                         {% else %}<a href="#" class="btn btn-icon btn-danger"><i class="fas fa-times"></i></a> {% endif %}
                         
@@ -82,6 +83,7 @@ Products List
                     
 
                     <td> {{product.stock }} </td>
+                    <td><a data-collapse="#mycard-collapse" class="btn btn-icon btn-info" href="{% url 'add_product_images' product.id %}"><i class="fas fa-plus"></i></a></td>
                     <td><a href="{% url 'product_update' product.id %}" class="btn btn-warning">Update</a></td>
                     <td><a href="{% url 'product_delete' product.id %}" class="btn btn-danger">Delete</a></td>
                 </tr>

@@ -42,7 +42,7 @@ Category List
                     <th>Image</th>
                     <th>Slug</th>
                     <th>Update</th>
-                    <th>Delete</th>
+                    <th>Available</th>
                 </tr>
                 {% for category in categories %}
                 <tr>
@@ -59,9 +59,12 @@ Category List
                     <td>
                         {{category.slug}}
                     </td>
-                
+                    <td>
+                        {% if category.is_available %}<a href="#" class="btn btn-icon btn-success"><i class="fas fa-check"></i></a>
+                        {% else %}<a href="#" class="btn btn-icon btn-danger"><i class="fas fa-times"></i></a> {% endif %}
+                    </td>
                     <td><a href="{% url 'category_update' category.id %}" class="btn btn-warning">Update</a></td>
-                    <td><a href="{% url 'category_delete' category.id %}" class="btn btn-danger">Delete</a></td>
+                    
                 </tr>
                 {% endfor %}
                 

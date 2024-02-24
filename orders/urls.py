@@ -16,7 +16,7 @@ urlpatterns = [
     path('payment_cancel',views.payment_cancel, name='payment_cancel'),
 
     path('download_invoice/', views.download_invoice, name='download_invoice'),
-
+    
 
     
 ]

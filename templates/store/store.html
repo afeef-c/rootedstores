@@ -71,17 +71,20 @@
 
 						<div class="filter-icons">
 							<!--=======  filter dropdown  =======-->
-
+<!--
 							<div class="single-icon filter-dropdown">
-								<select class="nice-select" name="sort_by" id="sort_by">
+								<form id="sortForm" method="POST" action="{% url 'sort' %}">
+								{% csrf_token %}
+								<select class="nice-select"  name="sort_by" id="sort_by">
 									<option value="default">Default sorting</option>
 									<option value="popularity">Sort by popularity</option>
 									<option value="rating">Sort by average rating</option>
 									<option value="latest">Sort by latest</option>
 									<option value="price_low_to_high">Sort by price: low to high</option>
-									<option value="price_high_to_low">Sort by price: high to low</option>
+									<option value="price_high_to_low">Sort by price: high to low<</option>
 								</select>
-							</div>
+								</form>
+							</div>-->
 
 							<!--=======  End of filter dropdown  =======-->
 
@@ -128,18 +131,18 @@
 							<!--=======  single advance filte  =======-->
 							<form id="sortForm" method="POST" action="{% url 'sort' %}">
 							{% csrf_token %}
-							<div class="single-filter-widget">
-								<h2  class="single-filter-widget--title">Sort by</h2>
-								<ul name="sort_by" id="sort_by" class="single-filter-widget--list">
-									<li><a href="#" value="default">Default</a></li>
-									<li><a href="#" value="popularity">Popularity</a></li>
-									<li><a href="#" value="rating">Average rating</a></li>
-									<li><a href="#" value="latest" >Newness</a></li>
-									<li><a href="#" value="price_low_to_high" >Price: low to high</a></li>
-									<li><a href="#" value="price_high_to_low" >Price: high to low</a></li>
-									
-								</ul>
-							</div>
+								<div class="single-filter-widget">
+									<h2  class="single-filter-widget--title">Sort by</h2>
+									<ul name="sort_by" id="sort_by" class="single-filter-widget--list">
+										<li><a href="#" value="default">Default</a></li>
+										<li><a href="#" value="popularity">Popularity</a></li>
+										<li><a href="#" value="rating">Average rating</a></li>
+										<li><a href="#" value="latest" >Newness</a></li>
+										<li><a href="#" value="price_low_to_high" >Price: low to high</a></li>
+										<li><a href="#" value="price_high_to_low" >Price: high to low</a></li>
+										
+									</ul>
+								</div>
 
 							</form>
 							
@@ -618,6 +621,19 @@ $(document).ready(function() {
         });
     });
 
+	document.addEventListener("DOMContentLoaded", function () {
+    var sortOptions = document.querySelectorAll('#sort_by option');
+
+    sortOptions.forEach(function (option) {
+        option.addEventListener('click', function (event) {
+            event.preventDefault();
+            var sortValue = option.value;
+            var form = document.getElementById('sortForm');
+            form.action = '{% url "sort" %}?sort_by=' + sortValue;
+            form.submit();
+        });
+    });
+});
 
 
 </script>

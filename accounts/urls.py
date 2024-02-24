@@ -23,6 +23,9 @@ urlpatterns = [
     path('change_password/',views.change_password, name='change_password'),
     path('order_detail/<str:order_id>',views.order_detail, name='order_detail'),
     path('order_invoice/<str:order_id>',views.order_invoice, name='order_invoice'),
+    
+    path('generate_invoice_pdf/<str:order_id>',views.generate_invoice_pdf, name='generate_invoice_pdf'),
+
     path('cancel_order/<int:order_id>',views.cancel_order, name='cancel_order'),
     path('return_order/<int:order_id>',views.return_order, name='return_order'),
     #===========wishlist===============

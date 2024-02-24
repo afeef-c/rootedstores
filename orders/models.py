@@ -7,6 +7,7 @@ from django.core.mail import send_mail
 from django.conf import settings
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.utils import timezone
 
 
 # Create your models here.
@@ -17,6 +18,7 @@ class Payment(models.Model):
     ('SUCCESS', 'Success'),
     ('FAILURE', 'Failure'),
     ('PENDING', 'Pending'),
+    ('COD','COD'),
     ('REFUND', 'Refund'),
     )
 
@@ -46,13 +48,13 @@ def update_wallet_balance(sender, instance, **kwargs):
 class Order(models.Model):
     
     STATUS = (
-        ('Processing','Processing'),
+        ('Pending','Pending'),
         ('Confirmed','Confirmed'),
         ('Shipped','Shipped'),
         ('Cancelled','Cancelled'),
         ('Completed','Completed'),
         ('Delivered','Delivered'),
-        ('Return','Return')
+        ('Return','Returned')
     )
 
     user = models.ForeignKey(Account, on_delete=models.SET_NULL, null=True)
@@ -77,6 +79,8 @@ class Order(models.Model):
     is_ordered = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    coupon = models.ForeignKey('Coupon', on_delete=models.SET_NULL,blank=True, null=True)
+
 
     def full_name(self):
         return f"{self.first_name} {self.last_name}"
@@ -132,3 +136,24 @@ class OrderProduct(models.Model):
     def __str__(self) -> str:
         return self.product.product_name
     
+
+#============================== Coupon =========================================================
+    
+    
+class Coupon(models.Model):
+    code = models.CharField(max_length=50, unique=True)
+    discount_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    valid_from = models.DateTimeField()
+    valid_until = models.DateTimeField()
+    is_active = models.BooleanField(default=True)
+
+    def is_valid(self):
+        now = timezone.now()
+        return self.valid_from <= now <= self.valid_until
+
+    def __str__(self):
+        return self.code
+    
+
+
+

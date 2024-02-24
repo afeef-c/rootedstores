@@ -58,6 +58,7 @@
 							<div class="text-center d-block">
 								<a href="{% url 'store' %}" class="btn btn-warning">Continue Shoping!</a>
 							</div>
+
 						{% else %}
 						
 					<div class="cart-table-container">
@@ -169,20 +170,51 @@
 							<div class="col-lg-6 mb-md-30 mb-sm-30">
 								<!--=======  coupon form  =======-->
 
-								<div class="lezada-form coupon-form">
-									<form action="#">
+								<!--<div class="lezada-form coupon-form">
+									<form action="">
+										{% csrf_token %}
 										<div class="row">
+											 {% if error_message %}
+												<p>{{ error_message }}</p>
+											{% endif %}
 											<div class="col-md-7 mb-sm-10">
 												<input type="text" placeholder="Enter your coupon code">
 											</div>
 											<div class="col-md-5">
-												<button class="lezada-button lezada-button--medium">apply coupon</button>
+												<button type="" class="lezada-button lezada-button--medium">apply coupon</button>
 											</div>
 										</div>
 									</form>
+								</div>-->
+
+								<!--=======  End of coupon form  =======-->
+								<!--=======  coupon form  =======-->
+
+								<div class="lezada-form coupon-form">
+									{% if 'coupon' not in request.session %}
+
+									<form action="{% url 'add_coupon' %}" method="POST">
+										{% csrf_token %}
+										<div class="row">
+											{% if error_message %}
+												<p>{{ error_message }}</p>
+											{% endif %}
+											<div class="col-md-7 mb-sm-10">
+												<!--<input type="text" placeholder="Enter your coupon code">-->
+												{{ couponform.code }}
+											</div>
+											<div class="col-md-5">
+												<button type="submit" class="lezada-button lezada-button--medium">apply coupon</button>
+											</div>
+										</div>
+									</form>
+									{% else %}
+									<p> {{discount_amount}} </p>
+									{% endif %}
 								</div>
 
 								<!--=======  End of coupon form  =======-->
+
 							</div>
 
 							<div class="col-lg-6 text-left text-lg-right">
@@ -198,8 +230,8 @@
 					<!--=======  End of coupon area  =======-->
 				</div>
 				
-
-				<div class="col-xl-4 offset-xl-8 col-lg-5 offset-lg-7">
+				
+				<div class="col-xl-5 offset-lg-7 col-lg-5 offset-lg-7">
 					<div class="cart-calculation-area">
 						<h2 class="mb-40">Cart totals</h2>
 
@@ -216,6 +248,12 @@
 								<th>Shipping  </th>
 								<td class="tax">₹ {{shipping_fee}}.0 </td>
 							</tr>
+							{% if 'coupon' in request.session and discount_amount > 0 %}
+							<tr>
+								<th>Referal/Coupon Discounts  </th>
+								<td class="coupon">₹ {{discount_amount}}.0 </td>
+							</tr>
+							{% endif %}
 							<tr>
 								<th>TOTAL</th>
 								<td class="total">₹ {{grand_total}} </td>
@@ -227,14 +265,19 @@
 						</div>
 					</div>
 				</div>
-				
 				{% endif %}
+				
+				
 			</div>
 		</div>
 	</div>
-
+	
+	{% if orders_exist %}
+	
+	 {% include 'cart/pending_order.html' %}
+	{% endif %}
 	<!--=====  End of cart page content  ======-->
-
+	
 
 {% endblock %}
 

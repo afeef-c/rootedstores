@@ -1,0 +1,133 @@
+
+{% load static %}
+
+<!DOCTYPE html>
+<html class="no-js" lang="zxx">
+
+
+<!-- Mirrored from htmldemo.net/lezada/lezada/ by HTTrack Website Copier/3.x [XR&CO'2014], Tue, 07 Jun 2022 10:50:00 GMT -->
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>Rooted - Plants eCommerce</title>
+	<meta name="description" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<!-- Favicon -->
+	<link rel="icon" href="{% static 'assets/images/rooted_icon.png'%}">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+	<style>
+		body {
+			max-width: 100%;
+			overflow-y: scroll; /* Enable horizontal scrolling */
+			overflow-x: hidden;
+		}
+	</style>
+	{% block css %}
+
+	{% endblock css %}
+	<!-- CSS
+	============================================ -->
+	<!-- Bootstrap CSS -->
+	<link href="{% static 'assets/css/bootstrap.min.css' %}" rel="stylesheet">
+
+	<!-- FontAwesome CSS -->
+	<link href="{% static 'assets/css/font-awesome.min.css' %}" rel="stylesheet">
+
+	<!-- Ionicons CSS -->
+	<link href="{% static 'assets/css/ionicons.min.css' %}" rel="stylesheet">
+
+	<!-- Themify CSS -->
+	<link href="{% static 'assets/css/themify-icons.css' %}" rel="stylesheet">
+
+	<!-- Plugins CSS -->
+	<link href="{% static 'assets/css/plugins.css' %}" rel="stylesheet">
+
+	<!-- Helper CSS -->
+	<link href="{% static 'assets/css/helper.css' %}" rel="stylesheet">
+
+	<!-- Main CSS -->
+	<link href="{% static 'assets/css/main.css' %}" rel="stylesheet">
+
+	<!-- Revolution Slider CSS -->
+	<link href="{% static 'assets/revolution/css/settings.css' %}" rel="stylesheet">
+	<link href="{% static 'assets/revolution/css/navigation.css' %}" rel="stylesheet">
+	<link href="{% static 'assets/revolution/custom-setting.css' %}" rel="stylesheet">
+
+	<!-- Modernizer JS -->
+	<script src="{% static 'assets/js/vendor/modernizr-2.8.3.min.js' %}"></script>
+
+	<!-- paypal scripts -->
+	<!--<script src="https://www.paypal.com/sdk/js?client-id=ARLdfpzOqELoE5R215LgTNMzUJZChL30XTh_IUmUaAfuE0FdwNsj3FcWQUQzNOtfCAee4fsOqUUchHhz&currency=INR"></script>-->
+	<!-- Razorpay -->
+	<!--<script src="https://checkout.razorpay.com/v1/checkout.js"></script>-->
+
+
+
+</head>
+<!-- Mirrored from htmldemo.net/lezada/lezada/ by HTTrack Website Copier/3.x [XR&CO'2014], Tue, 07 Jun 2022 10:50:54 GMT -->
+<body>
+	{% if 'blocked'  not in request.path  %}
+    {% endif %}
+
+    
+
+
+
+{% block content %}
+
+
+{% endblock %}
+
+
+
+
+	<!--=============================================
+	=            footer banner section area        =
+	=============================================-->
+
+	
+
+	<!--=====  End of ad section area ======-->
+
+	<!--=============================================
+	=            footer three         =
+	=============================================-->
+
+
+	<!--=====  End of footer three  ======-->
+
+
+
+
+	<!-- scroll to top  -->
+	<a href="#" class="scroll-top"></a>
+	<!-- end of scroll to top -->
+
+	<!-- JS
+        ============================================ -->
+	<!-- jQuery JS -->
+	<script src="{% static 'assets/js/vendor/jquery.min.js' %}"></script>
+
+	<!-- Popper JS -->
+	<script src="{% static 'assets/js/popper.min.js' %}"></script>
+
+	<!-- Bootstrap JS -->
+	<script src="{% static 'assets/js/bootstrap.min.js' %}"></script>
+
+	<!-- Plugins JS -->
+	<script src="{% static 'assets/js/plugins.js' %}"></script>
+
+	<!-- Main JS -->
+	<script src="{% static 'assets/js/main.js' %}"></script>
+
+
+	{% block js %}
+	{% endblock js %}	
+
+		<!-- Rayzor pay -->
+	<!--<script src="{% static 'js/chekout.js' %}"></script>-->
+
+</body>
+
+</html>

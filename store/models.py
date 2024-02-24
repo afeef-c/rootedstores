@@ -137,6 +137,7 @@ class Offer(models.Model):
     discount_percentage = models.DecimalField(max_digits=5, decimal_places=2)
     start_date = models.DateTimeField()
     end_date = models.DateTimeField()
+    is_active = models.BooleanField(default=True)
 
     def is_upcoming(self):
         now = timezone.now()
@@ -162,37 +163,4 @@ class Offer(models.Model):
         else:
             return {'days': 0, 'hours': 0, 'minutes': 0, 'seconds': 0}
     
-    def save(self, *args, **kwargs):
-        # Ensure discount_percentage is within certain limits
-        max_discount_percentage = 90  # Example: Maximum allowed discount percentage
-        min_discount_percentage = 0   # Example: Minimum allowed discount percentage
-        if self.discount_percentage > max_discount_percentage:
-            self.discount_percentage = max_discount_percentage
-        elif self.discount_percentage < min_discount_percentage:
-            self.discount_percentage = min_discount_percentage
-        
-        # Check if the product has more than 95% discount and add a separate offer
-        if self.discount_percentage > 95:
-            # Create a new offer with the same product but with a capped discount percentage
-            Offer.objects.create(
-                product=self.product,
-                discount_percentage=max_discount_percentage,  # Cap the discount percentage
-                start_date=self.start_date,
-                end_date=self.end_date
-            )
-        # # Check if end_date is greater than start_date
-        #if self.end_date <= self.start_date:
-        #    raise ValidationError("End date must be after start date")
-
-        super().save(*args, **kwargs)
-#class ProductOffer(models.Model):
-#    product = models.ForeignKey(Product, on_delete=models.CASCADE)
-#    discount_percentage = models.DecimalField(max_digits=5, decimal_places=2)
-#    start_date = models.DateTimeField(default=timezone.now)
-#    end_date = models.DateTimeField()
-
-
-#class Referral(models.Model):
-#    user = models.ForeignKey(Account, on_delete=models.CASCADE)
-#    referral_code = models.CharField(max_length=20, unique=True)
-#    discount_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    

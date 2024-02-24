@@ -14,16 +14,22 @@ urlpatterns = [
     path('category_list/', AdminViews.CategoriesListView.as_view(), name='category_list'),
     path('category_create/', AdminViews.CategoriesCreate.as_view(), name='category_create'),
     path('category_update/<slug:pk>', AdminViews.CategoriesUpdate.as_view(), name='category_update'),
-    path('category_delete/<slug:pk>', AdminViews.CategoryDeleteView.as_view(), name='category_delete'),
+    #path('category_delete/<slug:pk>', AdminViews.CategoryDeleteView.as_view(), name='category_delete'),
     # user
     path('user_create/', AdminViews.UserCreateView.as_view(), name='user_create'),
     path('users_list/', AdminViews.UsersListView.as_view(), name='users_list'),
     path('user_update/<slug:pk>', AdminViews.UserUpdate.as_view(), name='user_update'),
     path('user_delete/<int:pk>', AdminViews.UserDeleteView.as_view(), name='user_delete'),
 
+    #report
+    path('sales/', views.sales, name='sales'),
+    path('generate_sales_pdf/', views.generate_sales_pdf, name='generate_sales_pdf'),
+
     # products
     path('add_product/', AdminViews.ProductCreateView.as_view(), name='add_product'),
     path('products_list/', AdminViews.ProductListView.as_view(), name='products_list'),
+    
+    path('add_product_images/<int:product_id>', AdminViews.add_product_images, name='add_product_images'),
     path('product_update/<slug:pk>', AdminViews.ProductUpdate.as_view(), name='product_update'),
     path('product_delete/<int:pk>', AdminViews.ProductDeleteView.as_view(), name='product_delete'),
     
@@ -49,6 +55,17 @@ urlpatterns = [
     path('product_offers_update/<slug:pk>', AdminViews.ProductOffersUpdate.as_view(), name='product_offers_update'),
     path('add_product_offers/', AdminViews.ProductOfferCreateView.as_view(), name='add_product_offers'),
     path('add_category_offers/', AdminViews.CategoryOfferCreateView.as_view(), name='add_category_offers'),
+
+    #coupon
+    path('coupons/', AdminViews.Coupons.as_view(), name='coupons'),
+    path('create_coupon/', AdminViews.CouponCreateView.as_view(), name='create_coupon'),
+    path('update_coupon/<slug:pk>', AdminViews.CouponUpdateView.as_view(), name='update_coupon'),
+    path('delete_coupon/<slug:pk>', AdminViews.CouponDeleteView.as_view(), name='delete_coupon'),
+
+
+    path('filter_orders/', views.filter_orders, name='filter_orders'),
+
+
 ]   
 
 

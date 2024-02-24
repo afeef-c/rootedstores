@@ -1,9 +1,6 @@
 {% extends 'customadmin/admin_base.html' %}
 {% load static %}
 
-
-<h2>Orders list</h2>
-
 {% block title %}
 Category Offers
 {% endblock title %}
@@ -68,8 +65,8 @@ Category Offers
                             <div class="badge badge-secondary">Upcoming</div>
                         {% else %}
                             <div class="badge badge-danger"> Not Active</div>
-                        {% endif %}-->{% if offer.is_upcoming %}
-                        
+                        {% endif %}-->
+                        {% if offer.is_upcoming %}
                         <div class="badge badge-secondary">Upcoming</div><br>
                         {% elif offer.is_expired %}
                         <div class="badge badge-warning">Expired</div><br>
@@ -93,7 +90,7 @@ Category Offers
                         {% endif %}
                     </td>
                     
-                    <td><a href="{% url 'category_offers_update' offer.category.id %}" class="btn btn-warning">Update</a></td>
+                    <td><a href="{% url 'category_offers_update' offer.id %}" class="btn btn-warning">Update</a></td>
                 </tr>
                 {% endfor %}
                 

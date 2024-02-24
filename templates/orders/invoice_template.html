@@ -1,9 +1,10 @@
-{% extends 'partials/base.html' %}
+{% extends 'partials/base_.html' %}
 {% load static %}
 {% block css %}
 
 <style>
     body{margin-top:20px;
+        
     background-color:#eee;
     }
 
@@ -26,9 +27,9 @@
 {% endblock css %}
 
 {% block content %}
-    <div class="order-tracking-area mb-130 mt-130">
+    <div class="order-tracking-area mb-1 mt-130">
 		
-        <div class="container">
+        <div class="container ">
             <div class="row">
                 <div class=" col-lg-10 col-md-10 col-12 offset-lg-1 offset-md-1">
                     <div class="card p-5">
@@ -152,6 +153,11 @@
                                     <div class="float-end">
                                         <a href="javascript:window.print()" class="btn btn-success me-1"><i class="fa fa-print"></i></a>
                                     </div>
+                                    <div class="float-end">
+                                        <a href="{% url 'generate_invoice_pdf' order.order_number %}" class="btn btn-success me-1">Download</a>
+                                    </div>
+
+                                    
                                 </div>    
                             </div>
                         </div>

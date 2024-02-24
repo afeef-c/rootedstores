@@ -1,0 +1,90 @@
+{% extends 'customadmin/admin_base.html' %}
+{% load static %}
+
+{% block title %}
+Update Discount Coupon
+{% endblock title %}
+
+{% block custom_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+{% endblock custom_css %}
+
+{% block page_title %}
+Update Discount Coupon
+{% endblock page_title %}
+
+{% block page_content %}
+<div class="r">
+    <div class="col-12 col-md-12 col-lg-12">
+        <div class="card">
+            <div class="card-header">
+                <h4>Update Discount Coupon</h4>
+            </div>
+            <div class="card-body">
+                <form action="" method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {% for field in form %}
+
+                    {% if field.name == 'valid_from' or field.name == 'valid_until' %}
+                        <div class="form-group">
+                            <label for="">{{ field.label }} </label><br>
+                            <div class="input-group">
+                                <input type="text" name="{{ field.name }}" id="{{ field.id_for_label }}" class="form-control flatpickr-input" value="{{ field.value|date:"Y-m-d H:i" }}">
+                                <div class="input-group-append">
+                                    <span class="input-group-text"><i class="fa fa-calendar"></i></span>
+                                </div>
+                            </div>
+                            {% if field.errors %}
+                            <div class="alert alert-danger" style="margin: 10px; padding:0px">
+                                {{field.errors}}
+                            </div>
+                            {% endif %}
+                        </div>
+                    {% elif field.field.widget.input_type == 'checkbox' %}
+                            <div class="form-check">
+                                <input type="{{field.field.widget.input_type}}" name="{{field.name}}" id="{{field.name}}" class="form-control" {% if field.value %}checked{% endif %}>
+                                <label class="form-check-label" for="{{ field.name }}" >
+                                    {{ field.label }}
+                                </label>
+                            </div>
+                    {% else %}    
+                    <div class="form-group">
+                        <label> {{ field.label }} </label>
+                        <input type="{{field.field.widget.input_type}}" name="{{field.name}}" id="{{field.name}}" class="form-control">
+                        {% if field.errors %}
+                        <div class="alert alert-danger" style="margin: 10px; padding:0px">
+                            {{field.errors}}
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                    {% endfor %}                
+                    <button class="btn btn-primary btn-block" type="submit">ADD COUPON</button>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+{% endblock page_content %}
+
+{% block custom_js %}
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script>
+    flatpickr('.flatpickr-input', {
+        enableTime: true, // Enable time selection
+        dateFormat: "Y-m-d H:i", // Date format
+        time_24hr: true, // Use 24-hour time format
+        // Add any other options you need
+    });
+    
+    document.getElementById("cat_name").onkeyup = function() {
+        document.getElementById('slug').value = document.getElementById("cat_name").value.toLowerCase().replace(" ", '_');
+    }
+
+    
+</script>
+
+{% endblock custom_js %}

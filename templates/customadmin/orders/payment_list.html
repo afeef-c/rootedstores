@@ -21,16 +21,18 @@ Payment details
     <div class="card col-lg-12">
         <div class="card-header">
             <h4>Payment details</h4>
-        <!--<div class="card-header-form">
-            <form>
-            <div class="input-group">
-                <input type="text" class="form-control" placeholder="Search">
-                <div class="input-group-btn">
-                <button class="btn btn-primary"><i class="fas fa-search"></i></button>
-                </div>
-            </div>
-            </form>
-        </div>-->
+        
+            <!--<div class="card-header-form">
+                <form id="date_filter_form">
+                    <div class="input-group">
+                        <input type="date" class="form-control" id="start_date" name="start_date">
+                        <input type="date" class="form-control" id="end_date" name="end_date">
+                        <div class="input-group-btn">
+                            <button type="submit" class="btn btn-primary">Filter</button>
+                        </div>
+                    </div>
+                </form>
+            </div>-->
         </div>
         
         <div class="card-body p-0">
@@ -77,5 +79,25 @@ Payment details
 {% endblock page_content %}
 
 {% block custom_js %}
+<script>
+    document.getElementById('date_filter_form').addEventListener('submit', function(event) {
+        event.preventDefault();
+        var startDate = document.getElementById('start_date').value;
+        var endDate = document.getElementById('end_date').value;
+        filterPayments(startDate, endDate);
+    });
 
+    function filterPayments(startDate, endDate) {
+        var rows = document.getElementById('payment_table').getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+        for (var i = 0; i < rows.length; i++) {
+            var paymentDate = new Date(rows[i].querySelector('td:nth-child(4)').textContent); // Adjust this index based on the position of the date in your table
+            if (paymentDate < new Date(startDate) || paymentDate > new Date(endDate)) {
+                rows[i].style.display = 'none';
+            } else {
+                rows[i].style.display = '';
+            }
+        }
+    }
+
+</script>
 {% endblock custom_js %}

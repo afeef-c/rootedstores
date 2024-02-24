@@ -67,7 +67,7 @@
 								</a> 
 							</div>-->
 							<div class="search-widget">
-								<form action="/store/search/" method="GET">
+								<form action="{% url 'search' %}" method="GET">
 									<input type="search" name="keyword" placeholder="Search ...">
 									<button type="submit"><i class="ion-android-search"></i></button>
 								</form>

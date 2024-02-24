@@ -11,3 +11,9 @@ class OrderForm(forms.ModelForm):
         fields = ['first_name','last_name','email','phone','address_line_1','address_line_2','pin_code' ,'country','state','city','order_note']
 
 
+class CouponForm(forms.Form):
+    code = forms.CharField(widget=forms.TextInput(attrs={
+        'placeholder':"Enter your coupon code"
+    }))
+
+

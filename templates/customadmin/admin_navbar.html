@@ -69,7 +69,15 @@
                 <li class="{% if request.path == user_create %} active {% endif %}" ><a class="nav-link" href=" {% url 'user_create' %} ">Create Users</a></li>
               </ul>
             </li>
-            
+            <!--  Reports -->
+            {% url 'sales' as sales %}
+            <li class="dropdown {% if request.path == sales %} active {% endif %}">
+              <a href="#" class="nav-link has-dropdown"><i class="far fa-file"></i><span>Reports</span></a>
+              <ul class="dropdown-menu">
+                <li class="{% if request.path == sales %} active {% endif %}"><a class="nav-link" href=" {% url 'sales' %} ">sales</a></li>
+              </ul>
+              
+            </li>
             <!--  products manu -->
             
             {% url 'add_product' as add_product %}
@@ -117,14 +125,18 @@
             {% url 'category_offers' as category_offers %}
             {% url 'product_offers' as product_offers %}
             {% url 'category_offers_update' as category_offers_update %}
-            {% url 'product_offers_update' as payment_update %}
-            <li class="dropdown {% if request.path == category_offers %} active {% endif %}{% if request.path == product_offers %} active {% endif %} {% if request.path == category_offers_update %} active {% endif %} {% if request.path == product_offers_update %} active {% endif %}">
+            {% url 'product_offers_update' as product_offers_update %}
+            {% url 'coupons' as coupons %}
+            <li class="dropdown {% if request.path == category_offers %} active {% endif %}{% if request.path == product_offers %} active {% endif %} {% if request.path == category_offers_update %} active {% endif %} {% if request.path == product_offers_update %} active {% endif %}{% if request.path == coupons %} active {% endif %}">
               <a href="#" class="nav-link has-dropdown"><i class="fas fa-fire"></i><span>Offers</span></a>
               <ul class="dropdown-menu">
                 <li class="{% if request.path == category_offers %} active {% endif %} {% if request.path == category_offers_update %} active {% endif %}"><a class="nav-link" href=" {% url 'category_offers' %} "> Category Offers </a></li>
               </ul>
               <ul class="dropdown-menu">
                 <li class="{% if request.path == product_offers %} active {% endif %} {% if request.path == product_offers_update %} active {% endif %}"><a class="nav-link" href=" {% url 'product_offers' %} "> Product Offers </a></li>
+              </ul>
+              <ul class="dropdown-menu">
+                <li class="{% if request.path == coupons %} active {% endif %}"><a class="nav-link" href=" {% url 'coupons' %} "> Coupon Management </a></li>
               </ul>
             </li>
           </ul>

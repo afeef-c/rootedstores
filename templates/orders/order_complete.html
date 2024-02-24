@@ -124,6 +124,7 @@
                                             <tr>
                                                 <th style="width: 70px;"></th>
                                                 <th>Item</th>
+                                                <th>Offer Price</th>
                                                 <th>Price</th>
                                                 <th>Quantity</th>
                                                 <th class="text-end" style="width: 120px;">Total</th>
@@ -143,7 +144,8 @@
                                                             {% endif %}
                                                         </div>
                                                     </td>
-                                                    <td>₹ {{item.product_price}} </td>
+                                                    <td>₹ {{item.product_price|floatformat:'2'}} </td>
+                                                    <td>₹ {{item.product.price|floatformat:'2'}} </td>
                                                     <td> {{item.quantity}} </td>
                                                     <td class="text-end">₹ {{item.total}} </td>
                                                 </tr>
@@ -153,7 +155,7 @@
                                             
                                             <tr>
                                                 <th scope="row" colspan="4" class="text-end">Sub Total</th>
-                                                <td class="text-end">₹ {{subtotal}} </td>
+                                                <td class="text-end">₹ {{subtotal|floatformat:"2"}} </td>
                                             </tr>
 
                                             <!-- end tr -->
@@ -161,18 +163,25 @@
                                                 <th scope="row" colspan="4" class="border-0 text-end">
                                                     Shipping Charge :</th>
                                                     <p>Free shipping order > ₹1000</p>
-                                                <td class="border-0 text-end">₹ {{shipping_fee}} </td>
+                                                <td class="border-0 text-end">₹ {{shipping_fee|floatformat:"2"}} </td>
                                             </tr>
                                             <!-- end tr -->
                                             <tr>
                                                 <th scope="row" colspan="4" class="border-0 text-end">
                                                     Tax (2%)</th>
-                                                <td class="border-0 text-end">₹ {{tax|floatformat:"1"}} </td>
+                                                <td class="border-0 text-end">₹ {{tax|floatformat:"2"}} </td>
                                             </tr>
+                                            {% if 'coupon' in order.coupon or discount_amount > 0 %}
+                                            <tr>
+                                                <th scope="row" colspan="4" class="border-0 text-end">
+                                                    Referal/Coupon Discounts </th>
+                                                <td class="border-0 text-end">₹ {{discount_amount|floatformat:"2"}} </td>
+                                            </tr>
+                                            {% endif %}
                                             <!-- end tr -->
                                             <tr>
                                                 <th scope="row" colspan="4" class="border-0 text-end">Total</th>
-                                                <td class="border-0 text-end"><h4 class="m-0 fw-semibold">₹ {{grand_total|floatformat:"1"}} </h4></td>
+                                                <td class="border-0 text-end"><h4 class="m-0 fw-semibold">₹ {{grand_total|floatformat:"2"}} </h4></td>
                                             </tr>
                                             <!-- end tr -->
                                         </tbody><!-- end tbody -->
@@ -182,13 +191,7 @@
                                     <div class="float-end">
                                         <a href="javascript:window.print()" class="btn btn-success me-1"><i class="fa fa-print"></i></a>
                                         <!--<a href="#" class="btn btn-primary w-md">Send</a>-->
-                                        <a href="{% url 'download_invoice' %}?order_number={{ order_number }}
-                                        &payment_id={{ payment_id }}
-                                        &order_products={{ order_products }}
-                                        &subtotal={{ subtotal }}
-                                        &grand_total={{ grand_total}}
-                                        &tax={{tax}}
-                                        &shipping_fee={{ shipping_fee}}" class="btn btn-primary w-md">Download Invoice</a>
+                                        <a href="{% url 'generate_invoice_pdf' order.order_number %}">Download Invoice</a>
                                     </div>
                                 </div>
                             

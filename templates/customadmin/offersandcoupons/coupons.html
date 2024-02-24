@@ -1,0 +1,66 @@
+{% extends 'customadmin/admin_base.html' %}
+{% load static %}
+
+{% block title %}
+Coupon Management
+{% endblock title %}
+
+{% block custom_css %}
+{% endblock custom_css %}
+
+{% block page_title %}
+Coupon Management
+{% endblock page_title %}
+
+{% block page_content %}
+<div class="row">    
+
+    <div class="card col-lg-12">
+        <div class="card-header">
+            <h4>Coupon Management</h4>
+        <div class="card-header-form">
+            
+            <a href="{% url 'create_coupon' %}" class="btn btn-primary mt-4">Add New Coupon</a>
+        </div>
+        </div>
+        
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                <tbody>
+                <tr>
+                    <th>Coupon </th>
+                    <th>Discount Amount</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                    <th>Is Active</th>
+                    <th>Delete</th>
+                    <th>Update</th>
+                    
+                </tr>
+                {% for dis in coupons %}
+                <tr>
+                    <td> {{dis.code}} </td>
+                    <td>₹ {{dis.discount_amount|floatformat:"2"}} </td>
+                    <td> {{dis.valid_from}} </td>
+                    <td> {{dis.valid_until }} </td>
+                    <td> {% if dis.is_active %}<a href="#" class="btn btn-icon btn-success"><i class="fas fa-check"></i></a> {% else %}<a href="#" class="btn btn-icon btn-danger"><i class="fas fa-times"></i></a>{% endif %} </td>
+                    <td><a href="{% url 'delete_coupon' dis.id %}" class="btn btn-danger">Delete</a></td>
+                    <td><a href="{% url 'update_coupon' dis.id %}" class="btn btn-warning">Update</a></td>
+                </tr>
+                {% endfor %}
+                
+                
+                </tbody></table>
+            </div>
+        </div>
+        
+    </div>
+    
+</div> 
+
+{% endblock page_content %}
+
+{% block custom_js %}
+
+{% endblock custom_js %}
