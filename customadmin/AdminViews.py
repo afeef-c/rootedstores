@@ -51,7 +51,8 @@ def admin_home(request):
         .order_by('-total_quantity')  # Order by total quantity in descending order
         [:5]  # Limit to the top 5 most ordered products
     )
-
+    top_five_most_ordered_products_details = Product.objects.filter(id__in=[item['product'] for item in most_ordered_products])
+    
     most_ordered_category = (
         OrderProduct.objects.values('product__category__slug')  # Group by category name
         .annotate(total_quantity=Sum('quantity'))  # Calculate total quantity for each category
@@ -59,9 +60,13 @@ def admin_home(request):
         [:5]  # Fetch the top most ordered category
     )
     
-    top_five_most_ordered_products_details = Product.objects.filter(id__in=[item['product'] for item in most_ordered_products])
+    
     out_of_stock_products = Product.objects.all().order_by('stock')[:5]
 
+#    most_ordered_category = [
+#    {'category_name': item['product__category__cat_name'], 'total_quantity': item['total_quantity']} 
+#    for item in most_ordered_category
+#]
     
     top_five_most_ordered_categories_details = Category.objects.filter(slug__in=[item['product__category__slug'] for item in most_ordered_category]).prefetch_related('product_set')
 

@@ -173,7 +173,7 @@
                             </div>
                         </form>
                     {% else %}
-                        <form action="{% url 'payments' %}" method="POST">
+                        <form action="{% url 'wallet_payments' %}" method="POST">
                             {% csrf_token %}
                             <div class="check-box">
                                 <input type="checkbox" id="wallet" name="wallet" required>

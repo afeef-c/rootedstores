@@ -106,7 +106,7 @@ class Order(models.Model):
         elif self.status in ['Completed', 'Delivered']:
             # Check if the payment status is not already set to Success
             if self.payment and self.payment.status != 'SUCCESS':
-                self.payment.status = 'SUCCESS'
+                self.payment.status = "SUCCESS"
                 self.payment.save()
                 self.send_status_email()
 

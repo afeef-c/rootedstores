@@ -749,7 +749,14 @@ def generate_invoice_pdf(request,order_id):
         shipping_fee=0
     else:
         shipping_fee=100
-    grand_total = subtotal+tax+ shipping_fee
+
+    if order.coupon is not None:
+        discount_amount = float(order.coupon.discount_amount)
+    else:
+        discount_amount=0
+    
+
+    grand_total=round(subtotal + tax + shipping_fee - discount_amount, 2)
 
     context = {
         'order_detail':order_detail,
@@ -759,7 +766,8 @@ def generate_invoice_pdf(request,order_id):
         'tax':tax,
         'shipping_fee':shipping_fee,
         'grand_total':grand_total,
-        'payment': payment
+        'payment': payment,
+        'discount_amount':discount_amount
     }
 
 

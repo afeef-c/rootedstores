@@ -47,22 +47,18 @@ def cart(request):
 
         tax = (2 * total) / 100
         grand_total = total + tax
-    except Cart.DoesNotExist:
-        cart_items = []
+        orders_exist = Order.objects.filter(user=request.user, status='Pending').exists()
+        if orders_exist:
+            order = Order.objects.get(user=request.user, status='Pending')
+            #payment_method = order.payment.payment_method
 
-    orders_exist = Order.objects.filter(user=request.user, status='Pending').exists()
-    if orders_exist:
-        order = Order.objects.get(user=request.user, status='Pending')
-        payment_method = order.payment.payment_method
-
-        order_products = OrderProduct.objects.filter(order=order, ordered=False)
-        for pending_item in order_products:
-            pending_item.item_total = (float(pending_item.product_price) * pending_item.quantity)
-            pending_total += pending_item.item_total
-            quantity += pending_item.quantity
-
-
-    context = {
+            order_products = OrderProduct.objects.filter(order=order, ordered=False)
+            for pending_item in order_products:
+                pending_item.item_total = (float(pending_item.product_price) * pending_item.quantity)
+                pending_total += pending_item.item_total
+                quantity += pending_item.quantity
+        
+        context = {
         'total': total,
         'quantity': quantity,
         'variations': variations,
@@ -70,10 +66,18 @@ def cart(request):
         'grand_total': grand_total,
         'tax': tax,
         'orders_exist':orders_exist,
-    }
+        }
 
-    if orders_exist:
-        context['order_products'] = order_products
+        if orders_exist:
+            context['order_products'] = order_products
+        
+    except Cart.DoesNotExist:
+        cart_items = []
+    
 
+        context = {
+            'cart_items':cart_items
+        }
+    
 
     return context

@@ -63,11 +63,10 @@ MIDDLEWARE = [
     # for restric logged user to login page
     'accounts.middleware.RedirectAuthenticatedUserMiddleware',
     #restrict blocked user
-    #'yourapp.middleware.BlockedUserMiddleware',
     'rooted.middleware.BlockedUserMiddleware',
 
 
-     'corsheaders.middleware.CorsMiddleware', 
+    'corsheaders.middleware.CorsMiddleware', 
     
 ]
 
@@ -159,13 +158,13 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-from django.contrib.messages import constants as messages
+#from django.contrib.messages import constants as messages
 
-MESSAGE_TAGS = {
-    messages.ERROR: 'danger',
-}
+#MESSAGE_TAGS = {
+#    messages.ERROR: 'danger',
+#}
 
-MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
+#MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 
 
 #ACCOUNT_SID='AC0722d83bf85ed2310a99c6a179b132b1'

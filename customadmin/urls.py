@@ -65,7 +65,8 @@ urlpatterns = [
 
 
     path('filter_orders/', views.filter_orders, name='filter_orders'),
-    
+    #path('update_most_ordered_products/', AdminViews.update_most_ordered_products, name='update_most_ordered_products'),
+
 
 
 ]   

@@ -92,42 +92,48 @@
   <div class="row">
     
     <!-- Best selling products -->
-  <div class="col-lg-4">
-    <div class="card gradient-bottom">
+    <div class="col-lg-4">
+      
+      <div class="card gradient-bottom">
         <div class="card-header">
-            <h4>Best selling Products</h4>
-            <div class="card-header-action dropdown">
-                <a href="#" data-toggle="dropdown" class="btn btn-danger dropdown-toggle" id="selected-period">Month</a>
-                <ul class="dropdown-menu dropdown-menu-sm dropdown-menu-right" id="period-dropdown">
-                    <li class="dropdown-title">Select Period</li>
-                    <li><a href="#" class="dropdown-item select-period" data-period="today">Today</a></li>
-                    <li><a href="#" class="dropdown-item select-period" data-period="week">Week</a></li>
-                    <li><a href="#" class="dropdown-item select-period" data-period="month">Month</a></li>
-                    <li><a href="#" class="dropdown-item select-period" data-period="year">This Year</a></li>
-                </ul>
-            </div>
+          <h4>Best selling Products</h4>
+          <!--<div class="card-header-action dropdown">
+            <a href="#" data-toggle="dropdown" class="btn btn-danger dropdown-toggle">Month</a>
+            <ul class="dropdown-menu dropdown-menu-sm dropdown-menu-right">
+              <li class="dropdown-title">Select Period</li>
+              <li><a href="#" class="dropdown-item">Today</a></li>
+              <li><a href="#" class="dropdown-item">Week</a></li>
+              <li><a href="#" class="dropdown-item active">Month</a></li>
+              <li><a href="#" class="dropdown-item">This Year</a></li>
+            </ul>
+          </div>-->
         </div>
         <div class="card-body" id="top-5-scroll" tabindex="2" style="height: 315px; overflow: hidden; outline: none;">
-            <ul class="list-unstyled list-unstyled-border">
-                {% for product in top_five_most_ordered_products_details %}
-                    <a href="{% url 'product_update' product.id %}">
-                        <li class="media">
-                            <img class="mr-3 rounded" width="55" src="{{product.images.url}}" alt="product">
-                            <div class="media-body">
-                                <div class="float-right">
-                                    <div class="font-weight-600 text-muted text-small">₹ {{product.price}}</div>
-                                </div>
-                                <div class="media-title">{{product.product_name}}</div>
-                            </div>
-                        </li>
-                    </a>
-                {% endfor %}
-            </ul>
+          <ul class="list-unstyled list-unstyled-border">
+            {% for product in top_five_most_ordered_products_details %}
+            <a href="{% url 'product_update' product.id %}">
+            <li class="media">
+              <img class="mr-3 rounded" width="55" src="{{product.images.url}}" alt="product">
+              <div class="media-body">
+                <div class="float-right"><div class="font-weight-600 text-muted text-small">
+                ₹ {{product.price}}
+                  </div>
+                </div>
+                <div class="media-title"> {{product.product_name}} </div>
+                
+              </div>
+              
+            </li>
+            </a>
+            {% endfor %}
+          </ul>
         </div>
-        <div class="card-footer pt-3 d-flex justify-content-center"></div>
+        <div class="card-footer pt-3 d-flex justify-content-center">
+          
+        </div>
+      </div>
+      
     </div>
-</div>
-
     <!-- Best selling products end -->
 
     <!-- Best selling Category -->
@@ -136,16 +142,16 @@
       <div class="card gradient-bottom">
         <div class="card-header">
           <h4>Best selling Category</h4>
-          <div class="card-header-action dropdown">
+          <!--<div class="card-header-action dropdown">
             <a href="#" data-toggle="dropdown" class="btn btn-danger dropdown-toggle">Month</a>
             <ul class="dropdown-menu dropdown-menu-sm dropdown-menu-right">
               <li class="dropdown-title">Select Period</li>
               <li><a href="#" class="dropdown-item">Today</a></li>
               <li><a href="#" class="dropdown-item">Week</a></li>
-              <li><a href="#" class="dropdown-item">Month</a></li>
+              <li><a href="#" class="dropdown-item active">Month</a></li>
               <li><a href="#" class="dropdown-item">This Year</a></li>
             </ul>
-          </div>
+          </div>-->
         </div>
         <div class="card-body" id="top-5-scroll" tabindex="2" style="height: 315px; overflow: hidden; outline: none;">
           <ul class="list-unstyled list-unstyled-border">
@@ -269,29 +275,6 @@
 
 
 {% block custom_js %}
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-        // Get all dropdown items
-        var dropdownItems = document.querySelectorAll('#period-dropdown .dropdown-item');
-        var selectedPeriod = document.querySelector('#selected-period');
-
-        // Add click event listener to each dropdown item
-        dropdownItems.forEach(function(item) {
-            item.addEventListener('click', function(event) {
-                // Remove 'active' class from all dropdown items
-                dropdownItems.forEach(function(item) {
-                    item.classList.remove('active');
-                });
-
-                // Add 'active' class to the clicked dropdown item
-                this.classList.add('active');
-
-                // Update the selected period text
-                selectedPeriod.textContent = this.textContent;
-            });
-        });
-    });
-</script>
-
+  
 {% endblock custom_js %}
 
