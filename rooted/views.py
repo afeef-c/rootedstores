@@ -8,7 +8,10 @@ from django.contrib import messages
 
 def home(request):
     products = Product.objects.all().order_by('-created_date')
-    products_with_offers = Product.objects.filter(offer__isnull=False).distinct()
+    #products_with_offers = Product.objects.filter(get_offer_percent__gt=0)
+    products_with_offers = [product for product in products if product.get_offer_percent() is not None]
+
+
 
     
     context ={

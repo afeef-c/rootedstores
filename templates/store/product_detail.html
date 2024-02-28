@@ -86,7 +86,7 @@
 											</div>-->
 											<div class="single-product__floating-badges">
 												{% if single_product.get_offer_percent %}
-													<span class="onsale" > {{single_product.get_offer_percent|floatformat:"0"}}% </span>
+													<span class="onsale" > {{single_product.get_offer_percent|floatformat:"2"}}% </span>
 												{% endif %}
 												<!--<span class="hot">hot</span>-->
 											</div>
@@ -180,7 +180,7 @@
 
 									<div class="shop-product__price mb-30">
 										{% if single_product.get_offer_percent %}
-										<span> ₹ </span><span class="discounted-price" id="product-price" >{{single_product.get_offer_price|floatformat:"0"}}</span><br>
+										<span> ₹ </span><span class="discounted-price" id="product-price" >{{single_product.get_offer_price|floatformat:"2"}}</span><br>
 										<span> ₹ </span><span class="main-price discounted">{{single_product.price}} </span>
 										
 										{% else %}

@@ -81,13 +81,22 @@
                                                         {% endif %}
                                                         
                                                     </td>
-                                                    <td class="product-price"><span class="price">₹ {{ item.product.get_offer_price }} </span></td>
+                                                    <td class="product-price">
+                                                        {% if item.product.get_offer_percent %}
+                                                        <span class="price" style="white-space: nowrap; overflow: hidden;">₹ {{ item.product.get_offer_price }} <br>
+                                                        <span style="text-decoration: line-through;"> ₹ </span><span class="main-price discounted" style="text-decoration: line-through;">{{item.product.price}} </span>
+                                                        
+                                                        {% else %}
+                                                        <span class="price">₹ {{ item.product.get_offer_price }} 
+                                                        {% endif %}
+                                                        
+                                                    </td>
                                                     <td class="product-quantity">
                                                         <p>{{ item.quantity }}</p>
                                                         
                                                     </td>
                                                     <td class="total-price">
-                                                        <span class="price">₹ {{item.item_total}} </span>
+                                                        <span class="price" style="white-space: nowrap; overflow: hidden;">₹ {{item.item_total}} </span>
                                                     </td>
 
                                                 </tr>
@@ -119,17 +128,17 @@
                     {% for item in order_products %}
                     <ul>
                         
-                        <li>{{item.product.product_name}}  X {% if item.quantity < 10 %}0{{ item.quantity }}{% else %}{{ item.quantity }}{% endif %} <span>₹ {{item.item_total}} </span></li>
+                        <li>{{item.product}}  X {% if item.quantity < 10 %}0{{ item.quantity }}{% else %}{{ item.quantity }}{% endif %} <span>₹ {{item.item_total}} </span></li>
                         
                     </ul>
                     {% endfor %}
-                    <p>Sub Total <span>₹ {{panding_total}} </span></p>
-                    <p>Shipping Fee <span>₹ {{order.shipping_fee}} </span></p>
-                    <p>GST <span>₹ {{order.tax}} </span></p>
-                    {% if 'coupon' in request.session and discount_amount > 0 %}
-                    <p>Referal/Coupon Discounts <span>₹ {{order.coupon.discount_amount}} </span></p>
+                    <p>Sub Total <span>₹ {{pending_total|floatformat:'2'}} </span></p>
+                    <p>Shipping Fee <span>₹ {{order.shipping_fee|floatformat:'2'}} </span></p>
+                    <p>GST <span>₹ {{order.tax|floatformat:'2'}} </span></p>
+                    {% if order.coupon %}
+                    <p>Referal/Coupon Discounts <span>₹ {{order.coupon.discount_amount|floatformat:'2'}} </span></p>
                     {% endif %}
-                    <h4>Grand Total <span>₹ {{order.order_total}} </span></h4>
+                    <h4>Grand Total <span>₹ {{order.order_total|floatformat:'2'}} </span></h4>
 
                 </div>
                                         <!-- Payment Method -->
@@ -167,7 +176,7 @@
                         <form action="{% url 'payments' %}" method="POST">
                             {% csrf_token %}
                             <div class="check-box">
-                                <input type="checkbox" id="cod" name="cod" required>
+                                <input type="checkbox" id="wallet" name="wallet" required>
                                 <label for="cod">Confirm Payment using wallet money</label>
                             </div>
                             <div class="d-flex justify-content-center">
@@ -176,7 +185,19 @@
                             </div>
                         </form>
                     {% endif %}
+                    
+    
 
+                    <div class="container">
+                        <form method="post" action="{% url 'cancel_order' order.id %}">
+                        {% csrf_token %}
+						<div class="row justify-content-center">
+							<div class="col-12 col-md-6">
+								<button type="submit" name="submit" class="lezada-button lezada-button--medium mt-30 btn btn-primary btn-block" onclick="return confirm('Are you sure to cancel the order?')">Cancel Order</button>
+							</div>
+						</div>
+                        </form>
+					</div>
                                         
                 </div>
 

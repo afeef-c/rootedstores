@@ -1,10 +1,11 @@
 import datetime
+from decimal import Decimal
 import json
 import os
 import random
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
-from accounts.models import Account, AddressBook
+from accounts.models import Account, AddressBook, Transaction, Wallet
 from rooted import settings
 from django.contrib import messages
 
@@ -31,6 +32,7 @@ from django.core.serializers import serialize
 
 #from weasyprint import HTML
 import pdfkit
+import xlwt
 
 
 
@@ -68,6 +70,7 @@ def place_order(request, total=0, quantity=0):
     grand_total = 0
     tax = 0
     shipping_fee = 0
+    est_total = 0
     for cart_item in cart_items:
         total += (float(cart_item.product.get_offer_price()) * cart_item.quantity)
         quantity += cart_item.quantity
@@ -181,7 +184,7 @@ def place_order(request, total=0, quantity=0):
             amount_paid=order.order_total,
             status='PENDING'
         )
-        order.paymetn= payment
+        order.payment= payment
         order.save()
         cart_items = CartItem.objects.filter(user=order.user)
         for item in cart_items:
@@ -197,6 +200,9 @@ def place_order(request, total=0, quantity=0):
             item.delete()
 
         order_products = OrderProduct.objects.filter(order=order, ordered=False)
+        for item in order_products:
+            item.item_total = (float(item.product_price) * item.quantity)
+            quantity += item.quantity
 
         
         context = {
@@ -229,21 +235,48 @@ def payments(request):
     order_id= request.session.get('order_id')
     order = Order.objects.get(pk=order_id)
     payment = order.payment
-
+    print(order_id, order,payment)
     if request.method == "POST":
         
-        # Generate a unique payment ID for cash payment
         payment_id = order.user.first_name + str(random.randint(111111, 999999))
         while Payment.objects.filter(payment_id=payment_id).exists():
             payment_id = order.user.first_name + str(random.randint(111111, 999999))
         
+        if payment.payment_method == 'cash':
+        # Generate a unique payment ID for cash payment
         
-        payment.payment_id = payment_id
-        payment.status = 'COD'
-        order.status = 'Confirmed'
-        order.is_ordered = True
-        order.save()
-        payment.save()
+        
+            payment.payment_id = payment_id
+            payment.status = 'COD'
+            payment.payment_method = 'Cash on delivery'
+            order.status = 'Confirmed'
+            order.is_ordered = True
+            order.save()
+            payment.save()
+            
+        elif payment.payment_method == 'wallet':
+            wallet = Wallet.objects.get(user=request.user)
+
+            payment.payment_id = payment_id
+            payment.status = 'SUCCESS',
+            payment.payment_method = 'Wallet'
+            order.status = 'Confirmed'
+            order.is_ordered = True
+            order.save()
+            payment.save()
+            # Update wallet balance by adding the refunded amount
+            wallet.balance -= Decimal(order.order_total)
+            wallet.save()
+
+            # Create a transaction record for the refund
+            transaction = Transaction.objects.create(
+                wallet=wallet,
+                amount=order.order_total,
+                type='debit'  
+            )
+        else:
+            messages.error(request, "Choose a valid payment method!!")
+            return redirect('place_order')
 
 
 
@@ -254,13 +287,16 @@ def payments(request):
         for order_product in order_products:
             order_product.ordered = True
             order_product.save()
-    
+        
+
+        request.session.pop('coupon', None)    
 
         # Send confirmation email to customer
         send_mail("Order Confirmation:", f"Thank you for your order, Order confirmed with ORDER NO : {order.order_number}", settings.EMAIL_HOST_USER, [order.email], fail_silently=False)
 
         # Redirect to order completion page
         data = {'order_number': order.order_number, 'transID': payment.payment_id}
+        print(data)
         url = reverse('order_complete') + f'?order_number={data["order_number"]}&payment_id={data["transID"]}'
         return redirect(url)
     else:
@@ -347,7 +383,7 @@ def callback(request):
                 order_product.ordered = True
                 order_product.save()
         
-
+            request.session.pop('coupon', None)
 
             send_mail("Order Confirmation:", f"Thank you for your order, Order confirmed with ORDER NO : {order.order_number}", settings.EMAIL_HOST_USER, [order.email], fail_silently=False)
 
@@ -375,8 +411,9 @@ def order_complete(request,):
         order = Order.objects.get(user=request.user, order_number=order_number, is_ordered=True)
     else:
         order = Order.objects.get(user=user, order_number=order_number, is_ordered=True)
+
     order_products = OrderProduct.objects.filter(order_id=order.id)
-    order_products = OrderProduct.objects.filter(order=order)  # Assuming 'order' is the Order instance you want to fetch products for
+    #order_products = OrderProduct.objects.filter(order=order)  # Assuming 'order' is the Order instance you want to fetch products for
     order.status = 'Completed'
     subtotal = 0
     shipping_fee = 100
@@ -439,46 +476,104 @@ def payment_cancel(request):
 
 
 
-def download_invoice(request):
-    # Retrieve parameters from request.GET
-    order_number = request.GET.get('order_number')
-    payment_id = request.GET.get('payment_id')
-    order_products = request.GET.get('order_products')
-    subtotal = request.GET.get('subtotal')
-    grand_total = request.GET.get('grand_total')
-    tax = request.GET.get('tax')
-    shipping_fee = request.GET.get('shipping_fee')
+#def download_invoice_pdf(request):
+#    # Retrieve parameters from request.GET
+#    order_number = request.GET.get('order_number')
+#    payment_id = request.GET.get('payment_id')
+#    order_products = request.GET.get('order_products')
+#    subtotal = request.GET.get('subtotal')
+#    grand_total = request.GET.get('grand_total')
+#    tax = request.GET.get('tax')
+#    shipping_fee = request.GET.get('shipping_fee')
 
-    # Render HTML template with context data
-    context = {
-        'order_number': order_number,
-        'payment_id': payment_id,
-        'order_products': order_products,
-        'subtotal': subtotal,
-        'grand_total': grand_total,
-        'tax': tax,
-        'shipping_fee': shipping_fee
-        # Add other context data as needed
-    }
-    html_content = render_to_string('invoice_template.html', context)
+#    # Render HTML template with context data
+#    context = {
+#        'order_number': order_number,
+#        'payment_id': payment_id,
+#        'order_products': order_products,
+#        'subtotal': subtotal,
+#        'grand_total': grand_total,
+#        'tax': tax,
+#        'shipping_fee': shipping_fee
+#        # Add other context data as needed
+#    }
+#    html_content = render_to_string('invoice_template.html', context)
 
-    # Generate PDF from HTML content using pdfkit
-    pdf_file_path = f'invoice_{order_number}.pdf'
-    pdfkit.from_string(html_content, pdf_file_path)
 
-    # Read the generated PDF file
-    with open(pdf_file_path, 'rb') as f:
-        pdf_file = f.read()
 
-    # Create a response with the PDF file as a file attachment
-    response = HttpResponse(pdf_file, content_type='application/pdf')
-    response['Content-Disposition'] = f'attachment; filename="{pdf_file_path}"'
+#    # Generate PDF from HTML content using pdfkit
+#    pdf_file_path = f'invoice_{order_number}.pdf'
+#    pdfkit.from_string(html_content, pdf_file_path)
 
-    # Delete the temporary PDF file
-    os.remove(pdf_file_path)
+#    # Read the generated PDF file
+#    with open(pdf_file_path, 'rb') as f:
+#        pdf_file = f.read()
 
-    return response
+#    # Create a response with the PDF file as a file attachment
+#    response = HttpResponse(pdf_file, content_type='application/pdf')
+#    response['Content-Disposition'] = f'attachment; filename="{pdf_file_path}"'
 
+#    # Delete the temporary PDF file
+#    os.remove(pdf_file_path)
+
+
+#    return response
+
+
+
+#def download_invoice_xls(request):
+#    # Retrieve parameters from request.GET
+#    order_number = request.GET.get('order_number')
+#    payment_id = request.GET.get('payment_id')
+#    order_products = request.GET.get('order_products')
+#    subtotal = request.GET.get('subtotal')
+#    grand_total = request.GET.get('grand_total')
+#    tax = request.GET.get('tax')
+#    shipping_fee = request.GET.get('shipping_fee')
+
+#    # Render HTML template with context data
+#    context = {
+#        'order_number': order_number,
+#        'payment_id': payment_id,
+#        'order_products': order_products,
+#        'subtotal': subtotal,
+#        'grand_total': grand_total,
+#        'tax': tax,
+#        'shipping_fee': shipping_fee
+#        # Add other context data as needed
+#    }
+#    html_content = render_to_string('invoice_template.html', context)
+
+#    # Generate Excel file
+#    excel_file_path = f'invoice_{order_number}.xls'
+#    wb = xlwt.Workbook()
+#    ws = wb.add_sheet('Invoice')
+#    # Write data to Excel sheet
+#    ws.write(0, 0, 'Order Number')
+#    ws.write(0, 1, 'Payment ID')
+#    # Add more headers as needed
+#    ws.write(1, 0, order_number)
+#    ws.write(1, 1, payment_id)
+#    # Add more data as needed
+#    wb.save(excel_file_path)
+
+
+
+    
+#    # Read the generated P
+#    with open(excel_file_path, 'rb') as excel_file:
+#        excel_content = excel_file.read()
+
+
+
+#    excel_response = HttpResponse(excel_content, content_type='application/vnd.ms-excel')
+#    excel_response['Content-Disposition'] = f'attachment; filename="{excel_file_path}"'
+
+#    # Delete the temporary PDF file
+#    os.remove(excel_file_path)
+
+
+#    return excel_response
 
 
 

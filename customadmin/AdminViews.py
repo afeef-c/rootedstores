@@ -5,6 +5,7 @@ from django.shortcuts import redirect, render
 from django.contrib.auth.decorators import login_required
 from django.views.generic import ListView,CreateView,UpdateView,DetailView,DeleteView
 from accounts.models import *
+from .forms import CouponForm, OfferForm
 from orders.models import Coupon, Order, OrderProduct, Payment
 from store.models import *
 from category.models import Category
@@ -50,9 +51,20 @@ def admin_home(request):
         .order_by('-total_quantity')  # Order by total quantity in descending order
         [:5]  # Limit to the top 5 most ordered products
     )
-    top_five_most_ordered_products_details = Product.objects.filter(id__in=[item['product'] for item in most_ordered_products])
 
+    most_ordered_category = (
+        OrderProduct.objects.values('product__category__slug')  # Group by category name
+        .annotate(total_quantity=Sum('quantity'))  # Calculate total quantity for each category
+        .order_by('-total_quantity')  # Order by total quantity in descending order
+        [:5]  # Fetch the top most ordered category
+    )
+    
+    top_five_most_ordered_products_details = Product.objects.filter(id__in=[item['product'] for item in most_ordered_products])
     out_of_stock_products = Product.objects.all().order_by('stock')[:5]
+
+    
+    top_five_most_ordered_categories_details = Category.objects.filter(slug__in=[item['product__category__slug'] for item in most_ordered_category]).prefetch_related('product_set')
+
 
 #-----------------------------------------------------
     
@@ -68,8 +80,10 @@ def admin_home(request):
         'top_oders':top_oders,
         'most_ordered_products':most_ordered_products,
         'top_five_most_ordered_products_details':top_five_most_ordered_products_details,
-        'out_of_stock_products':out_of_stock_products
-
+        'out_of_stock_products':out_of_stock_products,
+        'most_ordered_category':most_ordered_category,
+        'top_five_most_ordered_categories_details':top_five_most_ordered_categories_details
+        
     }
 
     return render(request,'customadmin/admin_home.html', context)
@@ -83,6 +97,7 @@ class CategoriesListView(ListView):
     model = Category
     template_name = "customadmin/categories/category_list.html"
     context_object_name = "categories"
+
 @method_decorator(login_required, name='dispatch')
 class CategoriesCreate(SuccessMessageMixin, CreateView):
     model = Category
@@ -356,6 +371,10 @@ class OrderListView(ListView):
     template_name = "customadmin/orders/order_list.html"
     context_object_name = "orders"
 
+    def get_queryset(self):
+        # Get the queryset of orders and order them by date in ascending order
+        return Order.objects.all().order_by('-created_at')
+
 
 
 @method_decorator(login_required, name='dispatch')
@@ -407,6 +426,11 @@ class PaymentListView(ListView):
     model = Payment
     template_name = "customadmin/orders/payment_list.html"
     context_object_name = "payments"
+
+    def get_queryset(self):
+        # Get the queryset of orders and order them by date in ascending order
+        return Payment.objects.all().order_by('-created_at')
+
 
 
 @method_decorator(login_required, name='dispatch')
@@ -471,6 +495,21 @@ class ProductOfferCreateView(SuccessMessageMixin, CreateView):
     template_name = "customadmin/offersandcoupons/add_product_offers.html"
     success_url = reverse_lazy('product_offers') 
 
+    def form_valid(self, form):
+        
+        #category_id = form.cleaned_data.get('category').id
+        #product_id = form.cleaned_data.get('product').id
+        start_date = form.cleaned_data.get('start_date')  # Assuming start_date is a field in your form
+        end_date = form.cleaned_data.get('end_date')  # Assuming end_date is a field in your form
+
+
+        if start_date > end_date:
+            messages.error(self.request, "Start date cannot be greater than end date.")
+            return redirect('product_offers')  # Redirect to a different page or adjust as needed
+
+        
+        return super().form_valid(form)
+
 
 @method_decorator(login_required, name='dispatch')
 class CategoryOfferCreateView(SuccessMessageMixin, CreateView):
@@ -479,6 +518,41 @@ class CategoryOfferCreateView(SuccessMessageMixin, CreateView):
     fields = "__all__"
     template_name = "customadmin/offersandcoupons/add_category_offers.html"
     success_url = reverse_lazy('category_offers') 
+
+    def form_valid(self, form):
+        start_date = form.cleaned_data.get('start_date')
+        end_date = form.cleaned_data.get('end_date')
+
+        if start_date > end_date:
+            messages.error(self.request, "Start date cannot be greater than end date.")
+            return redirect('category_offers')  # Redirect to a different page or adjust as needed
+
+        category_id = form.cleaned_data.get('category').id
+        existing_offer = CategoryOffer.objects.filter(category_id=category_id).exists()
+
+        if existing_offer:
+            messages.error(self.request, "An offer already exists for this category.")
+            return redirect('category_offers')  # Redirect to a different page or adjust as needed
+        
+        return super().form_valid(form)
+
+    def save(self, *args, **kwargs):
+        # Ensure discount_percentage is within certain limits
+        max_discount_percentage = 90  # Example: Maximum allowed discount percentage
+        min_discount_percentage = 0   # Example: Minimum allowed discount percentage
+        if self.discount_percentage > max_discount_percentage:
+            self.discount_percentage = max_discount_percentage
+        elif self.discount_percentage < min_discount_percentage:
+            self.discount_percentage = min_discount_percentage
+        
+        # Check if the end_date is greater than the start_date
+        if self.end_date <= self.start_date:
+            raise ValidationError("End date must be after start date")
+
+        # Your existing save logic...
+        
+        super().save(*args, **kwargs)
+    
 
 
 
@@ -491,6 +565,21 @@ class CategoryOffersUpdate(SuccessMessageMixin, UpdateView):
     success_message = "The Offers status updated!"
     success_url = reverse_lazy('category_offers') 
 
+    def form_valid(self, form):
+            start_date = form.cleaned_data.get('start_date')
+            end_date = form.cleaned_data.get('end_date')
+
+            if start_date > end_date:
+                messages.error(self.request, "Start date cannot be greater than end date.")
+                return self.form_invalid(form)  # Return form invalid if start date is greater than end date
+            
+            return super().form_valid(form)
+    
+    def get_success_message(self, cleaned_data):
+        name = cleaned_data.get('product')  # Assuming 'order_number' is a field of the form
+        
+        return f"Product:{name} offer  updated successfully."
+
     
 
 @method_decorator(login_required, name='dispatch')
@@ -502,16 +591,19 @@ class ProductOffersUpdate(SuccessMessageMixin, UpdateView):
     success_url = reverse_lazy('product_offers') 
 
     def form_valid(self, form):
-        start_date = timezone.localtime(form.cleaned_data.get('start_date'))
+        start_date = form.cleaned_data.get('start_date')  # Assuming start_date is a field in your form
+        end_date = form.cleaned_data.get('end_date')  # Assuming end_date is a field in your form
 
-        end_date = timezone.localtime(form.cleaned_data.get('end_date'))
+        if start_date > end_date:
+            messages.error(self.request, "Start date cannot be greater than end date.")
+            return redirect('product_offers')  # Redirect to a different page or adjust as needed
+  
+        
+        response = super().form_valid(form)
+        return response
 
-        if start_date >= end_date:
-            messages.error(self.request, "Start date must be before end date.")
-            return self.form_invalid(form)
-    
-        return super().form_valid(form)
-    
+
+
 
 
 #============================================ coupon =======================================================================
@@ -531,26 +623,21 @@ class CouponCreateView(SuccessMessageMixin, CreateView):
     success_url = reverse_lazy('coupons') 
 
 
-@method_decorator(login_required, name='dispatch')
-class CouponUpdateView(SuccessMessageMixin, UpdateView):
-    model = Coupons
-    template_name = "customadmin/offersandcoupons/update_coupon.html"
-    
-    fields = ['code', 'discount_amount', 'valid_from', 'valid_until', 'is_active']
-    success_message = "The discount coupon has been updated!"
-    success_url = reverse_lazy('coupons') 
 
-    #def get_context_data(self, **kwargs):
-    #    context = super().get_context_data(**kwargs)
-    #    coupon = self.get_object()
-    #    # Assuming there can be multiple orders associated with a payment
-    #    coupon_code = coupon.code 
-    #    context['coupon_code'] = coupon_code
-    #    return context
-    
-    def form_valid(self, form):
-        response = super().form_valid(form)
-        return response
+@login_required
+def update_coupon(request, pk):
+    coupon = get_object_or_404(Coupon, pk=pk)
+    if request.method == 'POST':
+        form = CouponForm(request.POST, instance=coupon)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "The discount coupon has been updated!")
+            return redirect('coupons')
+    else:
+        form = CouponForm(instance=coupon)
+    return render(request, 'customadmin/offersandcoupons/update_coupon.html', {'form': form, 'coupon': coupon})
+
+
 
 
 @method_decorator(login_required, name='dispatch')
@@ -569,3 +656,4 @@ class CouponDeleteView(SuccessMessageMixin, DeleteView):
         context = super().get_context_data(**kwargs)
         context['title'] = 'Delete Coupon'
         return context
+#======================================================================================================================================

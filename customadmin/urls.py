@@ -24,6 +24,7 @@ urlpatterns = [
     #report
     path('sales/', views.sales, name='sales'),
     path('generate_sales_pdf/', views.generate_sales_pdf, name='generate_sales_pdf'),
+    path('generate_sales_excel/', views.generate_sales_excel, name='generate_sales_excel'),
 
     # products
     path('add_product/', AdminViews.ProductCreateView.as_view(), name='add_product'),
@@ -59,11 +60,12 @@ urlpatterns = [
     #coupon
     path('coupons/', AdminViews.Coupons.as_view(), name='coupons'),
     path('create_coupon/', AdminViews.CouponCreateView.as_view(), name='create_coupon'),
-    path('update_coupon/<slug:pk>', AdminViews.CouponUpdateView.as_view(), name='update_coupon'),
+    path('update_coupon/<slug:pk>', AdminViews.update_coupon, name='update_coupon'),
     path('delete_coupon/<slug:pk>', AdminViews.CouponDeleteView.as_view(), name='delete_coupon'),
 
 
     path('filter_orders/', views.filter_orders, name='filter_orders'),
+    
 
 
 ]   

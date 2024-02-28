@@ -78,20 +78,6 @@
 
 							<div class="single-icon user-login">
 								
-								<!--<div class="dropdown-menu dropdown-menu-right show">
-									<div class="dropdown-title">Logged in 5 min ago</div>
-									<a href="features-profile.html" class="dropdown-item has-icon">
-									<i class="far fa-user"></i> Profile
-									</a>
-									<a href="features-activities.html" class="dropdown-item has-icon">
-									<i class="fas fa-bolt"></i> Activities
-									</a>
-									<a href="features-settings.html" class="dropdown-item has-icon">
-									<i class="fas fa-cog"></i> Settings
-									</a>
-									<div class="dropdown-divider"></div>
-									
-								</div>-->
 
 								<div class="btn-group mb-2">
 									<a class="" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -104,9 +90,11 @@
 										<i class="far fa-user"></i>  {{user.username | capfirst }}
 										</a>
 										<div class="dropdown-divider"></div>
+										
 										<a href="{% url 'logout' %}" class="dropdown-item has-icon text-danger">
 											<i class="fas fa-sign-out-alt"></i> Logout
 										</a>
+										
 										{%else%}
 										<div class="dropdown-title">Welcome</div>
 										<div class="dropdown-title">To access account and manage order</div>
@@ -121,7 +109,41 @@
 							</div>
 
 							<!--=======  End of single-icon  =======-->
+							{% if 'cart' in request.path %}
 							
+							<div class="header-right-icons  ">
+								<div class="single-icon">
+									<li class="dropdown dropdown-list-toggle single-icon"><a href="#" data-toggle="dropdown" class="nav-link notification-toggle nav-link-lg beep" aria-expanded="false"><i class="far fa-bell"></i></a>
+										<div class="dropdown-menu dropdown-list dropdown-menu-right ">
+										<div class="dropdown-header">Referral Coupons
+											
+										</div>
+										<div class="dropdown-list-content dropdown-list-icons" tabindex="2" style="overflow: hidden; outline: none;">
+											
+										
+											<div class="dropdown-item-icon bg-info text-white">
+												<i class="fas fa-bell"></i>Available coupons
+											</div>
+											<div class=" align-center">
+											<ul>
+												{% for Coupon in coupons %}
+												<li class="dropdown-item"> {{Coupon.code}} </li>
+												{% endfor %}
+											</ul>
+											</div>
+											
+
+											
+										</div>
+										
+										<div id="ascrail2001" class="nicescroll-rails nicescroll-rails-vr" style="width: 9px; z-index: 1000; cursor: default; position: static; top: 58px; left: 341px; height: 350px; opacity: 0.3; display: none;"><div class="nicescroll-cursors" style="position: relative; top: 44px; float: right; width: 7px; height: 306px; background-color: rgb(241, 17, 17); border: 1px solid rgb(238, 10, 10); background-clip: padding-box; border-radius: 5px;"></div></div><div id="ascrail2001-hr" class="nicescroll-rails nicescroll-rails-hr" style="height: 9px; z-index: 1000; top: 399px; left: 0px; position: absolute; cursor: default; display: none; width: 341px; opacity: 0.3;"><div class="nicescroll-cursors" style="position: absolute; top: 0px; height: 7px; width: 350px; background-color: rgb(240, 11, 11); border: 1px solid rgb(255, 255, 255); background-clip: padding-box; border-radius: 5px; left: 0px;"></div></div></div>
+									</li>
+								</div>
+								
+							</div>
+								
+							
+							{% endif %}
 							<!--=======  single-icon  =======-->
 
 							<div class="single-icon wishlist">
@@ -133,7 +155,7 @@
 
 							<!--=======  End of single-icon  =======-->
 							<!--=======  single-icon  =======-->
-
+							{% if 'cart' not in request.path %}
 							<div class="single-icon cart">
 								<a href="javascript:void(0)" id="offcanvas-cart-icon">
 									<i class="ion-ios-cart"></i>
@@ -141,6 +163,7 @@
 									<span class="count" id="cart-list"> {{cart_count}} </span>
 								</a>
 							</div>
+							{% endif %}
 							<!--=======  End of single-icon  =======-->
 						</div>
 						<!--=======  End of header right icons  =======-->

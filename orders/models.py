@@ -97,7 +97,7 @@ class Order(models.Model):
         # Check if the status is changed to Cancelled or Return
         if self.status in ['Cancelled', 'Return']:
             # Check if the payment status is not already set to Refund
-            if self.payment and self.payment.status != 'REFUND':
+            if self.payment and self.payment.status == 'SUCCESS':
                 self.payment.status = 'REFUND'
                 self.payment.save()
                 self.send_status_email()
@@ -112,11 +112,19 @@ class Order(models.Model):
 
         super().save(*args, **kwargs)
 
+    def est_total(self):
+        """
+        Calculate the total sum of prices for all items in the order.
+        """
+        order_products = self.orderproduct_set.all()
+        total_price = sum([order_product.quantity * order_product.product_price for order_product in order_products])
+        return total_price
+
     def send_status_email(self):
         subject = 'Order Status Update'
         message = f'Your order status has been updated to: {self.status}. Payment status: {self.payment.status}'
         sender_email = settings.DEFAULT_FROM_EMAIL
-        recipient_email = self.user.email
+        recipient_email = self.email
 
         send_mail(subject, message, sender_email, [recipient_email])
     

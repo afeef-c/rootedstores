@@ -1,3 +1,4 @@
+from decimal import Decimal
 from django.http import HttpResponse
 from django.utils import timezone
 import random
@@ -28,6 +29,9 @@ from django.template.loader import get_template
 import xhtml2pdf.pisa as pisa
 from django.template.loader import render_to_string
 from django.conf import settings
+import xlwt
+from bs4 import BeautifulSoup
+
 
 
 User = get_user_model()  # Use the get_user_model() function to get the User model
@@ -199,8 +203,11 @@ def otp_verify(request, uid):
 @login_required(login_url='login')
 def dashboard(request):
     user = request.user
-    orders = Order.objects.order_by('-created_at').filter(user_id=request.user.id, is_ordered=True)
+    orders = Order.objects.order_by('-created_at').filter(user_id=request.user.id)
     orders_count = orders.count()
+    
+    if orders_count == 0:
+        orders = None
 
     if UserProfile.objects.filter(user=request.user).exists():
         address = AddressBook.objects.filter(user_id=request.user.id)
@@ -208,11 +215,12 @@ def dashboard(request):
         
         try:
             wallet = Wallet.objects.get(user=request.user)
-            returned_order = Order.objects.order_by('-created_at').filter(user_id=request.user.id, status__in=['Return','Cancelled'],is_ordered=True)
-            refund_orders = Order.objects.filter(user_id=request.user.id, payment__status='REFUND').order_by('-created_at')
-
+            transaction = Transaction.objects.filter(wallet=wallet)
+            
+            
         except Wallet.DoesNotExist:
             wallet = None
+            transaction = None
             wallet_message = "Wallet not yet activated"
 
         user_form = UserForm(instance=request.user)
@@ -226,9 +234,8 @@ def dashboard(request):
             'userprofile': userprofile,
             'address': address,
             'wallet':wallet,
-            'returned_order':returned_order,
-            'refund_orders':refund_orders,
             'wallet_message': wallet_message if wallet is None else None,
+            'transaction':transaction
         }
         return render(request, 'accounts/dashboard.html', context)
     else:
@@ -474,47 +481,38 @@ def order_detail(request, order_id):
 
     return render(request, 'accounts/order_detail.html',context)
 
-@login_required(login_url='login')
-def order_invoice(request,order_id):
-
-    order_detail = OrderProduct.objects.filter(order__order_number=order_id)
-    order = Order.objects.get(order_number=order_id)
-    payment = order.payment
-    subtotal = 0
-    tax=0
-    shipping_fee=0
-    for item in order_detail:
-        item.item_total = item.product_price*item.quantity
-        subtotal += item.item_total
-    
-    tax = (2*subtotal)/100
-    if subtotal>= 1000:
-        shipping_fee=0
-    else:
-        shipping_fee=100
-    grand_total = subtotal+tax+ shipping_fee
-
-    context = {
-        'order_detail':order_detail,
-        'order':order,
-        'subtotal':subtotal,
-        'shipping_fee':shipping_fee,
-        'tax':tax,
-        'shipping_fee':shipping_fee,
-        'grand_total':grand_total,
-        'payment': payment
-    }
-
-    return render(request, 'orders/invoice_template.html',context)
 
 
 @login_required(login_url='login')
 def cancel_order(request, order_id):
     order = get_object_or_404(Order, id=order_id)
     user = request.user
-    email = user.email
+    email = order.email
+    payment = order.payment
 
     if request.method == "POST":
+        amount_refunded = payment.amount_paid
+
+        if payment.status == 'SUCCESS':
+            payment.status == 'REFUND'
+            payment.save()
+            wallet, created = Wallet.objects.get_or_create(user=user)
+
+            # Update wallet balance by adding the refunded amount
+            #wallet.balance += Decimal(amount_refunded)
+            #wallet.save()
+            # This process is done in db side
+            # Create a transaction record for the refund
+            transaction = Transaction.objects.create(
+                wallet=wallet,
+                amount=amount_refunded,
+                type='credit'  # Assuming 'credit' means money is added to the wallet
+            )
+
+        elif payment.status == 'PENDING':
+                payment.status == 'FAILURE'
+                payment.save()
+                
         order.status = 'Cancelled'
         order.save()
         # Send cancellation mail
@@ -527,13 +525,37 @@ def cancel_order(request, order_id):
 def return_order(request, order_id):
     order = get_object_or_404(Order, id=order_id)
     user = request.user
-    email = user.email
+    email = order.email
+    payment = order.payment
 
     if request.method == "POST":
+        
+        amount_refunded = payment.amount_paid
+
+        if payment.status == 'SUCCESS':
+            payment.status == 'REFUND'
+            payment.save()
         order.status = 'Return'
         order.save()
+
+        wallet, created = Wallet.objects.get_or_create(user=user)
+
+        ## Update wallet balance by adding the refunded amount
+        #wallet.balance += Decimal(amount_refunded)
+        #wallet.save()
+        #transaction.save()
+
+
+        # Create a transaction record for the refund
+        transaction = Transaction.objects.create(
+            wallet=wallet,
+            amount=amount_refunded,
+            type='credit'  # Assuming 'credit' means money is added to the wallet
+        )
+
+
         # Send cancellation mail
-        send_mail("Order Return: ", f"Your order:{order.order_number}- for {order.full_name} is returned", settings.EMAIL_HOST_USER, [email], fail_silently=False)
+        send_mail("Order Return: ", f"Your order:{order.order_number}- for {order.full_name} is returned, Check wallets for refunds", settings.EMAIL_HOST_USER, [email], fail_silently=False)
         messages.success(request, 'Your order succesfully cancelled!!')
     
     return redirect('dashboard')
@@ -603,42 +625,91 @@ def remove_from_wishlist(request, item_id):
 # =================================Start Wallet===================================================================================================
 
 
-def handle_refund(request):
-    if request.method == 'POST':
-        # Assuming you receive data about payment status change in the request
-        payment_id = request.POST.get('payment_id')
-        new_status = request.POST.get('new_status')
+#def handle_refund(request):
+#    if request.method == 'POST':
+#        # Assuming you receive data about payment status change in the request
+#        payment_id = request.POST.get('payment_id')
+#        new_status = request.POST.get('new_status')
 
-        # Check if the payment status has changed to "Refund"
-        if new_status == 'Refund':
-            try:
-                payment = Payment.objects.get(pk=payment_id)
-                user = payment.user
-                amount_refunded = payment.amount_paid
+#        # Check if the payment status has changed to "Refund"
+#        if new_status == 'Refund':
+#            try:
+#                payment = Payment.objects.get(pk=payment_id)
+#                user = payment.user
+#                amount_refunded = payment.amount_paid
 
-                # Retrieve or create the user's wallet
-                wallet, created = Wallet.objects.get_or_create(user=user)
+#                # Retrieve or create the user's wallet
+#                wallet, created = Wallet.objects.get_or_create(user=user)
 
-                # Update wallet balance by adding the refunded amount
-                wallet.balance += amount_refunded
-                wallet.save()
+#                # Update wallet balance by adding the refunded amount
+#                wallet.balance += amount_refunded
+#                wallet.save()
+#                #transaction.save()
 
-                # Create a transaction record for the refund
-                transaction = Transaction.objects.create(
-                    wallet=wallet,
-                    amount=amount_refunded,
-                    type='credit'  # Assuming 'credit' means money is added to the wallet
-                )
 
-                return HttpResponse("Refund processed successfully")
-            except Payment.DoesNotExist:
-                return HttpResponse("Payment does not exist")
-            except Exception as e:
-                return HttpResponse(f"Error processing refund: {str(e)}")
+#                # Create a transaction record for the refund
+#                transaction = Transaction.objects.create(
+#                    wallet=wallet,
+#                    amount=amount_refunded,
+#                    type='credit'  # Assuming 'credit' means money is added to the wallet
+#                )
+                                
 
-    return HttpResponse("Invalid request")
+
+#                return HttpResponse("Refund processed successfully")
+#            except Payment.DoesNotExist:
+#                return HttpResponse("Payment does not exist")
+#            except Exception as e:
+#                return HttpResponse(f"Error processing refund: {str(e)}")
+
+#    return HttpResponse("Invalid request")
 
 # =================================End Wallet===================================================================================================
+
+@login_required(login_url='login')
+def order_invoice(request,order_id):
+
+    order = Order.objects.get(order_number=order_id)
+    order_detail = OrderProduct.objects.filter(order__order_number=order_id)
+    payment = order.payment
+    
+    subtotal = 0
+    est_subtotal =0
+    tax=0
+    shipping_fee=0
+    for item in order_detail:
+        item.item_total = item.product_price*item.quantity
+        item.est_item_total = item.product.price*item.quantity
+        subtotal += item.item_total
+        est_subtotal += item.est_item_total
+
+    if order.coupon is not None:
+        discount_amount = float(order.coupon.discount_amount)
+    else:
+        discount_amount=0
+    
+    tax = (2*subtotal)/100
+    if subtotal>= 1000:
+        shipping_fee=0
+    else:
+        shipping_fee=100
+    grand_total = subtotal+tax+ shipping_fee - discount_amount
+
+    context = {
+        'order_detail':order_detail,
+        'order':order,
+        'subtotal':subtotal,
+        'shipping_fee':shipping_fee,
+        'tax':tax,
+        'shipping_fee':shipping_fee,
+        'grand_total':grand_total,
+        'payment': payment,
+        'discount_amount':discount_amount
+    }
+
+    return render(request, 'orders/invoice_template.html',context)
+
+
 
 def generate_pdf_from_template(template_name, context, filename):
     # Render the template with the given context
@@ -693,6 +764,100 @@ def generate_invoice_pdf(request,order_id):
 
 
     # Generate PDF from the invoice template
-    pdf_response = generate_pdf_from_template('orders/invoice_template.html', context, 'invoice')
+    pdf_response = generate_pdf_from_template('orders/invoice_template.html', context, 'pdf_invoice')
 
     return pdf_response
+
+def generate_excel_from_template(template_name, context, filename):
+    # Render the template with the given context
+    html_content = render_to_string(template_name, context)
+
+    # Parse HTML content using BeautifulSoup
+    soup = BeautifulSoup(html_content, 'html.parser')
+
+    # Create a new workbook and add a sheet
+    workbook = xlwt.Workbook()
+    sheet = workbook.add_sheet('Sheet1')
+
+    # Write data from HTML to Excel sheet
+    for row_idx, row in enumerate(soup.find_all('tr')):
+        for col_idx, cell in enumerate(row.find_all(['td', 'th'])):
+            sheet.write(row_idx, col_idx, cell.text.strip())
+
+    # Create a response object
+    response = HttpResponse(content_type='application/vnd.ms-excel')
+    response['Content-Disposition'] = f'attachment; filename="{filename}.xls"'
+
+    # Write workbook content to response
+    workbook.save(response)
+
+    return response
+
+def generate_invoice_xls(request,order_id):
+    # Retrieve parameters from request.GET
+    order_detail = OrderProduct.objects.filter(order__order_number=order_id)
+    order = Order.objects.get(order_number=order_id)
+    payment = order.payment
+    subtotal = 0
+    tax=0
+    shipping_fee=0
+    for item in order_detail:
+        item.item_total = item.product_price*item.quantity
+        subtotal += item.item_total
+    
+    tax = (2*subtotal)/100
+    if subtotal>= 1000:
+        shipping_fee=0
+    else:
+        shipping_fee=100
+    grand_total = subtotal+tax+ shipping_fee
+
+    context = {
+        'order_detail':order_detail,
+        'order':order,
+        'subtotal':subtotal,
+        'shipping_fee':shipping_fee,
+        'tax':tax,
+        'shipping_fee':shipping_fee,
+        'grand_total':grand_total,
+        'payment': payment
+    }
+
+    #html_content = render_to_string('invoice_template.html', context)
+    # Generate PDF from the invoice template
+    excel_response = generate_excel_from_template('orders/invoice_template.html', context, 'excel_invoice')
+
+    return excel_response
+
+    # Generate Excel file
+    excel_file_path = f'invoice_{order_number}.xls'
+    wb = xlwt.Workbook()
+    ws = wb.add_sheet('Invoice')
+    # Write data to Excel sheet
+    ws.write(0, 0, 'Order Number')
+    ws.write(0, 1, 'Payment ID')
+    # Add more headers as needed
+    ws.write(1, 0, order_number)
+    ws.write(1, 1, payment_id)
+    # Add more data as needed
+    wb.save(excel_file_path)
+
+
+
+    
+    # Read the generated P
+    with open(excel_file_path, 'rb') as excel_file:
+        excel_content = excel_file.read()
+
+
+
+    excel_response = HttpResponse(excel_content, content_type='application/vnd.ms-excel')
+    excel_response['Content-Disposition'] = f'attachment; filename="{excel_file_path}"'
+
+    # Delete the temporary PDF file
+    os.remove(excel_file_path)
+
+
+    return excel_response
+
+

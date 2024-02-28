@@ -36,7 +36,7 @@
                         <div class="card-body">
                             <div class="row d-flex justify-content-between">
                                 <div class="invoice-title jsuti">
-                                    <h4 class="float-end font-size-15">{{payment.payment_id}} {% if payment.payment_method == 'cash' %} <span class="badge bg-success font-size-12 ms-2">Cash On Delivery</span> {% else %}<span class="badge bg-success font-size-12 ms-2">Razorpay</span>{% endif %} </h4>
+                                    <h4 class="float-end font-size-15">{{payment.payment_id}}  <span class="badge bg-success font-size-12 ms-2"> {{payment.payment_method}} </span></h4>
                                     <div class="mb-4">
                                     <img style="width: 10cap;" src="{%static 'images/rooted-high-resolution-logo-transparent.png' %}" alt="">
                                     </div>
@@ -93,8 +93,8 @@
                                     <table class="table align-middle table-nowrap table-centered mb-0">
                                         <thead>
                                             <tr>
-                                                <th style="width: 70px;"></th>
                                                 <th>Item</th>
+                                                <th>Offer Price</th>
                                                 <th>Price</th>
                                                 <th>Quantity</th>
                                                 <th class="text-end" style="width: 120px;">Total</th>
@@ -103,7 +103,6 @@
                                         <tbody>
                                             {% for item in order_detail %}
                                                 <tr>
-                                                    <th scope="row"></th>
                                                     <td>
                                                         <div>
                                                             <h5 class="text-truncate font-size-14 mb-1"> {{item.product.product_name}} </h5>
@@ -114,9 +113,10 @@
                                                             {% endif %}
                                                         </div>
                                                     </td>
-                                                    <td>₹ {{item.product_price}} </td>
+                                                    <td>INR. {{item.product_price|floatformat:'2'}} </td>
+                                                    <td>INR. {{item.product.price|floatformat:'2'}} </td>
                                                     <td> {{item.quantity}} </td>
-                                                    <td class="text-end">₹ {{item.item_total}} </td>
+                                                    <td class="text-end">INR. {{item.item_total|floatformat:'2'}} </td>
                                                 </tr>
                                 
                                             {% endfor %}
@@ -124,41 +124,38 @@
                                             
                                             <tr>
                                                 <th scope="row" colspan="4" class="text-end">Sub Total</th>
-                                                <td class="text-end">₹ {{subtotal|floatformat:'2'}} </td>
+                                                <td class="text-end">INR. {{subtotal|floatformat:'2'}} </td>
                                             </tr>
 
                                             <!-- end tr -->
                                             <tr>
                                                 <th scope="row" colspan="4" class="border-0 text-end">
                                                     Shipping Charge :</th>
-                                                    <p>Free shipping order > ₹1000</p>
-                                                <td class="border-0 text-end">₹ {{shipping_fee}} </td>
+                                                    <p>Free shipping order > INR.1000</p>
+                                                <td class="border-0 text-end">INR. {{shipping_fee|floatformat:'2'}} </td>
                                             </tr>
                                             <!-- end tr -->
                                             <tr>
                                                 <th scope="row" colspan="4" class="border-0 text-end">
                                                     Tax (2%)</th>
-                                                <td class="border-0 text-end">₹ {{tax|floatformat:'2'}} </td>
+                                                <td class="border-0 text-end">INR. {{tax|floatformat:'2'}} </td>
                                             </tr>
                                             <!-- end tr -->
+                                            {% if 'coupon' in order.coupon or discount_amount > 0 %}
+                                            <tr>
+                                                <th scope="row" colspan="4" class="border-0 text-end">
+                                                    Referal/Coupon Discounts </th>
+                                                <td class="border-0 text-end">INR. {{discount_amount|floatformat:"2"}} </td>
+                                            </tr>
+                                            {% endif %}
                                             <tr>
                                                 <th scope="row" colspan="4" class="border-0 text-end">Total</th>
-                                                <td class="border-0 text-end"><h4 class="m-0 fw-semibold">₹ {{grand_total|floatformat:'2'}} </h4></td>
+                                                <td class="border-0 text-end"><h4 class="m-0 fw-semibold">INR. {{grand_total|floatformat:'2'}} </h4></td>
                                             </tr>
                                             <!-- end tr -->
                                         </tbody><!-- end tbody -->
                                     </table><!-- end table -->
                                 </div><!-- end table responsive -->
-                                <div class="d-print-none mt-4">
-                                    <div class="float-end">
-                                        <a href="javascript:window.print()" class="btn btn-success me-1"><i class="fa fa-print"></i></a>
-                                    </div>
-                                    <div class="float-end">
-                                        <a href="{% url 'generate_invoice_pdf' order.order_number %}" class="btn btn-success me-1">Download</a>
-                                    </div>
-
-                                    
-                                </div>    
                             </div>
                         </div>
                     </div>

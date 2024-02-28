@@ -12,6 +12,7 @@ urlpatterns = [
     
     path('placeorder/', placeorder , name='placeorder' ),
     path('add_coupon/', add_coupon, name='add_coupon'),
+    path('cancel_order/<int:order_id>', cancel_p_order, name='cancel_order'),
 
     
 ]

@@ -25,6 +25,9 @@ urlpatterns = [
     path('order_invoice/<str:order_id>',views.order_invoice, name='order_invoice'),
     
     path('generate_invoice_pdf/<str:order_id>',views.generate_invoice_pdf, name='generate_invoice_pdf'),
+    path('generate_invoice_xls/<str:order_id>',views.generate_invoice_xls, name='generate_invoice_xls'),
+
+    
 
     path('cancel_order/<int:order_id>',views.cancel_order, name='cancel_order'),
     path('return_order/<int:order_id>',views.return_order, name='return_order'),

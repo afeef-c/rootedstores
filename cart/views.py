@@ -2,7 +2,7 @@ from django.utils import timezone
 
 from django.shortcuts import get_object_or_404, redirect, render
 
-from accounts.models import AddressBook
+from accounts.models import AddressBook, Wallet
 from .models import Cart,CartItem
 from store.models import Product, Variation
 from django.http import HttpResponse, JsonResponse
@@ -12,6 +12,7 @@ from django.contrib import messages
 from orders.forms import CouponForm
 from orders.models import Coupon, Order, OrderProduct
 from django.urls import reverse
+from decimal import Decimal
 
 # Create your views here.
 
@@ -141,7 +142,7 @@ def remove_cart_item(request,product_id, cart_item_id):
     return redirect('cart')
 
 
-def cart(request, total=0, quantity=0, cart_item=None,panding_total=0):
+def cart(request, total=0, quantity=0, cart_item=None,pending_total=0):
     grand_total = 0
     tax = 0
     variations = {}
@@ -165,7 +166,7 @@ def cart(request, total=0, quantity=0, cart_item=None,panding_total=0):
     
         if 'coupon' in request.session:
             coupon = request.session['coupon']
-            discount_amount = coupon['discount_amount']
+            discount_amount = Decimal(coupon['discount_amount'])
         else:
             discount_amount=0
             coupon = None
@@ -176,7 +177,7 @@ def cart(request, total=0, quantity=0, cart_item=None,panding_total=0):
         else:
             shipping_fee = 100
         tax = (2 * total) / 100
-        grand_total = total + tax +shipping_fee - discount_amount
+        grand_total = float(total + tax +shipping_fee) - float(discount_amount)
 
 
 
@@ -188,7 +189,7 @@ def cart(request, total=0, quantity=0, cart_item=None,panding_total=0):
             order_products = OrderProduct.objects.filter(order=order, ordered=False)
             for pending_item in order_products:
                 pending_item.item_total = (float(pending_item.product_price) * pending_item.quantity)
-                panding_total += pending_item.item_total
+                pending_total += pending_item.item_total
                 quantity += pending_item.quantity
 
         else:
@@ -196,6 +197,8 @@ def cart(request, total=0, quantity=0, cart_item=None,panding_total=0):
             payment_method=None
     except ObjectDoesNotExist:
         cart_items =[]
+
+    coupons = Coupon.objects.all()
 
     
 
@@ -211,10 +214,14 @@ def cart(request, total=0, quantity=0, cart_item=None,panding_total=0):
         'coupon':coupon,
         'orders_exist': orders_exist,
         'order':order,
-        #'order_products':order_products,
-        'panding_total':panding_total,
-        'payment_method':payment_method 
-    }   
+        'pending_total':pending_total,
+        'payment_method':payment_method,
+        'coupons':coupons 
+    }
+    if orders_exist:
+        context['order_products'] = order_products
+    
+
     return render(request, 'cart/cart.html', context)
 
 
@@ -246,7 +253,7 @@ def placeorder(request,total=0, quantity=0, cart_item=None):
         
         if 'coupon' in request.session:
             coupon = request.session['coupon']
-            discount_amount = coupon['discount_amount']
+            discount_amount = Decimal(coupon['discount_amount'])
         else:
             discount_amount=0
 
@@ -257,22 +264,30 @@ def placeorder(request,total=0, quantity=0, cart_item=None):
             shipping_fee = 0
 
         tax = (2 * total) / 100
-        grand_total = total + tax +shipping_fee-discount_amount
+        grand_total = Decimal(total + tax +shipping_fee) - discount_amount
 
     except ObjectDoesNotExist:
         cart_items =[]
     
     address = AddressBook.objects.filter(user_id=request.user.id)
+    try:
+        wallet = Wallet.objects.get(user=request.user)
+
+    except Wallet.DoesNotExist:
+        wallet = None
+        
+        
 
     context = {
         'total': total,
         'quantity': quantity,
         'shipping_fee':shipping_fee,
         'cart_items': cart_items,
-        'grand_total': grand_total,
+        'grand_total': round(grand_total,2),
         'tax': tax,
         'address':address,
-        'discount_amount':discount_amount
+        'discount_amount':discount_amount,
+        'wallet':wallet
     }
 
     return render(request, 'orders/placeorder.html', context)
@@ -287,13 +302,14 @@ def add_coupon(request):
                 coupon = Coupon.objects.get(code=code, is_active=True, valid_until__gte=timezone.now(), valid_from__lte = timezone.now() )
                 # Apply discount to cart total
                 request.session['coupon'] = {
+                    'coupon_id':coupon.id,
                     'code': coupon.code,
                     'discount_amount': float(coupon.discount_amount)
                 }
                 if 'coupon' in request.session:
-                    coupon_id = request.session['coupon']
+                    coupon_id = request.session['coupon']['coupon_id']
                     coupon = Coupon.objects.get(pk=coupon_id)
-                    coupon_discount = coupon.discount
+                    coupon_discount = coupon.discount_amount
 
 
                 context = {
@@ -308,3 +324,32 @@ def add_coupon(request):
     return redirect('cart')
 
 
+def cancel_p_order(request, order_id):
+    # Retrieve the order object or return a 404 error if not found
+    order = get_object_or_404(Order, id=order_id)
+    payment = order.payment
+    # Check if the request method is POST
+    if request.method == 'POST':
+        # Update the order status to "cancelled"
+        order_products = OrderProduct.objects.filter(order=order, ordered=False)
+        product = order_products
+        for pending_item in order_products:
+            pending_item.item_total = (float(pending_item.product_price) * pending_item.quantity)
+            product = pending_item.product
+            product.stock += pending_item.quantity
+            product.save()
+
+        order.status = 'Cancelled'
+        payment.status = 'FAILURE'
+        order.save()
+        payment.save()
+
+        if 'coupon' in request.session:
+            request.session.clear()
+
+        
+        # Redirect back to the order detail page
+        return redirect('cart')
+    
+    # If the request method is not POST, render a template with a confirmation message
+    return render(request, 'cancel_order.html', {'order': order})

@@ -34,15 +34,7 @@ Update Product Offers
                                     </div>
                                 </div>
                             </div>
-                        {% elif field.name == 'product' %}
-                            <div class="form-group">
-                                <label>{{ field.label }}</label>
-                                <select name="{{ field.name }}" id="{{ field.name }}" class="form-control" disabled>
-                                    {% for choice_value, choice_label in field.field.choices %}
-                                        <option value="{{ choice_value }}" {% if choice_value == field.value %}selected{% endif %}>{{ choice_label }}</option>
-                                    {% endfor %}
-                                </select>
-                            </div>
+                        
                         {% else %}
                             <div class="form-group">
                                 <label>{{ field.label }}</label>

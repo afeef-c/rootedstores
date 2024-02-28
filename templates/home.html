@@ -160,8 +160,9 @@
 						<div class="nav nav-tabs justify-content-center" id="nav-tab2" role="tablist">
 							<a class="nav-item nav-link active" id="product-tab-1" data-toggle="tab" href="#product-series-1"
 								role="tab" aria-selected="true">New</a>
-							<a class="nav-item nav-link" id="product-tab-2" data-toggle="tab" href="#product-series-2" role="tab"
-								aria-selected="false">Popular</a>
+								<!--After implementing rating  -->
+							<!--<a class="nav-item nav-link" id="product-tab-2" data-toggle="tab" href="#product-series-2" role="tab"
+								aria-selected="false">Popular</a>-->
 							<a class="nav-item nav-link" id="product-tab-3" data-toggle="tab" href="#product-series-3" role="tab"
 								aria-selected="false">Sale</a>
 						</div>
@@ -189,7 +190,7 @@
 
 										<div class="single-product__floating-badges">
 											{% if p.get_offer_percent %}
-												<span class="onsale" > {{p.get_offer_percent|floatformat:"0"}}% </span>
+												<span class="onsale" > {{p.get_offer_percent|floatformat:"2"}}% </span>
 											{% endif %}
 											<!--<span class="hot">hot</span>-->
 										</div>
@@ -226,7 +227,7 @@
 											<div class="price">
 												{% if p.get_offer_percent %}
 												<span class="main-price discounted">₹ {{p.price}} </span>
-												<span class="discounted-price">₹ {{p.get_offer_price|floatformat:"0" }} </span>
+												<span class="discounted-price">₹ {{p.get_offer_price|floatformat:"2" }} </span>
 												{% else %}
 												<span class="discounted-price">₹ {{p.price}} </span>
 												{% endif %}
@@ -296,43 +297,61 @@
 						<div class="tab-pane fade" id="product-series-3" role="tabpanel" aria-labelledby="product-tab-3">
 							<div class="row">
 
+								{% for p in products_with_offers %}
 
 								<!--=======  single product  =======-->
 								<div class="col-12 col-lg-4 col-md-6 col-sm-6 mb-45">
 									<div class="single-product">
 										<!--=======  single product image  =======-->
-
+										
 										<div class="single-product__image">
-											<a class="image-wrap" href="shop-product-basic.html">
-												<img src="{% static 'assets/images/products/furniture-1-1-600x800.jpg' %}" class="img-fluid" alt="">
-												<img src="{% static 'assets/images/products/furniture-1-2-600x800.jpg' %}" class="img-fluid" alt="">
+											<a class="image-wrap" href="{{ p.get_url }}">
+												<img src="{{ p.images.url }}" class="img-fluid w-10" alt="">
 											</a>
 
-											<div class="single-product__floating-badges">
-												<span class="onsale">-15%</span>
-											</div>
-											
-											<div class="single-product__floating-icons">
-												<span class="wishlist"><a href="#" data-tippy="Add to wishlist" data-tippy-inertia="true"
-														data-tippy-animation="shift-away" data-tippy-delay="50" data-tippy-arrow="true"
-														data-tippy-theme="sharpborder" data-tippy-placement="left"><i
-															class="ion-android-favorite-outline" ></i></a></span>
-											</div>
-											
+										<div class="single-product__floating-badges">
+											{% if p.get_offer_percent %}
+												<span class="onsale" > {{p.get_offer_percent|floatformat:"2"}}% </span>
+											{% endif %}
+											<!--<span class="hot">hot</span>-->
 										</div>
 
+											<div class="single-product__floating-icons">
+  
+												{% if p.id in wishlist_product_ids %}
+												<span class="wishlist"><a href="{% url 'remove_from_wishlist' p.id %}" data-tippy="Add to wishlist" data-tippy-inertia="true"
+													data-tippy-animation="shift-away" data-tippy-delay="50" data-tippy-arrow="true"
+													data-tippy-theme="sharpborder" data-tippy-placement="left">
+													<i class="ion-android-favorite-outline" style="color: red;"></i></a>
+												</span>
+												{% else %}
+													<span class="wishlist"><a href="{% url 'add_to_wishlist' p.id %}" data-tippy="Add to wishlist" data-tippy-inertia="true"
+														data-tippy-animation="shift-away" data-tippy-delay="50" data-tippy-arrow="true"
+														data-tippy-theme="sharpborder" data-tippy-placement="left">
+														<i class="ion-android-favorite-outline" ></i></a>
+													</span>
+												{% endif %}	
+
+												
+											</div>
+										</div>
 										<!--=======  End of single product image  =======-->
 
 										<!--=======  single product content  =======-->
 
-										<div class="single-product__content">
+										<div class="single-product__content" >
 											<div class="title">
-												<h3> <a href="shop-product-basic.html">Wooden Round Tablesssss</a></h3>
-												<a href="#">Add to cart</a>
+												<h3> <a href="{{ p.geturl }}"> {{p.product_name}} </a></h3>
+												<a href="{{ p.geturl }}"> View details</a>
+												
 											</div>
 											<div class="price">
-												<span class="main-price discounted">$400.00</span>
-												<span class="discounted-price">$380.00</span>
+												{% if p.get_offer_percent %}
+												<span class="main-price discounted">₹ {{p.price}} </span>
+												<span class="discounted-price">₹ {{p.get_offer_price|floatformat:"2" }} </span>
+												{% else %}
+												<span class="discounted-price">₹ {{p.price}} </span>
+												{% endif %}
 											</div>
 										</div>
 
@@ -340,7 +359,7 @@
 									</div>
 								</div>
 								<!--=======  End of single product  =======-->
-
+								{% endfor %}
 							</div>
 						</div>
 					</div>

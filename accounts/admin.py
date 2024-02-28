@@ -24,10 +24,19 @@ class UserProfilAdmin(admin.ModelAdmin):
     thumbnail.shor_description = 'Profile Picture'
     list_display = ('thumbnail','user','city','state','country')
 
+
+class TransactionAdmin(admin.TabularInline):
+    model = Transaction
+
+class WalletAdmin(admin.ModelAdmin):
+    inlines=[TransactionAdmin]
+    list_display = ('user','balance')
+
+
 admin.site.register(UserProfile,UserProfilAdmin)
 admin.site.register(AddressBook)
 admin.site.register(WishlistItem)
 admin.site.register(WishList)
-admin.site.register(Wallet)
+admin.site.register(Wallet,WalletAdmin)
 admin.site.register(Transaction)
 

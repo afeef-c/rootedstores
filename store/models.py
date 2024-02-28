@@ -88,6 +88,7 @@ class Product(models.Model):
             discount = category_offer.discount_percentage
             return discount
 
+
 @receiver(pre_save, sender=Product)
 def create_product_slug(sender, instance, **kwargs):
     # Auto-populate slug only if it's not provided
@@ -139,6 +140,7 @@ class Offer(models.Model):
     end_date = models.DateTimeField()
     is_active = models.BooleanField(default=True)
 
+    
     def is_upcoming(self):
         now = timezone.now()
         return self.start_date > now
@@ -162,5 +164,29 @@ class Offer(models.Model):
             return {'days': days, 'hours': hours, 'minutes': minutes, 'seconds': seconds}
         else:
             return {'days': 0, 'hours': 0, 'minutes': 0, 'seconds': 0}
+    
+    def save(self, *args, **kwargs):
+        # Ensure discount_percentage is within certain limits
+        max_discount_percentage = 85  # Example: Maximum allowed discount percentage
+        min_discount_percentage = 0   # Example: Minimum allowed discount percentage
+        if self.discount_percentage > max_discount_percentage:
+            self.discount_percentage = max_discount_percentage
+        elif self.discount_percentage < min_discount_percentage:
+            self.discount_percentage = min_discount_percentage
+        
+        # Check if the product has more than 95% discount and add a separate offer
+        if self.discount_percentage > 85:
+            # Create a new offer with the same product but with a capped discount percentage
+            Offer.objects.create(
+                product=self.product,
+                discount_percentage=max_discount_percentage,  # Cap the discount percentage
+                start_date=self.start_date,
+                end_date=self.end_date
+            )
+        # # Check if end_date is greater than start_date
+        #if self.end_date <= self.start_date:
+        #    raise ValidationError("End date must be after start date")
+
+        super().save(*args, **kwargs)
     
     

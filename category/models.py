@@ -39,6 +39,9 @@ class CategoryOffer(models.Model):
     end_date = models.DateTimeField()
     is_active = models.BooleanField(default=True)
 
+
+
+
     def is_upcoming(self):
         now = timezone.now()
         return self.start_date > now
@@ -62,4 +65,31 @@ class CategoryOffer(models.Model):
             return {'days': days, 'hours': hours, 'minutes': minutes, 'seconds': seconds}
         else:
             return {'days': 0, 'hours': 0, 'minutes': 0, 'seconds': 0}
+        
+    def save(self, *args, **kwargs):
+        # Ensure discount_percentage is within certain limits
+        max_discount_percentage = 85  # Example: Maximum allowed discount percentage
+        min_discount_percentage = 0   # Example: Minimum allowed discount percentage
+        if self.discount_percentage > max_discount_percentage:
+            self.discount_percentage = max_discount_percentage
+        elif self.discount_percentage < min_discount_percentage:
+            self.discount_percentage = min_discount_percentage
+        
+        # Check if the total discount percentage exceeds 95% for products in this category
+        existing_product_offers = store.models.Offer.objects.filter(product__category=self.category)
+        total_discount_percentage = self.discount_percentage
+
+        for offer in existing_product_offers:
+            total_discount_percentage += offer.discount_percentage
+        
+        # If the total discount percentage exceeds 95%, adjust the discount percentage
+        if total_discount_percentage > 85:
+            self.discount_percentage -= (total_discount_percentage - 85)
+
+         # Check if end_date is greater than start_date
+        if self.end_date <= self.start_date:
+            raise ValidationError("End date must be after start date")
+
+        
+        super().save(*args, **kwargs)
     

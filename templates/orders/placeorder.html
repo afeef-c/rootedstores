@@ -228,41 +228,44 @@
 											<h4 class="checkout-title">Payment Method</h4>
 
 											<div class="checkout-payment-method">
-
-												<!--<div class="single-method">
-													<input type="radio" id="payment_check" name="payment-method" value="check" >
-													<label for="payment_check">Check Payment</label>
-													<p data-method="check">Currently, the only acceptable payment method is PayPal. Please cooperate with us..</p>
-												</div>-->
-
-												<!--<div class="single-method">
-													<input type="radio" id="payment_bank" name="payment-method" value="bank">
-													<label for="payment_bank">Direct Bank Transfer</label>
-													<p data-method="bank">Currently, the only acceptable payment method is PayPal. Please cooperate with us.</p>
-												</div>-->
+												{% if wallet.balance <  grand_total %}
+												<p class="text-danger">Your wallet has not enough money to settle this order pleas user other payment methods</p>
+												{% elif not wallet %}
+												<p class="text-warning">You Don't have an active Wallet right now, So you can't pay using wallet </p><br>
+												{% endif %}
 												
-												<!--<div class="single-method">
-													<input type="radio" id="payment_payoneer" name="payment-method" value="payoneer">
-													<label for="payment_payoneer">Payoneer</label>
-													<p data-method="payoneer">Currently, the only acceptable payment method is PayPal. Please cooperate with us.</p>
-												</div>-->
+												{% if  grand_total < 1000 %}
+												<p class="text-warning">Cash On Delivery only for orders >= ₹ 1000 </p>
+												{% endif %}
 
 												<div class="single-method">
+													{% if grand_total < 1000 %}
+													<input type="radio" id="payment_cash" name="payment-method" value="cash" required disabled>
+													<label for="payment_cash" class="text-danger">Cash on Delivery**</label>
+													<p data-method="cash">Currently, the only acceptable payment methods are RazorPay, Cash on Delivery and Wallet.Cash on Delivery is only applicable form orders above ₹ 1000 Please cooperate with us.</p>
+													{% else %}
 													<input type="radio" id="payment_cash" name="payment-method" value="cash" required>
 													<label for="payment_cash">Cash on Delivery</label>
-													<p data-method="cash">Currently, the only acceptable payment method is RazorPay and Cash on Delivered. Please cooperate with us.</p>
+													<p data-method="cash">Currently, the only acceptable payment methods are RazorPay, Cash on Delivery and Wallet.Cash on Delivery is only applicable form orders above ₹ 1000 Please cooperate with us.</p>
+													{% endif %}
 												</div>
 
 												<div class="single-method">
 													<input type="radio" id="payment_razorpay" name="payment-method" value="razorpay" required>
 													<label for="payment_razorpay">RazorPay</label>
-													<p data-method="cash">Currently, the only acceptable payment method is RazorPay and Cash on Delivered. Please cooperate with us.</p>
+													<p data-method="cash">Currently, the only acceptable payment methods are RazorPay, Cash on Delivery and Wallet. Please cooperate with us.</p>
 												</div>
 
 												<div class="single-method">
+													{% if wallet.balance >=  grand_total %}
 													<input type="radio" id="wallet" name="payment-method" value="wallet" required>
-													<label for="wallet">Wallets</label>
-													<p data-method="cash">If you have any balance in wallet you can pay usigng wallet.</p>
+													<label for="wallet">Wallet</label>
+													<p data-method="wallet">You heve ₹ {{wallet.balance}} in wallet you can pay usigng wallet, only if order total <= wallet balance</p>
+													{% else %}
+													<input type="radio" id="wallet" name="payment-method" value="wallet" required disabled>
+													<label for="wallet" class="text-danger">Wallet**</label>
+													<p data-method="wallet">You heve ₹ {{wallet.balance}} in wallet you can pay usigng wallet, only if order total <= wallet balance</p>
+													{% endif %}
 												</div>
 
 												
@@ -287,13 +290,17 @@
 									</div>
 
 									
+
+									
 								</div>
 								
 							</div>
 							
 							</div>
 						</form>
+
 					</div>
+					
 				</div>
 			</div>
 		</div>

@@ -1,3 +1,4 @@
+from decimal import Decimal
 import os
 from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect, render
@@ -17,6 +18,8 @@ from django.db.models import Q
 
 import xhtml2pdf.pisa as pisa
 from django.template.loader import render_to_string
+import xlwt
+from bs4 import BeautifulSoup
 
 
 
@@ -70,8 +73,7 @@ def sales(request):
     users = Account.objects.filter(is_active=True)
     user_count = users.count()
     sales_count = OrderProduct.objects.all().count()
-
-
+    
     total_revenue = 0
     payment = Payment.objects.filter(status='SUCCESS')
     for i in payment:
@@ -83,7 +85,7 @@ def sales(request):
         'orders_count':orders_count,
         'user_count':user_count,
         'total_revenue':total_revenue,
-        'sales_count':sales_count
+        'sales_count':sales_count,
         
     }
 
@@ -227,3 +229,56 @@ def generate_sales_pdf(request):
     else:
         # Render the form for inputting start and end dates
         return render(request, 'sales_report_form.html')
+
+
+
+
+def generate_excel_from_template(template_name, context, filename):
+    # Render the template with the given context
+    html_content = render_to_string(template_name, context)
+
+    # Parse HTML content using BeautifulSoup
+    soup = BeautifulSoup(html_content, 'html.parser')
+
+    # Create a new workbook and add a sheet
+    workbook = xlwt.Workbook()
+    sheet = workbook.add_sheet('Sheet1')
+
+    # Write data from HTML to Excel sheet
+    for row_idx, row in enumerate(soup.find_all('tr')):
+        for col_idx, cell in enumerate(row.find_all(['td', 'th'])):
+            sheet.write(row_idx, col_idx, cell.text.strip())
+
+    # Create a response object
+    response = HttpResponse(content_type='application/vnd.ms-excel')
+    response['Content-Disposition'] = f'attachment; filename="{filename}.xls"'
+
+    # Write workbook content to response
+    workbook.save(response)
+
+    return response
+
+def generate_sales_excel(request):
+    if request.method == 'POST':
+        start_date = request.POST.get('start_date')
+        end_date = request.POST.get('end_date')
+
+        if start_date:
+            # Fetch data based on start and end dates
+            orders = Order.objects.filter(created_at__gte=start_date, created_at__lte=end_date)
+        else:
+            # Fetch all data
+            orders = Order.objects.all()
+
+        context = {
+            'orders': orders,
+        }
+
+        # Generate Excel from the HTML template
+        excel_response = generate_excel_from_template('customadmin/reports/sales_report.html', context, 'Sales_report')
+
+        return excel_response
+    else:
+        # Render the form for inputting start and end dates
+        return render(request, 'sales_report_form.html')
+

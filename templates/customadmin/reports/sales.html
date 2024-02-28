@@ -123,7 +123,13 @@ sales Reports
                     <td> {{order.created_at}} </td>
                     <td> {% if order.status == 'Cancelled' %} <span class="text-danger">{{order.status}} </span> {% else %} <span class="text-success">{{order.status}} </span>{% endif %}</td>
                     <td>₹ {{order.order_total|floatformat:"2"}} </td>
-                    <td><a href=""> {{order.payment.payment_id}} </a> </td>
+                    
+                    <td>
+                        <a href="{% url 'order_invoice' order.order_number %}">Show</a>
+                        <a href="{% url 'generate_invoice_pdf' order.order_number %}" class="btn btn-outline-secondary">PDF<i class="far fa-file-pdf"></i></a>
+                        <a href="{% url 'generate_invoice_xls' order.order_number %}" class="btn btn-outline-secondary">Excel<i class="far fa-file-excel"></i></a>  
+                
+                    </td>
                     <td><a href="{% url 'order_update' order.id %}" class="check-btn sqr-btn ">View</a></td>
                     </tr>
                     {% endfor %}
@@ -141,11 +147,24 @@ sales Reports
                         <input type="hidden" name="end_date"  >
                         {% endif %}
                         
-                        <button type="submit" class="btn btn-success me-1">Download</button>
+                        <button type="submit" class="btn btn-outline-secondary m-1"><i class="far fa-file-pdf">PDF</i></button>
                     </div>
                 </form>
-                
-
+                <form action="{% url 'generate_sales_excel' %}" method="POST">
+                    {% csrf_token %}
+                    <div class="float-end">
+                        {% if 'filter_orders' in request.path %}
+                        <input type="hidden" name="start_date" value="{{start_date}}">
+                        <input type="hidden" name="end_date" value="{{end_date}}">
+                        {% else %}
+                        <input type="hidden" name="start_date" >
+                        <input type="hidden" name="end_date"  >
+                        {% endif %}
+                        
+                        <button type="submit" class="btn btn-outline-secondary m-1"><i class="far fa-file-excel">Excel</i></button>
+                    </div>
+                </form>
+                    
             </div>
             </div>
         </div>

@@ -9,14 +9,12 @@ urlpatterns = [
     path('payments/', views.payments, name='payments'),
     path('rozer_payments', views.rozer_payments, name='rozer_payments'),
     path("callback/", views.callback, name="callback"),
-
     #path('proceed_to_pay/', views.razorpaycheck ),
 
     path('order_complete',views.order_complete, name='order_complete'),
     path('payment_cancel',views.payment_cancel, name='payment_cancel'),
 
-    path('download_invoice/', views.download_invoice, name='download_invoice'),
-    
-
-    
+    #path('download_invoice_pdf/', views.download_invoice_pdf, name='download_invoice_pdf'),
+    #path('download_invoice_xls/', views.download_invoice_xls, name='download_invoice_xls'),
+        
 ]

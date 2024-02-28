@@ -97,7 +97,14 @@
 										</td>
 										
 										<td class="product-price price">
-											<span class="price">₹ {{ item.product.get_offer_price }} 
+											
+											{% if item.product.get_offer_percent %}
+											<span class="price">₹ {{ item.product.get_offer_price|floatformat:"2" }} <br>
+											<span style="text-decoration: line-through;"> ₹ </span><span class="main-price discounted" style="text-decoration: line-through;">{{item.product.price|floatformat:"2"}} </span>
+											
+											{% else %}
+											<span class="price">₹ {{ item.product.get_offer_price|floatformat:"2" }} 
+											{% endif %}
 											
 										</span></td>
 
@@ -168,26 +175,7 @@
 					<div class="cart-coupon-area pb-30">
 						<div class="row align-items-center">
 							<div class="col-lg-6 mb-md-30 mb-sm-30">
-								<!--=======  coupon form  =======-->
 
-								<!--<div class="lezada-form coupon-form">
-									<form action="">
-										{% csrf_token %}
-										<div class="row">
-											 {% if error_message %}
-												<p>{{ error_message }}</p>
-											{% endif %}
-											<div class="col-md-7 mb-sm-10">
-												<input type="text" placeholder="Enter your coupon code">
-											</div>
-											<div class="col-md-5">
-												<button type="" class="lezada-button lezada-button--medium">apply coupon</button>
-											</div>
-										</div>
-									</form>
-								</div>-->
-
-								<!--=======  End of coupon form  =======-->
 								<!--=======  coupon form  =======-->
 
 								<div class="lezada-form coupon-form">
@@ -209,21 +197,19 @@
 										</div>
 									</form>
 									{% else %}
-									<p> {{discount_amount}} </p>
+									<h3> Coupen is applied and ₹ {{discount_amount|floatformat:"2"}} will deduce from your order total </h3>
 									{% endif %}
 								</div>
 
 								<!--=======  End of coupon form  =======-->
 
 							</div>
-
+							{% if 'coupon' not in request.session %}
 							<div class="col-lg-6 text-left text-lg-right">
-								<!--=======  update cart button  =======-->
-
-								<!--<button class="lezada-button lezada-button--medium">update cart</button>-->
-
-								<!--=======  End of update cart button  =======-->
+								for Coupons/Referral discount check "<i class="far fa-bell"></i>" in nav bar
+								Only one Chance is available for an order !! Try your luck
 							</div>
+							{% endif %}
 						</div>
 					</div>
 
@@ -246,23 +232,28 @@
 							</tr>
 							<tr>
 								<th>Shipping  </th>
-								<td class="tax">₹ {{shipping_fee}}.0 </td>
+								<td class="tax">₹ {{shipping_fee|floatformat:"2"}}.0 </td>
 							</tr>
-							{% if 'coupon' in request.session and discount_amount > 0 %}
+							{% if 'coupon' in request.session %}
 							<tr>
-								<th>Referal/Coupon Discounts  </th>
-								<td class="coupon">₹ {{discount_amount}}.0 </td>
+								<th>Referral/Coupon Discounts  </th>
+								<td class="coupon">₹ {{discount_amount|floatformat:"2"}}.0 </td>
 							</tr>
 							{% endif %}
 							<tr>
 								<th>TOTAL</th>
-								<td class="total">₹ {{grand_total}} </td>
+								<td class="total" style="white-space: nowrap; overflow: hidden;">₹ {{grand_total|floatformat:"2"}} </td>
 							</tr>
 						</table>
-
+						{% if orders_exist %}
+						<div class="cart-calculation-button text-center">
+					        <p class="text-danger">Please complete your unfinished orders before placing a new one.</p>
+						</div>
+						{% else %}
 						<div class="cart-calculation-button text-center">
 							<button  class="lezada-button lezada-button--medium"><a href="{% url 'placeorder' %}">place order</a></button>
 						</div>
+						{% endif %}
 					</div>
 				</div>
 				{% endif %}

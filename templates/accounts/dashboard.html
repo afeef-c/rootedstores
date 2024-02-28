@@ -127,8 +127,15 @@
                             <td> {{order.created_at}} </td>
                             <td> {% if order.status == 'Cancelled' %} <span class="text-danger">{{order.status}} </span> {% else %} <span class="text-success">{{order.status}} </span>{% endif %}</td>
                             <td>₹ {{order.order_total|floatformat:"2"}} </td>
-                            <td><a href="{% url 'order_invoice' order.order_number %}"> {{order.payment.payment_id}} </a> </td>
-                            <td><a href="{% url 'order_detail' order.order_number %}" class="check-btn sqr-btn ">View</a></td>
+                            <td>
+                              <a href="{% url 'order_invoice' order.order_number %}">Show</a>
+                              <a href="{% url 'generate_invoice_pdf' order.order_number %}" class="btn btn-outline-secondary">PDF<i class="far fa-file-pdf"></i></a>
+                              <a href="{% url 'generate_invoice_xls' order.order_number %}" class="btn btn-outline-secondary">Excel<i class="far fa-file-excel"></i></a>  
+                            </td>
+                            <td>
+                              <a href="{% url 'order_detail' order.order_number %}" class="check-btn sqr-btn ">View</a>
+                              
+                            </td>
                           </tr>
                           {% endfor %}
                           
@@ -151,12 +158,12 @@
                         </div>
                         <div class="card text-center col-lg-4 col-md-4 col-sm-12 ">
                           <div class="card-header">
-                            Featured
+                            Wallet
                           </div>
-                          <div class="card-body align-items-center">
+                          <div class="card-body text-center">
                             {%if wallet%}
                             <h4 class="card-title">Total Balence</h4>
-                            <div class="card-body d-flex align-items-center">
+                            <div class="card-body">
                               <h3> ₹  {{wallet.balance}}</h3>
                             </div>
                             {% else %}
@@ -165,11 +172,9 @@
                                    {{wallet_message}}
                             </div>
                             {% endif %}
-                            <a href="#" class="btn btn-primary">Go somewhere</a>
+                            
                           </div>
-                          <div class="card-footer text-muted">
-                            2 days ago
-                          </div>
+                          
                         </div>
                         <div class="col-lg-4 col-md-4 col-sm-12 ">
                         </div>
@@ -183,23 +188,17 @@
                           <tr>
                             <th>Order</th>
                             <th>Billing Name</th>
-                            <th>Date</th>
-                            <th>Status</th>
-                            <th>Total</th>
-                            <th>Invoice</th>
-                            <th>Action</th>
+                            <th>Type</th>
+                            <th>Time</th>
                           </tr>
                         </thead>
                         <tbody>
-                          {% for order in refund_orders %}
+                          {% for tran in transaction %}
                           <tr>
-                            <td> {{order.id}} </td>
-                            <td> {{order.full_name}} </td>
-                            <td> {{order.created_at}} </td>
-                            <td> {% if order.status == 'Cancelled' %} <span class="text-danger">{{order.status}} </span> {% else %} <span class="text-success">{{order.status}} </span>{% endif %}</td>
-                            <td>₹ {{order.order_total|floatformat:"2"}} </td>
-                            <td><a href="{% url 'order_invoice' order.order_number %}"> {{order.payment.payment_id}} </a> </td>
-                            <td><a href="{% url 'order_detail' order.order_number %}" class="check-btn sqr-btn ">View</a></td>
+                            <td> {{tran.id}} </td>
+                            <td> {{tran.amount}} </td>
+                            <td> {{tran.type}} </td>
+                            <td> {{tran.timestamp}} </td>
                           </tr>
                           {% endfor %}
                           

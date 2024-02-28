@@ -221,11 +221,19 @@
 
 					<!--=======  cart buttons  =======-->
 
-					<div class="cart-buttons">
+					<div class="cart-buttons m-2">
 						<a href="{% url 'cart' %}">view cart</a>
-						<a href="{% url 'placeorder' %}">Place Order</a>
+						
 					</div>
-
+						{% if orders_exist %}
+						<div class="cart-calculation-button text-center m-5">
+					        <p class="text-danger">Please complete your unfinished orders before placing a new one.</p>
+						</div>
+						{% else %}
+						<div class="cart-calculation-button text-center m-2">
+							<button  class="lezada-button lezada-button--medium"><a href="{% url 'placeorder' %}">place order</a></button>
+						</div>
+						{% endif %}
 					<!--=======  End of cart buttons  =======-->
 
 					<!--=======  free shipping text  =======-->

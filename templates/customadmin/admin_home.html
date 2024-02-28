@@ -90,63 +90,100 @@
 
 
   <div class="row">
-    <div class="col-md-8">
-      <div class="card">
+    
+    <!-- Best selling products -->
+  <div class="col-lg-4">
+    <div class="card gradient-bottom">
         <div class="card-header">
-          <h4>Invoices</h4>
-          <div class="card-header-action">
-            <a href="{% url 'orders_list' %}" class="btn btn-danger">View More <i class="fas fa-chevron-right"></i></a>
-          </div>
+            <h4>Best selling Products</h4>
+            <div class="card-header-action dropdown">
+                <a href="#" data-toggle="dropdown" class="btn btn-danger dropdown-toggle" id="selected-period">Month</a>
+                <ul class="dropdown-menu dropdown-menu-sm dropdown-menu-right" id="period-dropdown">
+                    <li class="dropdown-title">Select Period</li>
+                    <li><a href="#" class="dropdown-item select-period" data-period="today">Today</a></li>
+                    <li><a href="#" class="dropdown-item select-period" data-period="week">Week</a></li>
+                    <li><a href="#" class="dropdown-item select-period" data-period="month">Month</a></li>
+                    <li><a href="#" class="dropdown-item select-period" data-period="year">This Year</a></li>
+                </ul>
+            </div>
         </div>
-        <div class="card-body p-0">
-          <div class="table-responsive table-invoice">
-            <table class="table table-striped">
-              <tbody><tr>
-                <th>Invoice ID</th>
-                <th>Customer</th>
-                <th>Status</th>
-                <th>Due Date</th>
-                <th>Action</th>
-              </tr>
-              {% for order in top_oders %}
-              <tr>
-                
-                <td><a href="#"> {{order.payment.payment_id|slice:"-4:"}} </a></td>
-                <td class="font-weight-600"> {{order.full_name}} </td>
-                <td>
-                  {% if order.payment.status == 'SUCCESS' %}
-                  <div class="badge badge-success">Paid</div>
-                  {% else %}
-                  <div class="badge badge-warning">Unpaid</div>
-                  {% endif %}
-                </td>
-                <td> {{order.created_at}} </td>
-                <td>
-                  <a href="{% url 'order_update' order.id %}" class="btn btn-primary">Detail</a>
-                </td>
-              </tr>
-              {% endfor %}
-              
-            </tbody></table>
-          </div>
+        <div class="card-body" id="top-5-scroll" tabindex="2" style="height: 315px; overflow: hidden; outline: none;">
+            <ul class="list-unstyled list-unstyled-border">
+                {% for product in top_five_most_ordered_products_details %}
+                    <a href="{% url 'product_update' product.id %}">
+                        <li class="media">
+                            <img class="mr-3 rounded" width="55" src="{{product.images.url}}" alt="product">
+                            <div class="media-body">
+                                <div class="float-right">
+                                    <div class="font-weight-600 text-muted text-small">₹ {{product.price}}</div>
+                                </div>
+                                <div class="media-title">{{product.product_name}}</div>
+                            </div>
+                        </li>
+                    </a>
+                {% endfor %}
+            </ul>
         </div>
-      </div>
+        <div class="card-footer pt-3 d-flex justify-content-center"></div>
     </div>
+</div>
 
+    <!-- Best selling products end -->
+
+    <!-- Best selling Category -->
     <div class="col-lg-4">
       
       <div class="card gradient-bottom">
         <div class="card-header">
-          <h4>Update stocks</h4>
+          <h4>Best selling Category</h4>
           <div class="card-header-action dropdown">
             <a href="#" data-toggle="dropdown" class="btn btn-danger dropdown-toggle">Month</a>
             <ul class="dropdown-menu dropdown-menu-sm dropdown-menu-right">
               <li class="dropdown-title">Select Period</li>
               <li><a href="#" class="dropdown-item">Today</a></li>
               <li><a href="#" class="dropdown-item">Week</a></li>
-              <li><a href="#" class="dropdown-item active">Month</a></li>
+              <li><a href="#" class="dropdown-item">Month</a></li>
               <li><a href="#" class="dropdown-item">This Year</a></li>
             </ul>
+          </div>
+        </div>
+        <div class="card-body" id="top-5-scroll" tabindex="2" style="height: 315px; overflow: hidden; outline: none;">
+          <ul class="list-unstyled list-unstyled-border">
+            {% for cat in top_five_most_ordered_categories_details %}
+            
+            <li class="media">
+              <img class="mr-3 rounded" width="55" src="{{cat.cat_image.url}}" alt="product">
+              <div class="media-body">
+                <div class="float-right"><div class="font-weight-600 text-muted text-small">
+                  {{cat.total_quantity }}
+                  </div>
+                </div>
+                <a href="{% url 'category_update' cat.id %}">
+                <div class="media-title"> {{cat.cat_name }} </div>
+                </a>
+              </div>
+              
+            </li>
+          
+            {% endfor %}
+          </ul>
+        </div>
+        <div class="card-footer pt-3 d-flex justify-content-center">
+          
+        </div>
+      </div>
+      
+    </div>
+    <!-- Best selling Category end -->
+
+    <!-- Stock updations -->
+    <div class="col-lg-4">
+      
+      <div class="card gradient-bottom">
+        <div class="card-header">
+          <h4>Update stocks</h4>
+          <div class="card-header-action dropdown">
+            
           </div>
         </div>
         <div class="card-body" id="top-5-scroll" tabindex="2" style="height: 315px; overflow: hidden; outline: none;">
@@ -177,9 +214,52 @@
       </div>
       
     </div>
+    <!-- End Stock updations -->
+
     
   </div>
-
+  <div class="col-md-12">
+    <div class="card">
+      <div class="card-header">
+        <h4>Invoices</h4>
+        <div class="card-header-action">
+          <a href="{% url 'orders_list' %}" class="btn btn-danger">View More <i class="fas fa-chevron-right"></i></a>
+        </div>
+      </div>
+      <div class="card-body p-0">
+        <div class="table-responsive table-invoice">
+          <table class="table table-striped">
+            <tbody><tr>
+              <th>Invoice ID</th>
+              <th>Customer</th>
+              <th>Status</th>
+              <th>Due Date</th>
+              <th>Action</th>
+            </tr>
+            {% for order in top_oders %}
+            <tr>
+              
+              <td><a href="#"> {{order.payment.payment_id|slice:"-4:"}} </a></td>
+              <td class="font-weight-600"> {{order.full_name}} </td>
+              <td>
+                {% if order.payment.status == 'SUCCESS' %}
+                <div class="badge badge-success">Paid</div>
+                {% else %}
+                <div class="badge badge-warning">Unpaid</div>
+                {% endif %}
+              </td>
+              <td> {{order.created_at}} </td>
+              <td>
+                <a href="{% url 'order_update' order.id %}" class="btn btn-primary">Detail</a>
+              </td>
+            </tr>
+            {% endfor %}
+            
+          </tbody></table>
+        </div>
+      </div>
+    </div>
+  </div>
 
     
 {% endblock page_content %}
@@ -189,6 +269,29 @@
 
 
 {% block custom_js %}
-  
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Get all dropdown items
+        var dropdownItems = document.querySelectorAll('#period-dropdown .dropdown-item');
+        var selectedPeriod = document.querySelector('#selected-period');
+
+        // Add click event listener to each dropdown item
+        dropdownItems.forEach(function(item) {
+            item.addEventListener('click', function(event) {
+                // Remove 'active' class from all dropdown items
+                dropdownItems.forEach(function(item) {
+                    item.classList.remove('active');
+                });
+
+                // Add 'active' class to the clicked dropdown item
+                this.classList.add('active');
+
+                // Update the selected period text
+                selectedPeriod.textContent = this.textContent;
+            });
+        });
+    });
+</script>
+
 {% endblock custom_js %}
 

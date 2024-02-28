@@ -42,7 +42,7 @@ Update Discount Coupon
                         </div>
                     {% elif field.field.widget.input_type == 'checkbox' %}
                             <div class="form-check">
-                                <input type="{{field.field.widget.input_type}}" name="{{field.name}}" id="{{field.name}}" class="form-control" {% if field.value %}checked{% endif %}>
+                                <input type="{{field.field.widget.input_type}}" name="{{field.name}}" id="{{field.name}}" class="form-check-input" {% if field.value %}checked{% endif %}>
                                 <label class="form-check-label" for="{{ field.name }}" >
                                     {{ field.label }}
                                 </label>
@@ -50,7 +50,7 @@ Update Discount Coupon
                     {% else %}    
                     <div class="form-group">
                         <label> {{ field.label }} </label>
-                        <input type="{{field.field.widget.input_type}}" name="{{field.name}}" id="{{field.name}}" class="form-control">
+                        <input type="{{field.field.widget.input_type}}" name="{{field.name}}" id="{{field.name}}" class="form-control" value="{{ field.value }}">
                         {% if field.errors %}
                         <div class="alert alert-danger" style="margin: 10px; padding:0px">
                             {{field.errors}}
@@ -59,7 +59,7 @@ Update Discount Coupon
                     </div>
                     {% endif %}
                     {% endfor %}                
-                    <button class="btn btn-primary btn-block" type="submit">ADD COUPON</button>
+                    <button class="btn btn-primary btn-block" type="submit">UPDATE COUPON</button>
                 </form>
 
             </div>
@@ -79,12 +79,5 @@ Update Discount Coupon
         time_24hr: true, // Use 24-hour time format
         // Add any other options you need
     });
-    
-    document.getElementById("cat_name").onkeyup = function() {
-        document.getElementById('slug').value = document.getElementById("cat_name").value.toLowerCase().replace(" ", '_');
-    }
-
-    
 </script>
-
 {% endblock custom_js %}

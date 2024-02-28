@@ -68,7 +68,7 @@
                                 <h4><b>Payment Method</b></h4>
                             </div>
                             <div class="accordion-body collapse show" id="panel-body-1" data-parent="#accordion">
-                                <p> PayPal </p>
+                                <p> {{order.payment.payment_method}} </p>
                             </div>
                         </div>
                     </div>
@@ -110,13 +110,13 @@
                                                         {% endif %}
                                                         
                                                     </td>
-                                                    <td class="product-price"><span class="price">₹ {{ item.product.get_offer_price }} </span></td>
+                                                    <td class="product-price"><span class="price">₹ {{ item.product_price }} </span></td>
                                                     <td class="product-quantity">
                                                         <p>{{ item.quantity }}</p>
                                                         
                                                     </td>
                                                     <td class="total-price">
-                                                        <span class="price">₹ {{item.sub_total}} </span>
+                                                        <span class="price">₹ {{item.item_total}} </span>
                                                     </td>
 
                                                 </tr>
@@ -149,17 +149,17 @@
                     <div class="checkout-cart-total">
 
                         <h4>Product <span>Total</span></h4>
-                        {% for item in cart_items %}
+                        {% for item in order_products %}
                         <ul>
                             
-                            <li>{{item.product.product_name}}  X {% if item.quantity < 10 %}0{{ item.quantity }}{% else %}{{ item.quantity }}{% endif %} <span>₹ {{item.sub_total}} </span></li>
+                            <li>{{item.product.product_name}}  X {% if item.quantity < 10 %}0{{ item.quantity }}{% else %}{{ item.quantity }}{% endif %} <span>₹ {{item.item_total}} </span></li>
                             
                         </ul>
                         {% endfor %}
                         <p>Sub Total <span>₹ {{total}} </span></p>
                         <p>Shipping Fee <span>₹ {{shipping_fee}} </span></p>
                         <p>GST <span>₹ {{tax}} </span></p>
-                        {% if 'coupon' in request.session and discount_amount > 0 %}
+                        {% if order.coupon %}
                         <p>Referal/Coupon Discounts <span>₹ {{discount_amount}} </span></p>
                         {% endif %}
                         <h4>Grand Total <span>₹ {{grand_total}} </span></h4>
@@ -174,7 +174,7 @@
                     <div class="payment-icon mb-60 d-flex justify-content-center">
                         <img src="/static/assets/images/icons/pay.png" class="img-fluid" alt="">
                     </div>
-                    {% if payment_method = 'razorpay' %}
+                    {% if payment_method == 'razorpay' %}
                      <form action="{% url 'rozer_payments' %}" method="POST">
                         {% csrf_token %}
                         <div class="check-box d-flex justify-content-center">
@@ -183,6 +183,17 @@
                         </div>
                         <div class="d-flex justify-content-center">
                                     
+                            <button type="submit" id="pay-btn" name="submit" class="lezada-button lezada-button--medium mt-30 payWithRazor">Pay with Razorpay</button>
+                        </div>
+                     </form>
+                     {% elif payment_method == 'wallet' %}
+                     <form action="{% url 'payments' %}" method="POST">
+                        {% csrf_token %}
+                        <div class="check-box d-flex justify-content-center">
+                            <input type="checkbox" id="wallet" name="wallet" required>
+                            <label for="wallet">Confirm Pay using wallet </label>
+                        </div>
+                        <div class="d-flex justify-content-center">    
                             <button type="submit" id="pay-btn" name="submit" class="lezada-button lezada-button--medium mt-30 payWithRazor">Pay with Razorpay</button>
                         </div>
                      </form>
