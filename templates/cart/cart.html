@@ -13,6 +13,28 @@
     border-radius: 5px; /* Add border-radius for rounded corners */
     width: 50px; /* Adjust width as needed */
 }
+.collapsible {
+  background-color: #777;
+  color: white;
+  cursor: pointer;
+  padding: 18px;
+  width: 100%;
+  border: none;
+  text-align: left;
+  outline: none;
+  font-size: 15px;
+}
+
+.active, .collapsible:hover {
+  background-color: #555;
+}
+
+.content {
+  padding: 0 18px;
+  display: none;
+  overflow: hidden;
+  background-color: #f1f1f1;
+}
 
 </style>
 {% endblock css %}
@@ -51,16 +73,19 @@
 				
 				<div class="col-lg-12 mb-30">
 					<!--=======  cart table  =======-->
-						{% if not cart_items %}
-							<h2 class="text-center d-block">Your cart is empty</h2>	
-							<br style="display: none;">
-							
-							<div class="text-center d-block">
-								<a href="{% url 'store' %}" class="btn btn-warning">Continue Shoping!</a>
-							</div>
-
-						{% else %}
+				{% if not cart_items %}
+					<div class="cart-calculation-area m-5">
+						<h2 class="text-center d-block">Your cart is empty</h2>	
+						<br style="display: none;">
 						
+						<div class="text-center d-block">
+							<a href="{% url 'store' %}" class="btn btn-warning">Continue Shoping!</a>
+						</div>
+
+					</div>
+					
+				{% else %}
+				
 					<div class="cart-table-container">
 						
 						<table class="cart-table">
@@ -129,7 +154,7 @@
 
 										</td>
 										<td class="total-price">
-									    	<span class="price">₹ {{item.item_total}} </span>
+											<span class="price">₹ {{item.item_total}} </span>
 										</td>
 										
 										<td>
@@ -181,7 +206,7 @@
 								<div class="lezada-form coupon-form">
 									{% if 'coupon' not in request.session %}
 
-									<form action="{% url 'add_coupon' %}" method="POST">
+									<form action="{% url 'submit_coupon' %}" method="POST">
 										{% csrf_token %}
 										<div class="row">
 											{% if error_message %}
@@ -216,8 +241,8 @@
 					<!--=======  End of coupon area  =======-->
 				</div>
 				
-				
-				<div class="col-xl-5 offset-lg-7 col-lg-5 offset-lg-7">
+				<!-- Cart Check out -->
+				<div class="col-xl-5  offset-lg-1 col-lg-5 offset-lg-1">
 					<div class="cart-calculation-area">
 						<h2 class="mb-40">Cart totals</h2>
 
@@ -245,34 +270,150 @@
 								<td class="total" style="white-space: nowrap; overflow: hidden;">₹ {{grand_total|floatformat:"2"}} </td>
 							</tr>
 						</table>
-						{% if orders_exist %}
-						<div class="cart-calculation-button text-center">
+						
+						<!--<div class="cart-calculation-button text-center">
 					        <p class="text-danger">Please complete your unfinished orders before placing a new one.</p>
-						</div>
-						{% else %}
+						</div>-->
+						
 						<div class="cart-calculation-button text-center">
 							<button  class="lezada-button lezada-button--medium"><a href="{% url 'placeorder' %}">place order</a></button>
 						</div>
-						{% endif %}
+						
 					</div>
 				</div>
 				{% endif %}
+				{% if orders_exist %}
+				<!-- Pending orders -->
+				<div class="col-xl-5 offset-lg-1 col-lg-5 offset-lg-1">
+					<div class="cart-calculation-area">
+						<h2 class="mb-40">Pending Orders</h2>
+						{% for order in pending_orders %}
+						<button type="button" class="collapsible">Order Details-{{order.id}} </button>
+						<div class="content">
+							<p>{{order.first_name}} {{order.last_name}} </p>
+							<p>{{order.address_line_1}}</p>
+							<p>{{order.address_line_2}}</p>
+							<p>{{order.city}}, {{order.state}}, {{order.country}}</p>
+							
+							{% if order.pin_code %}
+							<p>PIN: {{order.pin_code}}</p>
+							{% endif %}
+							<p>Mail Id: {{order.email}}</p>
+							<p>Phone:{{order}} {{order.phone}}</p>
+							{% if order.order_note %}
+							<p>Order note: {{order.order_note}}</p>
+							{% endif %}
+							
+							<h4>Product <span>Total</span></h4>
+							{% for item in order_product %}
+							<ul>
+								
+								<li>{{item.product}}  X {% if item.quantity < 10 %}0{{ item.quantity }}{% else %}{{ item.quantity }}{% endif %} - <span>₹ {{item.item_total}} </span></li>
+								
+							</ul>
+							{% endfor %}
+							<p>Sub Total <span>₹ {{pending_total|floatformat:'2'}} </span></p>
+							<p>Shipping Fee <span>₹ {{order.shipping_fee|floatformat:'2'}} </span></p>
+							<p>GST <span>₹ {{order.tax|floatformat:'2'}} </span></p>
+							{% if order.coupon %}
+							<p>Referal/Coupon Discounts <span>₹ {{order.coupon.discount_amount|floatformat:'2'}} </span></p>
+							{% endif %}
+							<h4>Grand Total <span>₹ {{order.order_total|floatformat:'2'}} </span></h4>
+					
+							<div class="col-12 checkout-cart-total">
+						
+									
+								<div class="payment-icon mb-60 d-flex justify-content-center">
+									<img src="/static/assets/images/icons/pay.png" class="img-fluid" alt="">
+								</div>
+								{% if payment_method == 'razorpay' or payment_method == 'RazorPay' %}
+								<form action="{% url 'rozer_payments' order.id %}" method="POST">
+									{% csrf_token %}
+									<div class="check-box d-flex justify-content-center">
+										<input type="checkbox" id="cod" name="cod" required>
+										<label for="cod">Confirm Payment</label>
+									</div>
+									<div class="d-flex justify-content-center">
+												
+										<button type="submit" id="pay-btn" name="submit" class="lezada-button lezada-button--medium mt-30 payWithRazor">Pay with Razorpay</button>
+									</div>
+								</form>
+								{% elif payment_method == 'cash' %}
+									<form action="{% url 'payments' order.id %}" method="POST">
+										{% csrf_token %}
+										<div class="check-box">
+											<input type="checkbox" id="cod" name="payment-method" required>
+											<label for="cod">Confirm COD</label>
+										</div>
+										<div class="d-flex justify-content-center">
+											
+											<button type="submit" name="submit" class="lezada-button lezada-button--medium mt-30 ">Confirm Checkout</button>
+										</div>
+									</form>
+								{% else %}
+									<form action="{% url 'wallet_payments' order.id %}" method="POST">
+										{% csrf_token %}
+										<div class="check-box">
+											<input type="checkbox" id="wallet" name="wallet" required>
+											<label for="cod">Confirm Payment using wallet money</label>
+										</div>
+										<div class="d-flex justify-content-center">
+											
+											<button type="submit" name="submit" class="lezada-button lezada-button--medium mt-30 ">Confirm Checkout</button>
+										</div>
+									</form>
+								{% endif %}
+								
 				
-				
+
+								<div class="container">
+									<form method="post" action="{% url 'cancel_order' order.id %}">
+									{% csrf_token %}
+									<div class="row justify-content-center">
+										<div class="col-12">
+											<button type="submit" name="submit" class="lezada-button lezada-button--medium mt-30 btn btn-primary btn-block" onclick="return confirm('Are you sure to cancel the order?')">Cancel Order</button>
+										</div>
+									</div>
+									</form>
+								</div>
+													
+							</div>
+
+						</div>
+						{% endfor %}
+					
+					</div>
+					
+				</div>
+				<!-- end Pending orders -->
+				{% endif %}
 			</div>
 		</div>
 	</div>
 	
-	{% if orders_exist %}
-	
-	 {% include 'cart/pending_order.html' %}
-	{% endif %}
 	<!--=====  End of cart page content  ======-->
 	
 
 {% endblock %}
 
 {% block js %}
+<script>
+var coll = document.getElementsByClassName("collapsible");
+var i;
+
+for (i = 0; i < coll.length; i++) {
+  coll[i].addEventListener("click", function() {
+    this.classList.toggle("active");
+    var content = this.nextElementSibling;
+    if (content.style.display === "block") {
+      content.style.display = "none";
+    } else {
+      content.style.display = "block";
+    }
+  });
+}
+</script>
+
 
 <!--<script>
     $(document).ready(function() {

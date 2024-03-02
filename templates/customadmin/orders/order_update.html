@@ -24,17 +24,8 @@ Update Order
                     {% csrf_token %}
                     {% for field in form %}
                         
-                        {% if field.field.widget.input_type == 'file' %}
-                            <div class="form-group">
-                                <label for="">Current {{ field.label }} </label><br>
-                                <div class="custom-file">
-                                    <input type="{{ field.field.widget.input_type }}" name="{{ field.name }}" id="{{ field.id_for_label }}" class="custom-file-input">
-                                    <label class="custom-file-label" for="{{ field.id_for_label }}">Choose file</label>
-                                </div>
-                                <img  src="/media/{{ field.value }}" style="height: 200px;" alt="No profile_pic pleas add one">
-                            </div>
                         
-                        {% elif field.field.widget.input_type == 'checkbox' %}
+                        {% if field.field.widget.input_type == 'checkbox' %}
                             <div class="form-check">
                                 <input type="{{field.field.widget.input_type}}" name="{{field.name}}" id="{{field.name}}" class="form-control" {% if field.value %}checked{% endif %}>
                                 <label class="form-check-label" for="{{ field.name }}" >
@@ -50,7 +41,14 @@ Update Order
                                     {% endfor %}
                                 </select>
                             </div>
-                        
+                        {% elif field.name == 'coupon' %}
+                            {% if field.value != None %}
+                                <div class="form-group">
+                                    <label>{{ field.label }}</label>
+                                    <input type="text" name="{{ field.name }}" id="{{ field.name }}" class="form-control" value="{{ field.value }}">
+                                </div>
+                            {% endif %}
+
                         
                         {% else %}
                             <div class="form-group">
@@ -66,7 +64,7 @@ Update Order
                     {% endfor %}                
                     
 
-                    <button class="btn btn-primary btn-block" type="submit">UPDATE PRODUCT </button>
+                    <button class="btn btn-primary btn-block" type="submit">UPDATE ORDER </button>
                 </form>
 
             </div>

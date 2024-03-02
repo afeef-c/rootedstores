@@ -7,8 +7,12 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
-    path('dj-admin/', admin.site.urls),
-    path('admin/', include('customadmin.urls')),
+
+    # honey pot adminpannet not real
+    path('admin/', include('admin_honeypot.urls')),
+
+    path('rooted_dj_admin/', admin.site.urls),
+    path('rooted_admin/', include('customadmin.urls')),
     path('',views.home, name='home'),
     path('blocked/', views.blocked_page, name='blocked_page'),
     path('store/', include('store.urls')),

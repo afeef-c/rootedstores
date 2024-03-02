@@ -1,3 +1,12 @@
+
+{% extends 'partials/base.html' %}
+{% load static %}
+
+{% block css %}
+{% endblock css %}
+
+{% block content %}
+
 <div class="container border border-dark">
     <h2 class="title text-center m-5">Complete your pending order</h2>
     <div class="row">
@@ -16,7 +25,7 @@
                             <div class="accordion-body collapse show" id="panel-body-1" data-parent="#accordion">
                                 <p>{{order.first_name}} {{order.last_name}} </p>
                                 <p>{{order.address_line_1}}</p>
-                                <p>{{order.address_line_1}}</p>
+                                <p>{{order.address_line_2}}</p>
                                 <p>{{order.city}}</p>
                                 <p>{{order.state}}</p>
                                 <p>{{order.country}}</p>
@@ -205,4 +214,7 @@
 
     </div>
 </div>
-	
+
+{% endblock content %}
+
+

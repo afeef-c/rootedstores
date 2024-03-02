@@ -125,6 +125,25 @@ def place_order(request, total=0, quantity=0):
                     address.state = form.cleaned_data['state']
                     address.city = form.cleaned_data['city']
                     address.save()
+        
+                order_number  = order.user.last_name[:3] + str(random.randint(11111, 99999))+order.user.first_name[:2]
+            
+                while Order.objects.filter(order_number=order_number).exists():
+                    order_number = order.user.last_name[:3] + str(random.randint(11111, 99999))+order.user.first_name[:2]
+
+                order.order_number = order_number
+                order.status = 'Pending'
+                
+                if 'coupon' in request.session:
+                    order.coupon = coupon_instance
+                else:
+                    order.coupon = None
+            
+                order.save()
+
+                request.session['order_id'] = order.id
+
+
         else:
             try:
                 address = AddressBook.objects.get(id=selected_address)
@@ -150,27 +169,27 @@ def place_order(request, total=0, quantity=0):
                 )
         
         
-        order_number  = order.user.last_name[:3] + str(random.randint(11111, 99999))+order.user.first_name[:2]
+            order_number  = order.user.last_name[:3] + str(random.randint(11111, 99999))+order.user.first_name[:2]
         
-        while Order.objects.filter(order_number=order_number).exists():
-            order_number = order.user.last_name[:3] + str(random.randint(11111, 99999))+order.user.first_name[:2]
+            while Order.objects.filter(order_number=order_number).exists():
+                order_number = order.user.last_name[:3] + str(random.randint(11111, 99999))+order.user.first_name[:2]
 
-        order.order_number = order_number
-        order.status = 'Pending'
+            order.order_number = order_number
+            order.status = 'Pending'
+            
+            if 'coupon' in request.session:
+                order.coupon = coupon_instance
+            else:
+                order.coupon = None
         
-        if 'coupon' in request.session:
-            order.coupon = coupon_instance
-        else:
-            order.coupon = None
-        order.save()
+            order.save()
+
+            request.session['order_id'] = order.id
+
         
         if 'coupon' in request.session:
             del request.session['coupon']
 
-
-        
-
-        request.session['order_id'] = order.id
 
             
 
@@ -209,7 +228,13 @@ def place_order(request, total=0, quantity=0):
             item.item_total = (float(item.product_price) * item.quantity)
             quantity += item.quantity
 
-        
+        if 'coupon' in request.session:
+            del request.session['coupon']
+        if 'order_id' in request.session:
+            del request.session['order_id']
+        if 'order_note' in request.session:
+                    del request.session['order_note']
+
         context = {
             'order_products':order_products,
             'total': total,
@@ -226,21 +251,19 @@ def place_order(request, total=0, quantity=0):
         return render(request, 'orders/payments.html', context)
                     
     else:
-        try:
-            address = AddressBook.objects.get(id=selected_address)
-        except AddressBook.DoesNotExist:
+        #try:
+        #    address = AddressBook.objects.get(id=selected_address)
+        #except AddressBook.DoesNotExist:
             return redirect('place_order')
 
         
         
 
 @csrf_exempt
-def payments(request):
+def payments(request,order_id):
     
-    order_id= request.session.get('order_id')
     order = Order.objects.get(pk=order_id)
     payment = order.payment
-    print(order_id, order,payment)
     if request.method == "POST":
         
         payment_id = order.user.first_name + str(random.randint(111111, 999999))
@@ -290,9 +313,8 @@ def payments(request):
 
 
 @csrf_exempt
-def wallet_payments(request):
+def wallet_payments(request,order_id):
     
-    order_id= request.session.get('order_id')
     order = Order.objects.get(pk=order_id)
     payment = order.payment
     
@@ -361,9 +383,8 @@ def initiate_payment(amount, currency='INR'):
    return response['id']
 
 @login_required
-def rozer_payments(request):
+def rozer_payments(request,order_id):
 
-    order_id= request.session.get('order_id')
     order = Order.objects.get(pk=order_id)
     payment = order.payment
 
@@ -389,9 +410,8 @@ def rozer_payments(request):
 
 
 @csrf_exempt
-def callback(request):
+def callback(request,order_id):
 
-    order_id= request.session.get('order_id')
     order = Order.objects.get(pk=order_id)
     payment = order.payment
 

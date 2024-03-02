@@ -1,6 +1,6 @@
 from django import forms
 from django.forms import inlineformset_factory
-from orders.models import Coupon
+from orders.models import Coupon, Order
 
 from store.models import Offer, Product
 from store.models import ProductImages
@@ -40,3 +40,4 @@ class CouponForm(forms.ModelForm):
             'valid_from': forms.DateInput(attrs={'type': 'date'}),
             'valid_until': forms.DateInput(attrs={'type': 'date'}),
         }
+

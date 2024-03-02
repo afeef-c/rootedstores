@@ -49,7 +49,7 @@
 				<!--=======  contact widget  =======-->
 
 				<div class="contact-widget">
-					<p class="email"><a href="mailto:contact@lezada.com">contact@lezada.com</a></p>
+					<p class="email"><a href="mailto:afeefc8281@gmail.com">afeefc8281@gmail.com</a></p>
 					<p class="phone">(+00) 123 567990</p>
 
 					<div class="social-icons">
@@ -129,6 +129,7 @@
 
 						<!--=======  End of single cart product  =======-->
 						{% endfor %}
+						
 					</div>
 
 					<!--=======  cart buttons  =======-->
@@ -172,9 +173,9 @@
 					
 					<div class="text-center d-block">
 						<a href="{% url 'store' %}" class="btn btn-warning">Continue Shoping!</a>
-						<div class="cart-buttons">
+						<div class="cart-buttons m-5">
 						<a class="btn btn-dark align-middle" href="{% url 'cart' %}">view cart</a>
-					</div>
+						</div>
 					</div>
 					
 				{% else %}
@@ -225,15 +226,7 @@
 						<a href="{% url 'cart' %}">view cart</a>
 						
 					</div>
-						{% if orders_exist %}
-						<div class="cart-calculation-button text-center m-5">
-					        <p class="text-danger">Please complete your unfinished orders before placing a new one.</p>
-						</div>
-						{% else %}
-						<div class="cart-calculation-button text-center m-2">
-							<button  class="lezada-button lezada-button--medium"><a href="{% url 'placeorder' %}">place order</a></button>
-						</div>
-						{% endif %}
+						
 					<!--=======  End of cart buttons  =======-->
 
 					<!--=======  free shipping text  =======-->
@@ -246,7 +239,15 @@
 				</div>
 				{% endif %}
 			</div>
-
+			{% if orders_exist %}
+			<div class="cart-calculation-button text-center m-5">
+				<p class="text-danger">Please Check/complete your unfinished orders.</p>
+			</div>
+			{% else %}
+			<div class="cart-calculation-button text-center m-2">
+				<button  class="lezada-button lezada-button--medium"><a href="{% url 'placeorder' %}">place order</a></button>
+			</div>
+			{% endif %}
 			<!--=======  End of offcanvas cart content container   =======-->
 		</div>
 	</div>

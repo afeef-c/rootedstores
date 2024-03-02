@@ -6,10 +6,10 @@ urlpatterns = [
     
     path('place_order/', views.place_order, name='place_order'),
     
-    path('wallet_payments/', views.wallet_payments, name='wallet_payments'),
-    path('payments/', views.payments, name='payments'),
-    path('rozer_payments', views.rozer_payments, name='rozer_payments'),
-    path("callback/", views.callback, name="callback"),
+    path('wallet_payments/<slug:order_id>', views.wallet_payments, name='wallet_payments'),
+    path('payments/<slug:order_id>', views.payments, name='payments'),
+    path('rozer_payments/<slug:order_id>', views.rozer_payments, name='rozer_payments'),
+    path("callback/<slug:order_id>", views.callback, name="callback"),
     #path('proceed_to_pay/', views.razorpaycheck ),
 
     path('order_complete',views.order_complete, name='order_complete'),

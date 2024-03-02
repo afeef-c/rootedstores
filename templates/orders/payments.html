@@ -53,7 +53,7 @@
                                 <p>PIN: {{order.pin_code}}</p>
                                 {% endif %}
                                 <p>Mail Id: {{order.email}}</p>
-                                <p>Phone:{{order}} {{order.phone}}</p>
+                                <p>Phone:{{order.phone}}</p>
                                 {% if order.order_note %}
                                 <p>Order note: {{order.order_note}}</p>
                                 {% endif %}
@@ -175,7 +175,7 @@
                         <img src="/static/assets/images/icons/pay.png" class="img-fluid" alt="">
                     </div>
                     {% if payment_method == 'razorpay' %}
-                     <form action="{% url 'rozer_payments' %}" method="POST">
+                     <form action="{% url 'rozer_payments' order.id %}" method="POST">
                         {% csrf_token %}
                         <div class="check-box d-flex justify-content-center">
                             <input type="checkbox" id="cod" name="payment_method" required>
@@ -187,7 +187,7 @@
                         </div>
                      </form>
                      {% elif payment_method == 'wallet' %}
-                     <form action="{% url 'wallet_payments' %}" method="POST">
+                     <form action="{% url 'wallet_payments' order.id %}" method="POST">
                         {% csrf_token %}
                         <div class="check-box d-flex justify-content-center">
                             <input type="checkbox" id="wallet" name="payment_method" required>
@@ -199,7 +199,7 @@
                      </form>
                     
                     {% else %}
-                        <form action="{% url 'payments' %}" method="POST">
+                        <form action="{% url 'payments' order.id %}" method="POST">
                             {% csrf_token %}
                             <div class="check-box">
                                 <input type="checkbox" id="cod" name="payment_method" required>

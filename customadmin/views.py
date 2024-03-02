@@ -28,7 +28,7 @@ from bs4 import BeautifulSoup
 
 def admin_login(request):
      try:
-        if request.user.is_authenticated:
+        if request.user.is_authenticated and request.user.is_superadmin:
             messages.success(request, 'The admin logout successfully')
             return redirect('admin_home')
         
@@ -45,7 +45,7 @@ def admin_login(request):
             
             user = authenticate(request, email=user_obj.email, password=password)
             
-            if user and user.is_superadmin:
+            if user and user.is_admin:
                 login(request, user)
                 messages.success(request, 'The admin loged in successfully')
                 return redirect('admin_home')

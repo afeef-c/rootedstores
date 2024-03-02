@@ -168,7 +168,7 @@ class Offer(models.Model):
     def save(self, *args, **kwargs):
         # Ensure discount_percentage is within certain limits
         max_discount_percentage = 85  # Example: Maximum allowed discount percentage
-        min_discount_percentage = 0   # Example: Minimum allowed discount percentage
+        min_discount_percentage = 1   # Example: Minimum allowed discount percentage
         if self.discount_percentage > max_discount_percentage:
             self.discount_percentage = max_discount_percentage
         elif self.discount_percentage < min_discount_percentage:

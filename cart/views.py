@@ -183,17 +183,17 @@ def cart(request, total=0, quantity=0, cart_item=None,pending_total=0):
 
         orders_exist = Order.objects.filter(user=request.user, status='Pending').exists()
         if orders_exist:
-            order = Order.objects.get(user=request.user, status='Pending')
-            payment_method = order.payment.payment_method
-
-            order_products = OrderProduct.objects.filter(order=order, ordered=False)
-            for pending_item in order_products:
-                pending_item.item_total = (float(pending_item.product_price) * pending_item.quantity)
-                pending_total += pending_item.item_total
-                quantity += pending_item.quantity
+            pending_orders = Order.objects.filter(user=request.user, status='Pending')
+            for order in pending_orders:
+                payment_method = order.payment.payment_method
+                order_products = OrderProduct.objects.filter(order=order, ordered=False)
+                for pending_item in order_products:
+                    pending_item.item_total = (float(pending_item.product_price) * pending_item.quantity)
+                    pending_total += pending_item.item_total
+                    quantity += pending_item.quantity
 
         else:
-            order=None
+            pending_orders=None
             payment_method=None
     except ObjectDoesNotExist:
         cart_items =[]
@@ -213,7 +213,7 @@ def cart(request, total=0, quantity=0, cart_item=None,pending_total=0):
         'discount_amount':discount_amount,
         'coupon':coupon,
         'orders_exist': orders_exist,
-        'order':order,
+        'pending_orders':pending_orders,
         'pending_total':pending_total,
         'payment_method':payment_method,
         'coupons':coupons 
@@ -293,8 +293,9 @@ def placeorder(request,total=0, quantity=0, cart_item=None):
     return render(request, 'orders/placeorder.html', context)
 
 
-def add_coupon(request):
+def submit_coupon(request):
     if request.method == "POST":
+        print("Hi++++++++++++++++++++++++++++++++============================")
         form = CouponForm(request.POST)
         if form.is_valid():
             code = form.cleaned_data['code']
@@ -311,7 +312,7 @@ def add_coupon(request):
                     coupon = Coupon.objects.get(pk=coupon_id)
                     coupon_discount = coupon.discount_amount
 
-
+                print(coupon)
                 context = {
                     'coupon_discount':coupon_discount
                 }

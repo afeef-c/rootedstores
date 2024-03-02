@@ -76,7 +76,7 @@
         description: "Test Transaction",
         image: "{% static 'images/root_logo.png' %}",
         order_id: "{{ rozer_order_id }}",
-        callback_url: "{% url 'callback' %}",
+        callback_url: "{% url 'callback' order.id %}",
         redirect: false,
         prefill: {
             "name": "Afeef",

@@ -23,12 +23,14 @@ from django.db.models import F
 
 
 
-
 #============================Home =======================================================================
 
 
 @login_required(login_url='admin_login')
 def admin_home(request):
+    if not request.user.is_admin:
+        return redirect('admin_login')  # Redirect to the user dashboard if not a super admin
+
 
     orders_count = Order.objects.all().count()
     completed_orders = Order.objects.filter(status='Completed')
@@ -393,37 +395,35 @@ class OrderUpdate(SuccessMessageMixin, UpdateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         order = self.get_object()
-        # Assuming there can be multiple orders associated with a payment
         orders_emails = order.email 
         context['orders_emails'] = orders_emails
         return context
 
-    
-    
     def form_valid(self, form):
         # Call the parent class's form_valid method
         response = super().form_valid(form)
 
         # Check if there's an update in order status
         if form.has_changed() and 'status' in form.changed_data:
-            # Get the updated payment object
+            # Get the updated order object
             order = self.object
+            # Get the customer email from the order
             customer_email = order.email
             # Compose the email message
             subject = 'Order Status Update'
             message = f'Your Order status has been updated to: {order.status}'
             sender_email = settings.DEFAULT_FROM_EMAIL
-            recipient_list = [order.email]
+            recipient_list = [customer_email]
             # Send the email
             send_mail(subject, message, sender_email, recipient_list)
 
         return response
     
-
     def get_success_message(self, cleaned_data):
-        order_number = cleaned_data.get('order_number')  # Assuming 'order_number' is a field of the form
-        name = cleaned_data.get('full_name')  # Assuming 'name' is a field of the form
+        order_number = cleaned_data.get('order_number', '')  # Assuming 'order_number' is a field of the form
+        name = cleaned_data.get('full_name', '')  # Assuming 'full_name' is a field of the form
         return f"Order: {name}-{order_number} updated successfully."
+    
 
 
 #============================================ Paymment =======================================================================
@@ -523,6 +523,8 @@ class CategoryOfferCreateView(SuccessMessageMixin, CreateView):
     fields = "__all__"
     template_name = "customadmin/offersandcoupons/add_category_offers.html"
     success_url = reverse_lazy('category_offers') 
+    
+
 
     def form_valid(self, form):
         start_date = form.cleaned_data.get('start_date')

@@ -209,19 +209,22 @@ def dashboard(request):
     if orders_count == 0:
         orders = None
 
+    try:
+        wallet = Wallet.objects.get(user=request.user)
+        transaction = Transaction.objects.filter(wallet=wallet)
+        
+        
+    except Wallet.DoesNotExist:
+        wallet = None
+        transaction = None
+        wallet_message = "Wallet not yet activated"
+
+    address = AddressBook.objects.filter(user_id=request.user.id)
+
     if UserProfile.objects.filter(user=request.user).exists():
-        address = AddressBook.objects.filter(user_id=request.user.id)
+        
         userprofile = get_object_or_404(UserProfile, user=request.user)
         
-        try:
-            wallet = Wallet.objects.get(user=request.user)
-            transaction = Transaction.objects.filter(wallet=wallet)
-            
-            
-        except Wallet.DoesNotExist:
-            wallet = None
-            transaction = None
-            wallet_message = "Wallet not yet activated"
 
         user_form = UserForm(instance=request.user)
         profile_form = UserProfileForm(instance=userprofile)
@@ -247,9 +250,12 @@ def dashboard(request):
             'profile_form': profile_form,
             'orders':orders,
             'orders_count':orders_count,
+            'address': address,
+            'wallet':wallet,
+            'wallet_message': wallet_message if wallet is None else None,
+            'transaction':transaction
         }
         return render(request, 'accounts/dashboard.html', context)
-
 # =========================================================End dashboard =======================================
 
 
@@ -625,44 +631,44 @@ def remove_from_wishlist(request, item_id):
 # =================================Start Wallet===================================================================================================
 
 
-#def handle_refund(request):
-#    if request.method == 'POST':
-#        # Assuming you receive data about payment status change in the request
-#        payment_id = request.POST.get('payment_id')
-#        new_status = request.POST.get('new_status')
+def handle_refund(request):
+    if request.method == 'POST':
+        # Assuming you receive data about payment status change in the request
+        payment_id = request.POST.get('payment_id')
+        new_status = request.POST.get('new_status')
 
-#        # Check if the payment status has changed to "Refund"
-#        if new_status == 'Refund':
-#            try:
-#                payment = Payment.objects.get(pk=payment_id)
-#                user = payment.user
-#                amount_refunded = payment.amount_paid
+        # Check if the payment status has changed to "Refund"
+        if new_status == 'Refund':
+            try:
+                payment = Payment.objects.get(pk=payment_id)
+                user = payment.user
+                amount_refunded = payment.amount_paid
 
-#                # Retrieve or create the user's wallet
-#                wallet, created = Wallet.objects.get_or_create(user=user)
+                # Retrieve or create the user's wallet
+                wallet, created = Wallet.objects.get_or_create(user=user)
 
-#                # Update wallet balance by adding the refunded amount
-#                wallet.balance += amount_refunded
-#                wallet.save()
-#                #transaction.save()
+                # Update wallet balance by adding the refunded amount
+                wallet.balance += amount_refunded
+                wallet.save()
+                #transaction.save()
 
 
-#                # Create a transaction record for the refund
-#                transaction = Transaction.objects.create(
-#                    wallet=wallet,
-#                    amount=amount_refunded,
-#                    type='credit'  # Assuming 'credit' means money is added to the wallet
-#                )
+                # Create a transaction record for the refund
+                transaction = Transaction.objects.create(
+                    wallet=wallet,
+                    amount=amount_refunded,
+                    type='credit'  # Assuming 'credit' means money is added to the wallet
+                )
                                 
 
 
-#                return HttpResponse("Refund processed successfully")
-#            except Payment.DoesNotExist:
-#                return HttpResponse("Payment does not exist")
-#            except Exception as e:
-#                return HttpResponse(f"Error processing refund: {str(e)}")
+                return HttpResponse("Refund processed successfully")
+            except Payment.DoesNotExist:
+                return HttpResponse("Payment does not exist")
+            except Exception as e:
+                return HttpResponse(f"Error processing refund: {str(e)}")
 
-#    return HttpResponse("Invalid request")
+    return HttpResponse("Invalid request")
 
 # =================================End Wallet===================================================================================================
 
