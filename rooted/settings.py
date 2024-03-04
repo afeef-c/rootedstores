@@ -48,7 +48,8 @@ INSTALLED_APPS = [
     'orders',
     
     'customadmin',
-    'admin_honeypot'
+    'admin_honeypot',
+    
     
 
 ]
@@ -211,3 +212,17 @@ RAZOR_KEY_SECRET = config('RAZOR_KEY_SECRET')
 SECURE_CROSS_ORIGIN_OPENER_POLICY = "same-origin-allow-popups"
 
 CORS_ORIGIN_ALLOW_ALL = True  
+
+
+
+AWS_ACCESS_KEY_ID = 'AKIAQ3EGTSLPSGMOV433'
+AWS_SECRET_ACCESS_KEY = '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'
+AWS_STORAGE_BUCKET_NAME = 'rootedplants'
+AWS_S3_SIGNATURE_NAME = 's3v4',
+AWS_S3_REGION_NAME = 'ap-south-1'
+AWS_S3_FILE_OVERWRITE = False
+AWS_DEFAULT_ACL =  None
+AWS_S3_VERITY = True
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+
+
