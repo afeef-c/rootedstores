@@ -9,13 +9,10 @@ https://docs.djangoproject.com/en/5.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
-from dotenv import load_dotenv
+
 import os
 from pathlib import Path
 from decouple import config
-
-load_dotenv()
-
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -26,9 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-#SECRET_KEY = config('SECRET_KEY')
-SECRET_KEY = os.environ.get('SECRET_KEY')
-
+SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config('DEBUG', default=True, cast=bool)
@@ -53,8 +48,7 @@ INSTALLED_APPS = [
     'orders',
     
     'customadmin',
-    'admin_honeypot',
-    
+    'admin_honeypot'
     
 
 ]
@@ -108,21 +102,28 @@ AUTH_USER_MODEL = 'accounts.Account'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
-
-
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('DATABASE_NAME'),
-        'USER': os.environ.get('DATABASE_USER'),
-        'PASSWORD': os.environ.get('DATABASE_PASS'),
-        'HOST': os.environ.get('DATABASE_HOST'),
-        'PORT': os.environ.get('DATABASE_PORT'),
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+        
     }
 }
 
+#DATABASES = {
+#    'default': {
+#        'ENGINE': 'django.db.backends.postgresql',
+#        'NAME': 'rootedplants',
+#        'USER': 'afeefc123',
+#        'PASSWORD': 'ummerc123!',
+#        'HOST': 'rootedplants.cfs8kyc4kwl3.eu-north-1.rds.amazonaws.com',
+#        'PORT': '5432',
+#    }
+#}
 
 
+# Password validation
+# https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -179,17 +180,24 @@ MESSAGE_TAGS = {
 MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 
 
+#ACCOUNT_SID='AC0722d83bf85ed2310a99c6a179b132b1'
+#AUTH_TOKEN='ae919a604c2e32f27f139e368656e671'
+#COUNTRY_CODE='+91'
+#TWILIO_WHATSAPP_NUMBER='whatsapp:+14155238886.'
+#TWILIO_PHONE_NUMBER='+15182914114'
+
+
 # SMTP Email settings
 
+EMAIL_BACKEND = config('EMAIL_BACKEND')
+EMAIL_HOST = config('EMAIL_HOST')
+EMAIL_PORT = config('EMAIL_PORT', cast=int)
+EMAIL_USE_TLS = config('EMAIL_USE_TLS', cast=bool)
+EMAIL_HOST_USER = config('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
+EMAIL_USE_SSL = config('EMAIL_USE_SSL', cast=bool)
 
 
-EMAIL_BACKEND = os.environ.get('EMAIL_BACKEND')
-EMAIL_HOST = os.environ.get('EMAIL_HOST')
-EMAIL_PORT = os.environ.get('EMAIL_PORT', default=False)  # Assuming a default value of 0 if not set
-EMAIL_USE_TLS = os.environ.get('EMAIL_USE_TLS', default=False)  # Assuming a default value of 0 if not set
-EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
-EMAIL_USE_SSL = os.environ.get('EMAIL_USE_SSL', default=False)  # Assuming a default value of 0 if not set
 
 #PAYPAL_RECEIVER_EMAIL = 'rootedstores@gmail.com'
 #PAYPAL_TEST = True
@@ -201,16 +209,3 @@ RAZOR_KEY_SECRET = config('RAZOR_KEY_SECRET')
 SECURE_CROSS_ORIGIN_OPENER_POLICY = "same-origin-allow-popups"
 
 CORS_ORIGIN_ALLOW_ALL = True  
-
-
-
-
-
-AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
-AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
-AWS_STORAGE_BUCKET_NAME = os.environ.get('AWS_STORAGE_BUCKET_NAME')
-AWS_S3_SIGNATURE_NAME = os.environ.get('AWS_S3_SIGNATURE_NAME')
-AWS_S3_REGION_NAME = os.environ.get('AWS_S3_REGION_NAME')
-AWS_S3_FILE_OVERWRITE = os.environ.get('AWS_S3_FILE_OVERWRITE', default=False)
-AWS_DEFAULT_ACL = os.environ.get('AWS_DEFAULT_ACL', default=None)
-AWS_S3_VERIFY = os.environ.get('AWS_S3_VERIFY', default=True)
