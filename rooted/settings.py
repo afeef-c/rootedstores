@@ -103,30 +103,29 @@ AUTH_USER_MODEL = 'accounts.Account'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+        
+    }
+}
+
+
+
 #DATABASES = {
 #    'default': {
-#        'ENGINE': 'django.db.backends.sqlite3',
-#        'NAME': BASE_DIR / 'db.sqlite3',
-        
+#        'ENGINE': 'django.db.backends.postgresql',
+#        'NAME': os.environ.get('DATABASE_NAME'),
+#        'USER': os.environ.get('DATABASE_USER'),
+#        'PASSWORD': os.environ.get('DATABASE_PASS'),
+#        'HOST': os.environ.get('DATABASE_HOST'),
+#        'PORT': os.environ.get('DATABASE_PORT'),
 #    }
 #}
 
 
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'rootedplants',
-        'USER': 'afeefc123',
-        'PASSWORD': 'ummerc123!',
-        'HOST': 'rootedplants.cfs8kyc4kwl3.eu-north-1.rds.amazonaws.com',
-        'PORT': '5432',
-    }
-}
-
-
-# Password validation
-# https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -183,13 +182,6 @@ MESSAGE_TAGS = {
 MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 
 
-#ACCOUNT_SID='AC0722d83bf85ed2310a99c6a179b132b1'
-#AUTH_TOKEN='ae919a604c2e32f27f139e368656e671'
-#COUNTRY_CODE='+91'
-#TWILIO_WHATSAPP_NUMBER='whatsapp:+14155238886.'
-#TWILIO_PHONE_NUMBER='+15182914114'
-
-
 # SMTP Email settings
 
 EMAIL_BACKEND = config('EMAIL_BACKEND')
@@ -215,14 +207,13 @@ CORS_ORIGIN_ALLOW_ALL = True
 
 
 
-AWS_ACCESS_KEY_ID = 'AKIAQ3EGTSLPSGMOV433'
-AWS_SECRET_ACCESS_KEY = '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'
-AWS_STORAGE_BUCKET_NAME = 'rootedplants'
-AWS_S3_SIGNATURE_NAME = 's3v4',
-AWS_S3_REGION_NAME = 'ap-south-1'
-AWS_S3_FILE_OVERWRITE = False
-AWS_DEFAULT_ACL =  None
-AWS_S3_VERITY = True
-DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
 
 
+AWS_ACCESS_KEY_ID = os.environ.get('AWS_ACCESS_KEY_ID')
+AWS_SECRET_ACCESS_KEY = os.environ.get('AWS_SECRET_ACCESS_KEY')
+AWS_STORAGE_BUCKET_NAME = os.environ.get('AWS_STORAGE_BUCKET_NAME')
+AWS_S3_SIGNATURE_NAME = os.environ.get('AWS_S3_SIGNATURE_NAME')
+AWS_S3_REGION_NAME = os.environ.get('AWS_S3_REGION_NAME')
+AWS_S3_FILE_OVERWRITE = os.environ.get('AWS_S3_FILE_OVERWRITE', default=False)
+AWS_DEFAULT_ACL = os.environ.get('AWS_DEFAULT_ACL', default=None)
+AWS_S3_VERIFY = os.environ.get('AWS_S3_VERIFY', default=True)
